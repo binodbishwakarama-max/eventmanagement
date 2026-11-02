@@ -1,0 +1,52 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Build artifacts
+dist
+dist-ssr
+**/dist
+build
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.local
+
+# Database dumps, backups & user data
+backups/
+**/backups/**
+*.dump
+*.bson
+
+# Local uploaded files
+uploads/
+**/uploads/**
+
+# System, IDE & Tool Artifacts
+.system_generated/
+.gemini/
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing & Coverage
+coverage/

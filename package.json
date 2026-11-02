@@ -1,0 +1,26 @@
+{
+  "name": "dsu-campus-events",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Independent campus event-management demo using DSU as context",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "test": "npm run test -w server",
+    "test:concurrency": "npm run test:concurrency -w server",
+    "test:load": "npm run test:load -w server",
+    "test:uat": "npm run test:uat -w server",
+    "seed": "npm run seed -w server",
+    "provision-admin": "npm run provision-admin -w server",
+    "seed:pilot": "npm run seed:pilot -w server",
+    "backup": "npm run backup -w server",
+    "restore": "npm run restore -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

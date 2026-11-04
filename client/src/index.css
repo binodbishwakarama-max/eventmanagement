@@ -67,3 +67,48 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #9CA3AF;
 }
+
+/* Institutional Clean Print Layout */
+@media print {
+  header,
+  footer,
+  .animate-ticker,
+  button,
+  .dsu-overlay {
+    background: transparent !important;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  .dsu-pass-voucher {
+    position: static !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: 2px solid #002B55 !important;
+    page-break-inside: avoid;
+  }
+
+  header,
+  footer,
+  nav,
+  button,
+  a {
+    display: none !important;
+  }
+
+  .dsu-pass-voucher,
+  .dsu-pass-voucher * {
+    display: block !important;
+  }
+
+  .dsu-pass-voucher .flex {
+    display: flex !important;
+  }
+
+  .dsu-pass-voucher .grid {
+    display: grid !important;
+  }
+}

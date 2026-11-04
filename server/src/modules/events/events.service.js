@@ -29,7 +29,29 @@ export async function getPublicEvents(query) {
   const sort = sortOptions[query.sort] || sortOptions.soonest;
 
   if (query.search) {
-    filter.title = { $regex: escapeRegex(query.search), $options: 'i' };
+    const escaped = escapeRegex(query.search);
+    const searchRegex = { $regex: escaped, $options: 'i' };
+    filter.$or = [
+      { title: searchRegex },
+      { description: searchRegex },
+      { venue: searchRegex },
+      { organizerClub: searchRegex }
+    ];
+  }
+
+  if (query.school) {
+    const schoolRegex = { $regex: escapeRegex(query.school), $options: 'i' };
+    const schoolCondition = [{ organizerClub: schoolRegex }, { description: schoolRegex }];
+    if (filter.$or) {
+      filter.$and = [{ $or: filter.$or }, { $or: schoolCondition }];
+      delete filter.$or;
+    } else {
+      filter.$or = schoolCondition;
+    }
+  }
+
+  if (query.venue) {
+    filter.venue = { $regex: escapeRegex(query.venue), $options: 'i' };
   }
 
   if (query.category) {
@@ -113,7 +135,29 @@ export async function getAdminEvents(query, user) {
   }
 
   if (query.search) {
-    filter.title = { $regex: escapeRegex(query.search), $options: 'i' };
+    const escaped = escapeRegex(query.search);
+    const searchRegex = { $regex: escaped, $options: 'i' };
+    filter.$or = [
+      { title: searchRegex },
+      { description: searchRegex },
+      { venue: searchRegex },
+      { organizerClub: searchRegex }
+    ];
+  }
+
+  if (query.school) {
+    const schoolRegex = { $regex: escapeRegex(query.school), $options: 'i' };
+    const schoolCondition = [{ organizerClub: schoolRegex }, { description: schoolRegex }];
+    if (filter.$or) {
+      filter.$and = [{ $or: filter.$or }, { $or: schoolCondition }];
+      delete filter.$or;
+    } else {
+      filter.$or = schoolCondition;
+    }
+  }
+
+  if (query.venue) {
+    filter.venue = { $regex: escapeRegex(query.venue), $options: 'i' };
   }
 
   const [items, total] = await Promise.all([

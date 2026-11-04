@@ -12,10 +12,11 @@ import {
   MapPin,
   ExternalLink,
   Phone,
-  GraduationCap
+  GraduationCap,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getLocalRegistrations } from '../api/demoData';
+import { apiClient } from '../api/client';
 import { DsuLogo } from './DsuLogo';
 import { CampusMapModal } from './CampusMapModal';
 
@@ -39,18 +40,61 @@ export function Navbar() {
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   const schoolsRef = useRef(null);
+  const notifRef = useRef(null);
 
   const [activePassCount, setActivePassCount] = useState(0);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(2);
+
+  const campusNotifications = [
+    {
+      id: 1,
+      title: 'Invento 2026 Keynote Registrations Live',
+      desc: 'Sir M. Visvesvaraya Auditorium bookings open for school tech symposium.',
+      time: '10m ago'
+    },
+    {
+      id: 2,
+      title: 'Harohalli Central Turf Scheduling',
+      desc: 'Inter-department sports rounds updated on campus calendar.',
+      time: '1h ago'
+    },
+    {
+      id: 3,
+      title: 'DSU Digital Pass Gate Verifications Active',
+      desc: 'Organizers can now scan student QR passes with high-speed camera verification.',
+      time: '3h ago'
+    }
+  ];
+
+  const fetchActivePassCount = async () => {
+    if (!user) {
+      setActivePassCount(0);
+      return;
+    }
+    try {
+      const res = await apiClient.get('/registrations/me');
+      const active = (res.data?.data || []).filter((r) => r.status === 'registered');
+      setActivePassCount(active.length);
+    } catch {
+      try {
+        const cached = localStorage.getItem('dsu_cached_passes');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          setActivePassCount(parsed.filter((r) => r.status === 'registered').length);
+        }
+      } catch {
+        setActivePassCount(0);
+      }
+    }
+  };
 
   useEffect(() => {
-    try {
-      const regs = getLocalRegistrations();
-      const count = regs.filter((r) => r.status === 'registered').length;
-      setActivePassCount(count);
-    } catch {
-      setActivePassCount(0);
-    }
-  }, [location.pathname]);
+    fetchActivePassCount();
+    const handleUpdate = () => fetchActivePassCount();
+    window.addEventListener('dsu-registrations-updated', handleUpdate);
+    return () => window.removeEventListener('dsu-registrations-updated', handleUpdate);
+  }, [user, location.pathname]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -59,6 +103,9 @@ export function Navbar() {
       }
       if (schoolsRef.current && !schoolsRef.current.contains(event.target)) {
         setSchoolsDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotificationsOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -213,8 +260,50 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Right: Search & Profile */}
+            {/* Right: Notifications & Profile */}
             <div className="hidden sm:flex items-center gap-3">
+              {/* Institutional Notifications Popover */}
+              <div className="relative" ref={notifRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNotificationsOpen(!notificationsOpen);
+                    setUnreadNotifications(0);
+                  }}
+                  className="relative p-2 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition bg-white text-slate-600 shadow-2xs"
+                  aria-label="Campus announcements and alerts"
+                  title="Campus announcements & updates"
+                >
+                  <Bell className="w-4 h-4 text-slate-600" />
+                  {unreadNotifications > 0 && (
+                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+                  )}
+                </button>
+
+                {notificationsOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white border border-[#E5E7EB] shadow-xl p-3 text-xs z-50 animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                      <span className="font-bold text-[#002B55] text-xs uppercase tracking-wider">Campus Alerts</span>
+                      <span className="text-[10px] text-slate-400 font-mono">Live DSU Feed</span>
+                    </div>
+                    <div className="space-y-2">
+                      {campusNotifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className="p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-bold text-slate-800 text-xs">{n.title}</p>
+                            <span className="text-[10px] text-slate-400 shrink-0 font-mono">{n.time}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{n.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {user ? (
                 <div className="relative" ref={dropdownRef}>
                   <button

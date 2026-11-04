@@ -41,3 +41,36 @@ export function playSuccessChime() {
   }
 }
 
+/**
+ * Synthesizes an authoritative, low-frequency buzz for invalid passes or duplicate check-ins.
+ * 2-tone sawtooth buzz: 180 Hz -> 120 Hz.
+ */
+export function playErrorBuzzer() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(200, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.26);
+
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.26);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.26);
+  } catch {
+    // If Web Audio is blocked or not supported, fail silently
+  }
+}

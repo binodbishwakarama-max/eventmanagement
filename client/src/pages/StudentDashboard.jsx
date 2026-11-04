@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import { downloadIcsFile } from '../utils/calendar';
+import { downloadIcsFile, getGoogleCalendarUrl } from '../utils/calendar';
 import { DsuLogo } from '../components/DsuLogo';
+import { TicketQrCode } from '../components/TicketQrCode';
 import {
   Calendar,
   MapPin,
@@ -23,7 +24,9 @@ import {
   ChevronRight,
   GraduationCap,
   Building,
-  UserCheck
+  UserCheck,
+  WifiOff,
+  Radio
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -33,19 +36,46 @@ export function StudentDashboard() {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedPass, setSelectedPass] = useState(null);
   const [cancellingEventId, setCancellingEventId] = useState(null);
+  const [liveSec, setLiveSec] = useState(new Date());
+
+  // Tick the security second clock for live voucher verification
+  useEffect(() => {
+    const timer = setInterval(() => setLiveSec(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchRegistrations = async () => {
     setLoading(true);
     setLoadError('');
     try {
       const res = await apiClient.get('/registrations/me');
-      setRegistrations(res.data.data || []);
+      const items = res.data.data || [];
+      setRegistrations(items);
+      setIsOfflineMode(false);
+      try {
+        localStorage.setItem('dsu_cached_passes', JSON.stringify(items));
+      } catch {}
+      window.dispatchEvent(new Event('dsu-registrations-updated'));
     } catch (err) {
-      setLoadError(err.response?.data?.message || 'Unable to load registrations. Please try again.');
-      toast.error('Failed to load your registrations');
+      // Offline fallback: check local cached passbook
+      const cached = localStorage.getItem('dsu_cached_passes');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setRegistrations(parsed);
+          setIsOfflineMode(true);
+          toast('Loaded saved passes from offline storage', { icon: '📦' });
+        } catch {
+          setLoadError(err.response?.data?.message || 'Unable to load registrations. Please try again.');
+        }
+      } else {
+        setLoadError(err.response?.data?.message || 'Unable to load registrations. Please try again.');
+        toast.error('Failed to load your registrations');
+      }
     } finally {
       setLoading(false);
     }
@@ -61,74 +91,97 @@ export function StudentDashboard() {
     try {
       await apiClient.delete(`/events/${eventId}/register`);
       toast.success('Registration cancelled');
-      await fetchRegistrations();
+      fetchRegistrations();
+      window.dispatchEvent(new Event('dsu-registrations-updated'));
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Cancellation failed');
+      toast.error(err.response?.data?.message || 'Failed to cancel registration');
     } finally {
       setCancellingEventId(null);
     }
   };
 
   const handleCopyCode = (code) => {
-    if (!code) return;
     navigator.clipboard.writeText(code);
-    toast.success('Pass code copied to clipboard!', { icon: '📋' });
+    toast.success('Pass code copied to clipboard');
   };
 
-  const now = new Date();
-  const upcoming = registrations.filter((r) => r.status === 'registered' && new Date(r.event?.startsAt) > now);
-  const attended = registrations.filter((r) => r.status === 'registered' && r.attended);
-  const past = registrations.filter((r) => r.status === 'registered' && new Date(r.event?.startsAt) <= now);
+  const upcoming = registrations.filter(
+    (r) => r.status === 'registered' && (!r.event?.startsAt || new Date(r.event.startsAt) >= new Date())
+  );
+  const past = registrations.filter(
+    (r) =>
+      r.status === 'registered' &&
+      r.event?.startsAt &&
+      new Date(r.event.startsAt) < new Date()
+  );
   const cancelled = registrations.filter((r) => r.status === 'cancelled');
 
   const displayedList =
-    activeTab === 'upcoming'
-      ? upcoming
-      : activeTab === 'past'
-      ? past
-      : cancelled;
+    activeTab === 'upcoming' ? upcoming : activeTab === 'past' ? past : cancelled;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 min-h-screen">
-      {/* Student Profile & Pass Hub Header */}
-      <section className="dsu-card p-6 sm:p-10 mb-8 border-t-4 border-t-[#002B55]">
+    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      {/* Offline Alert Banner */}
+      {isOfflineMode && (
+        <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <WifiOff className="w-4 h-4 text-amber-700 shrink-0" />
+            <span>
+              <strong>Offline Mode Active:</strong> Displaying your previously synced passes from local storage. Your QR codes remain 100% scannable at campus gates.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={fetchRegistrations}
+            className="font-semibold underline hover:text-amber-950 shrink-0"
+          >
+            Reconnect
+          </button>
+        </div>
+      )}
+
+      {/* Student Profile & Passbook Header */}
+      <section className="dsu-card p-6 sm:p-8 mb-8 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#002B55]/5 border border-[#002B55]/15 text-xs font-semibold text-[#002B55]">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>Official DSU Student Passbook</span>
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-[#002B55] text-white flex items-center justify-center font-bold text-xl shrink-0 shadow-sm">
+              {user?.name ? user.name.slice(0, 2).toUpperCase() : 'DS'}
             </div>
-
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#002B55] tracking-tight">
-              {user?.name}
-            </h1>
-
-            <div className="text-xs sm:text-sm text-slate-500 flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-slate-700">Dayananda Sagar University</span>
-              <span className="text-slate-300">·</span>
-              <span className="font-mono text-[#002B55] font-bold">
-                USN: {user?.usn || user?.rollNumber || '1DS22CS042'}
-              </span>
-              {user?.department && (
-                <>
-                  <span className="text-slate-300">·</span>
-                  <span className="text-slate-600">{user.department}</span>
-                </>
-              )}
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] tracking-tight">
+                  {user?.name || 'DSU Student'}
+                </h1>
+                {user?.isVerified ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Verified Student ID
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" /> Pending Verification
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 font-mono mt-1">
+                USN: <span className="text-slate-800 font-bold">{user?.usn || user?.rollNumber || '1DS22CS042'}</span> • {user?.email}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {user?.department || 'School of Computer Applications'} • Dayananda Sagar University
+              </p>
             </div>
           </div>
 
           <Link
             to="/events"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-semibold shadow-xs transition active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#002B55] text-white text-xs font-semibold hover:bg-[#001B36] transition shadow-xs"
           >
-            <span>Explore Events</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <Ticket className="w-4 h-4 text-[#D9A521]" />
+            <span>Discover More Events</span>
           </Link>
         </div>
 
-        {/* 4 Stat Metrics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-100">
+        {/* 3 Metric Shelves */}
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Active Passes
@@ -139,14 +192,8 @@ export function StudentDashboard() {
             <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Attended
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">{attended.length}</p>
-          </div>
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
-              Total Bookings
-            </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1">
-              {registrations.filter((r) => r.status === 'registered').length}
+            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">
+              {registrations.filter((r) => r.attended).length}
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
@@ -239,7 +286,13 @@ export function StudentDashboard() {
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       <span className="font-medium text-slate-700">
-                        {starts.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {starts.toLocaleDateString('en-IN', {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -271,7 +324,7 @@ export function StudentDashboard() {
                         className="inline-flex items-center gap-2 text-xs font-bold text-white bg-[#002B55] hover:bg-[#001B36] px-4 py-2.5 rounded-xl transition shadow-xs active:scale-[0.98]"
                       >
                         <QrCode className="w-3.5 h-3.5 text-[#D9A521]" />
-                        {reg.attended ? 'Attendance Record' : 'View Hall Ticket'}
+                        {reg.attended ? 'Attendance Record' : 'View Digital Pass'}
                       </button>
                     </>
                   )}
@@ -308,7 +361,7 @@ export function StudentDashboard() {
       {/* Authentic DSU Digital Hall Ticket / Event Pass Modal */}
       {selectedPass && (
         <div className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
-          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white">
+          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white rounded-2xl border border-slate-300">
             {/* Pass Header Banner */}
             <div className="bg-[#002B55] text-white p-6 relative border-b-2 border-[#D9A521]">
               <button
@@ -339,6 +392,21 @@ export function StudentDashboard() {
               </div>
             </div>
 
+            {/* Live Security Anti-Screenshot Bar */}
+            <div className="bg-slate-900 text-white px-6 py-2 flex items-center justify-between text-[11px] font-mono">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="text-emerald-400 font-semibold tracking-wider uppercase">Live Gate Pass</span>
+              </div>
+              <span className="text-slate-400">
+                {liveSec.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })},{' '}
+                {liveSec.toLocaleTimeString('en-IN')} IST
+              </span>
+            </div>
+
             {/* Pass Details Shelf */}
             <div className="p-6 space-y-4 text-slate-800">
               <div>
@@ -349,7 +417,10 @@ export function StudentDashboard() {
                   {selectedPass.event?.title.replace(/^DEMO:\s*/, '')}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  Organized by <strong className="font-semibold text-slate-700">{selectedPass.event?.organizerClub || 'Dayananda Sagar University'}</strong>
+                  Organized by{' '}
+                  <strong className="font-semibold text-slate-700">
+                    {selectedPass.event?.organizerClub || 'Dayananda Sagar University'}
+                  </strong>
                 </p>
               </div>
 
@@ -384,53 +455,58 @@ export function StudentDashboard() {
                 </div>
               </div>
 
-              {/* Monospace Barcode & Ticket Code Block */}
-              <div className="border-2 border-dashed border-[#002B55]/30 bg-blue-50/40 rounded-2xl p-4 text-center relative group">
-                <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
-                  Gate Verification Code
+              {/* 2D Scannable QR Code Block */}
+              <div className="border-2 border-dashed border-[#002B55]/30 bg-blue-50/40 rounded-2xl p-5 text-center relative group">
+                <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block mb-3">
+                  Gate Laser Verification Code
                 </span>
-                <div className="flex items-center justify-center gap-2 my-1.5">
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-[#002B55] select-all">
-                    {selectedPass.ticketCode}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleCopyCode(selectedPass.ticketCode)}
-                    className="p-1.5 rounded-lg border border-slate-300 hover:bg-white text-slate-600 transition shadow-xs"
-                    title="Copy verification code"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                </div>
+
+                <TicketQrCode
+                  ticketCode={selectedPass.ticketCode}
+                  eventTitle={selectedPass.event?.title}
+                  studentUsn={user?.usn}
+                  size={170}
+                />
 
                 {/* Perforated Divider */}
-                <div className="my-2.5 border-t border-dashed border-slate-300 relative">
-                  <div className="absolute -left-6 -top-2 w-4 h-4 rounded-full bg-white border border-slate-200"></div>
-                  <div className="absolute -right-6 -top-2 w-4 h-4 rounded-full bg-white border border-slate-200"></div>
+                <div className="my-3 border-t border-dashed border-slate-300 relative">
+                  <div className="absolute -left-7 -top-2 w-4 h-4 rounded-full bg-white border border-slate-200"></div>
+                  <div className="absolute -right-7 -top-2 w-4 h-4 rounded-full bg-white border border-slate-200"></div>
                 </div>
 
-                <p className="text-xs text-slate-600 font-medium">
-                  Present this voucher or University USN at the event check-in desk
+                <p className="text-[11px] text-slate-600 font-medium">
+                  Scan this live pass at the gate or present your University USN card
                 </p>
               </div>
 
               {selectedPass.attended && (
                 <div className="flex items-center gap-2.5 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
                   <Award className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Verified attendance record on file for university credits.</span>
+                  <span>Verified attendance record on file for university academic credits.</span>
                 </div>
               )}
             </div>
 
             {/* Pass Actions */}
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[#002B55] hover:underline"
-              >
-                <Printer className="w-4 h-4" /> Print Pass Voucher
-              </button>
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#002B55] hover:underline"
+                >
+                  <Printer className="w-3.5 h-3.5" /> Print Pass
+                </button>
+
+                <a
+                  href={getGoogleCalendarUrl(selectedPass.event)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5" /> Google Cal
+                </a>
+              </div>
 
               <button
                 type="button"

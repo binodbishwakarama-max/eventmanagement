@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
-import { playSuccessChime } from '../utils/audio';
+import { playSuccessChime, playErrorBuzzer } from '../utils/audio';
+import { QrCameraScannerModal } from '../components/QrCameraScannerModal';
 import {
   ArrowLeft,
   Check,
@@ -13,7 +14,12 @@ import {
   Ticket,
   Volume2,
   GraduationCap,
-  Building
+  Building,
+  Camera,
+  ShieldCheck,
+  Clock,
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -28,6 +34,8 @@ export const AttendancePage = () => {
   const [ticketInput, setTicketInput] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
   const [tabFilter, setTabFilter] = useState('all'); // 'all' | 'attended' | 'pending'
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [lastVerifiedStudent, setLastVerifiedStudent] = useState(null);
 
   const fetchRegistrations = async () => {
     setLoading(true);
@@ -62,6 +70,7 @@ export const AttendancePage = () => {
       toast.success('Attendance verified');
       fetchRegistrations();
     } catch (err) {
+      playErrorBuzzer();
       toast.error(err.response?.data?.message || 'Failed to update attendance');
     } finally {
       setUpdatingRegistration(null);
@@ -75,7 +84,7 @@ export const AttendancePage = () => {
       const safeText = /^[\s]*[=+\-@]/.test(text) ? `'${text}` : text;
       return `"${safeText.replace(/"/g, '""')}"`;
     };
-    const headers = ['Student Name', 'University USN', 'Student Email', 'Department / School', 'Pass Code', 'Attendance Verified']
+    const headers = ['Student Name', 'University USN', 'Student Email', 'Department / School', 'Pass Code', 'Attendance Verified', 'Verified At']
       .map(csvCell)
       .join(',');
     const rows = registrations
@@ -86,7 +95,8 @@ export const AttendancePage = () => {
           registration.student?.email,
           registration.student?.department,
           registration.ticketCode,
-          registration.attended ? 'Yes' : 'No'
+          registration.attended ? 'Yes' : 'No',
+          registration.attendedAt ? new Date(registration.attendedAt).toLocaleString('en-IN') : 'N/A'
         ]
           .map(csvCell)
           .join(',')
@@ -102,44 +112,37 @@ export const AttendancePage = () => {
     toast.success('Official attendee CSV roster downloaded');
   };
 
-  const isStarted = event ? new Date() >= new Date(event.startsAt) : false;
-
-  const handleTicketCheckIn = async (e) => {
-    e.preventDefault();
-    const code = ticketInput.trim().toUpperCase();
+  const verifyTicket = async (rawCode) => {
+    const code = rawCode.trim().toUpperCase();
     if (!code) return;
-
-    if (!isStarted) {
-      toast.error('Attendance check-in opens when the event start time is reached.');
-      return;
-    }
-
-    const reg = registrations.find((r) => r.ticketCode?.toUpperCase() === code);
-    if (!reg || reg.status !== 'registered') {
-      toast.error(`Ticket code "${code}" not found for this event`);
-      return;
-    }
-
-    if (reg.attended) {
-      toast(`${reg.student?.name} is already checked in`, { icon: 'ℹ️' });
-      setTicketInput('');
-      return;
-    }
 
     setCheckingIn(true);
     try {
-      await apiClient.patch(`/events/${id}/registrations/${reg._id}/attendance`, {
-        attended: true
+      const res = await apiClient.post(`/events/${id}/verify-pass`, {
+        ticketCode: code
       });
       playSuccessChime();
-      toast.success(`Check-in logged for ${reg.student?.name || 'student'}`);
+      const verified = res.data?.data;
+      setLastVerifiedStudent(verified);
+      toast.success(`Check-in verified: ${verified.student?.name || 'Student'} (${verified.student?.usn || code})`, {
+        icon: '✅',
+        duration: 4000
+      });
       setTicketInput('');
       fetchRegistrations();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Check-in failed');
+      playErrorBuzzer();
+      const msg = err.response?.data?.message || 'Verification failed';
+      toast.error(msg, { icon: '⚠️', duration: 4500 });
     } finally {
       setCheckingIn(false);
     }
+  };
+
+  const handleTicketCheckIn = async (e) => {
+    e.preventDefault();
+    if (!ticketInput.trim()) return;
+    await verifyTicket(ticketInput);
   };
 
   const attendedCount = registrations.filter((r) => r.attended).length;
@@ -215,13 +218,23 @@ export const AttendancePage = () => {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={exportCSV}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-300 transition shadow-xs"
-          >
-            <Download className="w-4 h-4 text-slate-500" /> Export CSV Roster
-          </button>
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setScannerOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-xs flex-1 sm:flex-initial"
+            >
+              <Camera className="w-4 h-4 text-[#D9A521]" /> Scan Pass QR
+            </button>
+
+            <button
+              type="button"
+              onClick={exportCSV}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-300 transition shadow-xs"
+            >
+              <Download className="w-4 h-4 text-slate-500" /> Export CSV Roster
+            </button>
+          </div>
         </div>
 
         {/* 4 Metric Shelves with Circular Turnout Progress */}
@@ -289,7 +302,7 @@ export const AttendancePage = () => {
               <input
                 type="text"
                 aria-label="Ticket code check-in"
-                placeholder="Enter or scan pass code (e.g. DSU-1234)..."
+                placeholder="Scan QR or enter ticket code (e.g. TKT-2490-X)..."
                 value={ticketInput}
                 onChange={(e) => setTicketInput(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono uppercase font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55] transition"
@@ -297,10 +310,10 @@ export const AttendancePage = () => {
             </div>
             <button
               type="submit"
-              disabled={!isStarted || checkingIn}
+              disabled={checkingIn || !ticketInput.trim()}
               className="px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition active:scale-[0.98] disabled:opacity-50 whitespace-nowrap shadow-xs"
             >
-              {checkingIn ? 'Logging...' : 'Log Check-In'}
+              {checkingIn ? 'Verifying...' : 'Log Check-In'}
             </button>
           </form>
 
@@ -319,9 +332,35 @@ export const AttendancePage = () => {
           </div>
         </div>
 
-        {!isStarted && (
-          <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs">
-            Attendance check-in becomes active when the scheduled event start time arrives.
+        {/* Live Verified Attendee Banner */}
+        {lastVerifiedStudent && (
+          <div className="p-4 bg-emerald-50/90 border border-emerald-200 rounded-2xl flex items-center justify-between gap-4 animate-in fade-in duration-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-emerald-950 font-sans">
+                    {lastVerifiedStudent.student?.name}
+                  </span>
+                  <span className="font-mono text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                    {lastVerifiedStudent.student?.usn || lastVerifiedStudent.ticketCode}
+                  </span>
+                </div>
+                <p className="text-[11px] text-emerald-800 mt-0.5">
+                  {lastVerifiedStudent.student?.department || 'Dayananda Sagar University'} • Check-in recorded at{' '}
+                  {new Date(lastVerifiedStudent.attendedAt || Date.now()).toLocaleTimeString('en-IN')}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLastVerifiedStudent(null)}
+              className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 underline px-2 py-1"
+            >
+              Dismiss
+            </button>
           </div>
         )}
       </div>
@@ -378,37 +417,34 @@ export const AttendancePage = () => {
                 filteredRegistrations.map((reg) => (
                   <tr key={reg._id} className="hover:bg-slate-50/80 transition">
                     <td className="py-3.5 px-6 font-bold text-slate-900">{reg.student?.name}</td>
-                    <td className="py-3.5 px-4 font-mono text-[#002B55] font-bold">
-                      {reg.student?.usn || reg.student?.rollNumber || 'Not provided'}
+                    <td className="py-3.5 px-4 font-mono text-slate-600">
+                      {reg.student?.usn || reg.student?.rollNumber || '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'General Campus'}</td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-[#002B55]">{reg.ticketCode}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'DSU'}</td>
+                    <td className="py-3.5 px-4">
+                      <span className="font-mono font-bold text-[#002B55] bg-blue-50/80 px-2 py-0.5 rounded border border-blue-200/60">
+                        {reg.ticketCode}
+                      </span>
+                    </td>
                     <td className="py-3.5 px-6 text-center">
                       <button
                         type="button"
                         onClick={() => toggleAttendance(reg._id, reg.attended)}
-                        disabled={!isStarted || reg.attended || updatingRegistration !== null}
-                        aria-label={
+                        disabled={reg.attended || updatingRegistration === reg._id}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition ${
                           reg.attended
-                            ? `Attendance verified for ${reg.student?.name}`
-                            : `Mark attendance for ${reg.student?.name}`
-                        }
-                        className={`w-7 h-7 rounded-lg inline-flex items-center justify-center transition ${
-                          reg.attended
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : isStarted
-                            ? 'bg-slate-100 hover:bg-slate-200 border border-slate-300 text-transparent hover:text-slate-600'
-                            : 'bg-slate-50 text-transparent cursor-not-allowed opacity-40'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
+                            : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-300'
                         }`}
-                        title={
-                          reg.attended
-                            ? 'Attendance verified'
-                            : isStarted
-                            ? 'Click to log attendance'
-                            : 'Check-in opens at start time'
-                        }
                       >
-                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        {reg.attended ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Checked In</span>
+                          </>
+                        ) : (
+                          <span>Mark Present</span>
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -418,6 +454,16 @@ export const AttendancePage = () => {
           </table>
         </div>
       </div>
+
+      {/* Real-time Camera QR Scanner Modal */}
+      <QrCameraScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onScan={async (scannedCode) => {
+          await verifyTicket(scannedCode);
+        }}
+        isProcessing={checkingIn}
+      />
     </div>
   );
 };

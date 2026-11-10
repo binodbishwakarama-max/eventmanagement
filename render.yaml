@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: dsu-campus-events
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build -w client
+    startCommand: node server/src/server.js
+    healthCheckPath: /api/health/live
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEMO_MODE
+        value: false
+      - key: ALLOWED_EMAIL_DOMAINS
+        value: dsu.edu.in
+      - key: TRUST_PROXY
+        value: true
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@dsu.edu.in
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: EMAIL_PROVIDER
+        value: smtp

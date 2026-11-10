@@ -28,3 +28,4 @@ services:
         value: local
       - key: EMAIL_PROVIDER
         value: smtp
+

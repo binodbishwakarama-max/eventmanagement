@@ -93,3 +93,4 @@ export function Confetti({ active = true, duration = 3500 }) {
     />
   );
 }
+

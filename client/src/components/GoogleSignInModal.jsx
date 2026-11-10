@@ -207,3 +207,4 @@ export function GoogleSignInModal({ isOpen, onClose, onSuccess }) {
     </div>
   );
 }
+

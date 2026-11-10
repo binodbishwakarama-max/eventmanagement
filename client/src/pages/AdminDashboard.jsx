@@ -194,33 +194,33 @@ export const AdminDashboard = () => {
 
       {/* 5-Metric Operations Analytics Shelf */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="dsu-card p-5">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
+          <div className="dsu-card p-3.5 sm:p-5">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Total Gatherings
             </span>
             <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] mt-1">{stats.totalEvents}</p>
           </div>
-          <div className="dsu-card p-5">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+          <div className="dsu-card p-3.5 sm:p-5">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Published Live
             </span>
             <p className="text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1">{stats.publishedEvents}</p>
           </div>
-          <div className="dsu-card p-5">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+          <div className="dsu-card p-3.5 sm:p-5">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Upcoming
             </span>
             <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600 mt-1">{stats.upcomingEvents}</p>
           </div>
-          <div className="dsu-card p-5">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+          <div className="dsu-card p-3.5 sm:p-5">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Student Passes
             </span>
             <p className="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-1">{stats.totalRegistrations}</p>
           </div>
-          <div className="dsu-card p-5 col-span-2 lg:col-span-1">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+          <div className="dsu-card p-3.5 sm:p-5 col-span-2 sm:col-span-1 lg:col-span-1">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Verified Attendance
             </span>
             <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">{stats.attendanceRate}%</p>
@@ -229,11 +229,11 @@ export const AdminDashboard = () => {
       )}
 
       {/* Console Tab Navigation */}
-      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto scrollbar-none flex-nowrap overscroll-x-contain">
         <button
           type="button"
           onClick={() => setActiveTab('events')}
-          className={`px-4 py-2 rounded-full text-xs font-semibold transition ${
+          className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition ${
             activeTab === 'events'
               ? 'bg-[#002B55] text-white shadow-xs font-bold'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -247,7 +247,7 @@ export const AdminDashboard = () => {
             <button
               type="button"
               onClick={() => setActiveTab('verification')}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition flex items-center gap-1.5 ${
                 activeTab === 'verification'
                   ? 'bg-[#002B55] text-white shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -265,7 +265,7 @@ export const AdminDashboard = () => {
             <button
               type="button"
               onClick={() => setActiveTab('users')}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition ${
                 activeTab === 'users'
                   ? 'bg-[#002B55] text-white shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'

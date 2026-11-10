@@ -239,8 +239,8 @@ export const AttendancePage = () => {
         </div>
 
         {/* 4 Metric Shelves with Circular Turnout Progress */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-slate-100">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-widest block">
               Registered
             </span>

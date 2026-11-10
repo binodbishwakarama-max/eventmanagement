@@ -311,20 +311,57 @@ export function EventsPage() {
     <div className="min-h-screen pb-24 bg-[#F8FAFC] relative">
       {/* Subtle Panoramic DSU Campus Backdrop Watermark across the page body (Desktop only to prevent redundant mobile downloads) */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.09] filter grayscale-0 hidden sm:block"
-        style={{ backgroundImage: `url('/dsu-main-campus-admission.jpg')` }}
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.06] filter grayscale-0 hidden sm:block dsu-campus-watermark"
       />
 
       {/* Big Tech Premium Hero Section with High-Visibility DSU Harohalli Campus Backdrop */}
-      <section className="relative overflow-hidden bg-[#000E1C] text-white pt-10 pb-16 sm:pb-20 border-b border-[#002B55] z-10">
-        {/* Real DSU Harohalli Main Campus Photographic Backdrop - 100% Bright, Vivid Clarity */}
+      <section className="relative overflow-hidden bg-[#000E1C] text-white pt-8 sm:pt-10 pb-12 sm:pb-20 border-b border-[#002B55] z-10">
+        {/* Real DSU Harohalli Main Campus Photographic Backdrop - 100% Bright, Vivid Clarity across all Devices & Retina Screens */}
         <picture>
-          <source media="(max-width: 767px)" srcSet="/dsu-main-campus-admission-mobile.jpg" />
-          <source media="(min-width: 768px)" srcSet="/dsu-main-campus-admission.jpg" />
+          {/* Mobile High-DPI 2x/3x and standard WebP (Square-framed on Grand Admin Building) */}
+          <source
+            media="(max-width: 767px)"
+            type="image/webp"
+            srcSet="/dsu-campus-hero-mobile.webp 800w, /dsu-campus-hero-mobile-2x.webp 1280w"
+            sizes="(max-width: 767px) 100vw, 800px"
+          />
+          {/* Mobile Fallback JPEG */}
+          <source
+            media="(max-width: 767px)"
+            srcSet="/dsu-campus-hero-mobile.jpg 800w, /dsu-campus-hero-mobile-2x.jpg 1280w"
+            sizes="(max-width: 767px) 100vw, 800px"
+          />
+          {/* 4K and Ultra-wide Displays (WebP) */}
+          <source
+            media="(min-width: 1921px)"
+            type="image/webp"
+            srcSet="/dsu-campus-hero-2560.webp 2560w, /dsu-campus-hero-4k.webp 3840w"
+            sizes="100vw"
+          />
+          {/* 4K and Ultra-wide Displays (JPEG) */}
+          <source
+            media="(min-width: 1921px)"
+            srcSet="/dsu-campus-hero-2560.jpg 2560w, /dsu-campus-hero-4k.jpg 3840w"
+            sizes="100vw"
+          />
+          {/* Standard Desktop & Tablet (WebP) */}
+          <source
+            media="(min-width: 768px)"
+            type="image/webp"
+            srcSet="/dsu-campus-hero-tablet.webp 1280w, /dsu-campus-hero-desktop.webp 1920w, /dsu-campus-hero-2560.webp 2560w"
+            sizes="(max-width: 1280px) 100vw, 1920px"
+          />
+          {/* Standard Desktop & Tablet (JPEG) */}
+          <source
+            media="(min-width: 768px)"
+            srcSet="/dsu-campus-hero-tablet.jpg 1280w, /dsu-campus-hero-desktop.jpg 1920w, /dsu-campus-hero-2560.jpg 2560w"
+            sizes="(max-width: 1280px) 100vw, 1920px"
+          />
+          {/* Universal Fallback Image */}
           <img
-            src="/dsu-main-campus-admission-mobile.jpg"
+            src="/dsu-main-campus-admission.jpg"
             alt="Dayananda Sagar University Harohalli Main Campus"
-            className="absolute inset-0 w-full h-full object-cover object-center sm:object-[right_center] opacity-100 pointer-events-none transform scale-100 transition-all duration-1000"
+            className="absolute inset-0 w-full h-full object-cover object-center sm:object-[center_35%] lg:object-[right_center] opacity-100 pointer-events-none transform scale-100 transition-all duration-700"
             fetchPriority="high"
             decoding="async"
           />
@@ -338,9 +375,9 @@ export function EventsPage() {
 
         <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           {/* Two-Column Hero Row: Left (Branding, Headline, Indicators), Right (Campus Card) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Column (8 cols): Eyebrow, Title, Description, Metrics */}
-            <div className="lg:col-span-7 xl:col-span-8 space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-center">
+            {/* Left Column: Eyebrow, Title, Description, Metrics */}
+            <div className="md:col-span-7 xl:col-span-8 space-y-4 sm:space-y-5">
               {/* Eyebrow Status Badge */}
               <div className="flex flex-wrap items-center gap-2">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold backdrop-blur-md shimmer-badge shadow-xs">
@@ -390,8 +427,8 @@ export function EventsPage() {
               </div>
             </div>
 
-            {/* Right Column (4-5 cols): Apple-Grade Interactive Transparent Glass Card */}
-            <div className="lg:col-span-5 xl:col-span-4 flex justify-start lg:justify-end">
+            {/* Right Column: Apple-Grade Interactive Transparent Glass Card */}
+            <div className="md:col-span-5 xl:col-span-4 flex justify-start md:justify-end">
               <AppleGlassCard className="w-full max-w-md lg:max-w-sm p-5 sm:p-6 cursor-pointer">
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-2">
@@ -470,29 +507,30 @@ export function EventsPage() {
                 )}
               </div>
 
-              {/* Campus Map Trigger */}
-              <button
-                type="button"
-                onClick={() => setMapModalOpen(true)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition shrink-0 active:scale-[0.98]"
-              >
-                <Compass className="w-4 h-4 text-[#D9A521]" />
-                <span>Campus Venues</span>
-              </button>
+              {/* Action Buttons: Side-by-side on mobile phones, flex row on tablet/desktop */}
+              <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setMapModalOpen(true)}
+                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition shrink-0 active:scale-[0.98]"
+                >
+                  <Compass className="w-4 h-4 text-[#D9A521] shrink-0" />
+                  <span className="truncate">Campus Venues</span>
+                </button>
 
-              {/* Filters Toggle */}
-              <button
-                type="button"
-                onClick={() => setFiltersOpen(!filtersOpen)}
-                className={`inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-bold border transition shrink-0 active:scale-[0.98] ${
-                  filtersOpen || from || to || sort !== 'soonest'
-                    ? 'bg-[#002B55] text-white border-[#002B55] shadow-xs'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                <span>Filters {hasActiveFilters && '•'}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                  className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold border transition shrink-0 active:scale-[0.98] ${
+                    filtersOpen || from || to || sort !== 'soonest'
+                      ? 'bg-[#002B55] text-white border-[#002B55] shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <SlidersHorizontal className="w-4 h-4 shrink-0" />
+                  <span>Filters {hasActiveFilters && '•'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Expandable Filter Drawer */}
@@ -557,11 +595,11 @@ export function EventsPage() {
       </section>
 
       {/* Modern Category Selector & View Switcher Bar */}
-      <section className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* Category Pills with Icons */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+      <section className="sticky top-16 sm:top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            {/* Category Pills with Icons (Fluid horizontal scroll with momentum) */}
+            <div className="flex-1 min-w-0 flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none overscroll-x-contain">
               {CATEGORY_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isSelected = category === item.name || (item.name === 'All' && !category);

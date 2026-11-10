@@ -11,6 +11,7 @@ import { CampusMapModal } from '../components/CampusMapModal';
 import {
   MapPin,
   ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   CalendarPlus,
   Ticket,
@@ -284,8 +285,8 @@ export function EventDetailPage() {
           </div>
 
           {/* Official Campus Venue & Accessibility Guide */}
-          <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card space-y-4">
-            <div className="flex items-start justify-between gap-4">
+          <div className="p-5 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0 text-[#002B55]">
                   <MapPin className="w-5 h-5 text-[#002B55]" />
@@ -298,16 +299,14 @@ export function EventDetailPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setMapModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#002B55] text-xs font-bold transition shadow-xs"
-                >
-                  <Compass className="w-3.5 h-3.5 text-[#D9A521]" />
-                  <span>Campus Map & Directions</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setMapModalOpen(true)}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#002B55] text-xs font-bold transition shadow-xs"
+              >
+                <Compass className="w-3.5 h-3.5 text-[#D9A521]" />
+                <span>Campus Map & Directions</span>
+              </button>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center gap-3">
@@ -319,7 +318,7 @@ export function EventDetailPage() {
           </div>
 
           {/* Student Roster Counter & Proof */}
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card flex items-center justify-between">
+          <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex -space-x-2">
                 <div className="w-9 h-9 rounded-full bg-[#002B55] text-[#D9A521] font-bold text-xs flex items-center justify-center border-2 border-white shadow-xs">
@@ -547,6 +546,46 @@ export function EventDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Floating Mobile Registration Action Bar */}
+      <div data-testid="floating-mobile-action-bar" className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 z-30 shadow-2xl flex items-center justify-between gap-3">
+        <div>
+          <span className="block text-[11px] font-mono text-slate-500">
+            {available > 0 ? `${available} seats left` : 'Full'}
+          </span>
+          <span className="text-xs font-extrabold text-[#002B55]">
+            {isRegistered ? 'Seat Confirmed' : 'Free Student Pass'}
+          </span>
+        </div>
+
+        {isRegistered ? (
+          <Link
+            to="/dashboard"
+            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+          >
+            <Ticket className="w-4 h-4" />
+            <span>View Pass</span>
+          </Link>
+        ) : isFull ? (
+          <button
+            type="button"
+            disabled
+            className="px-5 py-2.5 rounded-xl bg-slate-200 text-slate-400 text-xs font-bold cursor-not-allowed"
+          >
+            Fully Booked
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleRegister}
+            disabled={actionLoading}
+            className="px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <span>Register Now</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Campus Map Navigator Modal */}

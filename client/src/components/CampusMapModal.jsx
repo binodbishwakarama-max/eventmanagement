@@ -180,8 +180,8 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
           </button>
         </div>
 
-        {/* Map Explorer Body */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden min-h-0">
+        {/* Map Explorer Body - Scrollable on mobile, split-panel on desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-y-auto lg:overflow-hidden min-h-0">
           {/* Left/Main Column: Stylized Campus Vector Map */}
           <div className="lg:col-span-7 bg-[#001B36] relative overflow-hidden flex flex-col items-center justify-center p-6 border-b lg:border-b-0 lg:border-r border-slate-200">
             {/* Campus Plan SVG Canvas */}

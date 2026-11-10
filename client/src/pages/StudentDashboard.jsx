@@ -214,32 +214,32 @@ export function StudentDashboard() {
         </div>
 
         {/* 3 Metric Shelves */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200 flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Active Passes
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] mt-1">{upcoming.length}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] sm:mt-1">{upcoming.length}</p>
           </div>
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200 flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Attended
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">
+            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 sm:mt-1">
               {registrations.filter((r) => r.attended).length}
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200 flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Cancelled
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-400 mt-1">{cancelled.length}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-slate-400 sm:mt-1">{cancelled.length}</p>
           </div>
         </div>
       </section>
 
       {/* Segmented Control Tabs */}
-      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3 overflow-x-auto scrollbar-none flex-nowrap overscroll-x-contain">
         {[
           { key: 'upcoming', label: `Active Passes (${upcoming.length})` },
           { key: 'past', label: `Past Activities (${past.length})` },
@@ -249,7 +249,7 @@ export function StudentDashboard() {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 ${
+            className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all duration-150 ${
               activeTab === tab.key
                 ? 'bg-[#002B55] text-white shadow-xs font-bold'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'

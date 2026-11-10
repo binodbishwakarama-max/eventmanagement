@@ -74,14 +74,13 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-slate-50">
+    <div className="min-h-[calc(100vh-140px)] min-h-[calc(100dvh-140px)] flex items-center justify-center p-3 sm:p-6 lg:p-12 bg-slate-50">
       <div className="max-w-5xl w-full bg-white rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-xl border border-slate-200">
         {/* Left Column: Brand & Digital Pass preview */}
         {/* Institutional brand column with authentic DSU Harohalli Campus Backdrop */}
-        <div className="lg:col-span-5 bg-blue-950 text-white p-8 sm:p-10 flex flex-col justify-between relative border-r border-amber-500/20 overflow-hidden">
+        <div className="lg:col-span-5 bg-blue-950 text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative border-r border-amber-500/20 overflow-hidden">
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none"
-            style={{ backgroundImage: `url('/dsu-main-campus-admission.jpg')` }}
+            className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none dsu-auth-backdrop"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#00142A] via-[#001B36]/85 to-[#002244]/80 pointer-events-none" />
 

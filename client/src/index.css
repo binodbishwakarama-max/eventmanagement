@@ -7,6 +7,12 @@
     color-scheme: light;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    --sat: env(safe-area-inset-top, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
   }
 
   body {
@@ -14,13 +20,57 @@
     background-color: #F8FAFC;
     color: #0F172A;
     min-height: 100vh;
+    min-height: 100dvh;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    overflow-x: hidden;
+    padding-left: var(--sal);
+    padding-right: var(--sar);
   }
 
   :focus-visible {
     outline: 2px solid #002B55;
     outline-offset: 2px;
   }
+
+  /* Prevent automatic iOS zoom on form inputs by ensuring minimum 16px font-size */
+  @media screen and (max-width: 767px) {
+    input[type='text'],
+    input[type='email'],
+    input[type='password'],
+    input[type='number'],
+    input[type='date'],
+    input[type='datetime-local'],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Responsive High-DPI Campus Watermark */
+.dsu-campus-watermark {
+  background-image: url('/dsu-campus-hero-desktop.jpg');
+  background-image: -webkit-image-set(
+    url('/dsu-campus-hero-tablet.webp') 1x,
+    url('/dsu-campus-hero-desktop.webp') 2x
+  );
+  background-image: image-set(
+    url('/dsu-campus-hero-tablet.webp') 1x,
+    url('/dsu-campus-hero-desktop.webp') 2x
+  );
+}
+
+/* Responsive Login/Auth Backdrop */
+.dsu-auth-backdrop {
+  background-image: url('/dsu-campus-hero-desktop.jpg');
+  background-image: -webkit-image-set(
+    url('/dsu-campus-hero-mobile-2x.webp') 1x,
+    url('/dsu-campus-hero-desktop.webp') 2x
+  );
+  background-image: image-set(
+    url('/dsu-campus-hero-mobile-2x.webp') 1x,
+    url('/dsu-campus-hero-desktop.webp') 2x
+  );
 }
 
 /* Glassmorphism Navigation */

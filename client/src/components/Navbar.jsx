@@ -369,7 +369,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 active:scale-95 transition"
                 aria-label="Toggle Navigation Menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -379,33 +379,53 @@ export function Navbar() {
         </nav>
 
         {/* University announcements ticker */}
-        <div className="bg-[#F8FAFC] border-t border-b border-[#E5E7EB] px-4 py-2 overflow-hidden flex items-center text-xs group" title="Live University Notices">
-          <div className="flex items-center gap-1.5 shrink-0 bg-[#002B55] text-[#D9A521] px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase mr-3">
+        <div className="bg-[#F8FAFC] border-t border-b border-[#E5E7EB] px-3 sm:px-4 py-2 overflow-hidden flex items-center text-xs group" title="Live University Notices">
+          <div className="flex items-center gap-1.5 shrink-0 bg-[#002B55] text-[#D9A521] px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase mr-2.5 sm:mr-3">
             <span>CAMPUS NOTICE</span>
           </div>
 
-          <p className="text-slate-700 text-xs font-medium">
+          <p className="text-slate-700 text-xs font-medium truncate sm:whitespace-normal">
             Registrations are open for university technical symposia, national hackathons, and varsity championships.
           </p>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#E5E7EB] bg-white p-4 space-y-2 text-sm font-medium">
+          <div className="lg:hidden border-t border-[#E5E7EB] bg-white p-4 space-y-2 text-sm font-medium max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain shadow-2xl animate-in slide-in-from-top-2 duration-150">
             <Link
               to="/events"
               onClick={() => setMobileMenuOpen(false)}
-              className="block p-2 rounded-lg text-slate-800 hover:bg-slate-100"
+              className="block p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 font-semibold"
             >
               Campus Events
             </Link>
+
+            {/* Mobile Categories Accordion */}
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block px-1">
+                Browse Categories
+              </span>
+              <div className="grid grid-cols-2 gap-1.5 pt-1 text-xs">
+                {EVENT_CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat}
+                    to={`/events?category=${encodeURIComponent(cat)}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-[#002B55] hover:text-white transition font-medium text-center"
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={() => {
                 setMobileMenuOpen(false);
                 setMapModalOpen(true);
               }}
-              className="w-full text-left p-2 rounded-lg text-slate-800 hover:bg-slate-100 flex items-center justify-between"
+              className="w-full text-left p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-between font-semibold"
             >
               <span>DSU Campus Map & Venues</span>
               <MapPin className="w-4 h-4 text-[#D9A521]" />
@@ -413,15 +433,20 @@ export function Navbar() {
             <Link
               to="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
-              className="block p-2 rounded-lg text-slate-800 hover:bg-slate-100"
+              className="block p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 font-semibold flex items-center justify-between"
             >
-              My Passes ({activePassCount})
+              <span>My Passes</span>
+              {activePassCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-extrabold">
+                  {activePassCount} Active
+                </span>
+              )}
             </Link>
             {user && (user.role === 'admin' || user.role === 'organizer') && (
               <Link
                 to="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block p-2 rounded-lg text-[#002B55] hover:bg-slate-100"
+                className="block p-2.5 rounded-xl text-[#002B55] bg-blue-50/50 hover:bg-blue-50 font-bold"
               >
                 Operations Console
               </Link>
@@ -436,23 +461,24 @@ export function Navbar() {
                     setMobileMenuOpen(false);
                     navigate('/login');
                   }}
-                  className="w-full text-left p-2 rounded-lg text-rose-600 hover:bg-rose-50"
+                  className="w-full text-left p-2.5 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold flex items-center gap-2"
                 >
-                  Sign Out ({user.name})
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out ({user.name})</span>
                 </button>
               ) : (
                 <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 rounded-lg text-center font-semibold text-slate-700 bg-slate-100"
+                    className="p-3 rounded-xl text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 rounded-lg text-center font-semibold text-white bg-[#002B55]"
+                    className="p-3 rounded-xl text-center font-bold text-white bg-[#002B55] hover:bg-[#001B36]"
                   >
                     Register
                   </Link>

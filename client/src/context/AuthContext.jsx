@@ -52,6 +52,17 @@ export const AuthProvider = ({ children }) => {
     return receivedUser;
   };
 
+  const loginWithGoogle = async (googleData) => {
+    const res = await apiClient.post('/auth/google', googleData);
+    const { token: receivedToken, user: receivedUser, isNew } = res.data.data;
+    localStorage.setItem('dsu_token', receivedToken);
+    localStorage.setItem('dsu_user', JSON.stringify(receivedUser));
+    setToken(receivedToken);
+    setUser(receivedUser);
+    toast.success(isNew ? `Welcome to DSU Events, ${receivedUser.name}!` : `Welcome back, ${receivedUser.name}!`);
+    return { user: receivedUser, isNew };
+  };
+
   const refreshUser = async () => {
     try {
       const res = await apiClient.get('/auth/me');
@@ -80,7 +91,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, loginWithGoogle, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

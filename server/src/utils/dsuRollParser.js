@@ -1,0 +1,79 @@
+/**
+ * Dayananda Sagar University (DSU) Academic Identity & Roll Parser (Server)
+ * Validates and extracts branches from college emails (e.g. eng25cs0453@dsu.edu.in)
+ */
+
+const BRANCH_MAP = {
+  cs: { name: 'Computer Science & Engineering', short: 'CSE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  cse: { name: 'Computer Science & Engineering', short: 'CSE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  aiml: { name: 'Artificial Intelligence & Machine Learning', short: 'AI & ML', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ai: { name: 'Artificial Intelligence & Machine Learning', short: 'AI & ML', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ds: { name: 'Data Science & Big Data Analytics', short: 'Data Science', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  cnds: { name: 'Computer Networks & Data Science', short: 'CNDS', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  cy: { name: 'Cyber Security & Forensic Computing', short: 'Cyber Security', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  cscy: { name: 'Cyber Security & Forensic Computing', short: 'Cyber Security', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  is: { name: 'Information Science & Technology', short: 'ISE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ise: { name: 'Information Science & Technology', short: 'ISE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ec: { name: 'Electronics & Communication Engineering', short: 'ECE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ece: { name: 'Electronics & Communication Engineering', short: 'ECE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ee: { name: 'Electrical & Electronics Engineering', short: 'EEE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  eee: { name: 'Electrical & Electronics Engineering', short: 'EEE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  ae: { name: 'Aerospace Engineering', short: 'Aerospace', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  me: { name: 'Mechanical Engineering', short: 'Mechanical', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  bt: { name: 'Biotechnology & Bioinformatics', short: 'Biotech', degree: 'B.Tech', school: 'School of Basic & Applied Sciences' },
+  cv: { name: 'Civil Engineering', short: 'Civil', degree: 'B.Tech', school: 'School of Engineering & Technology' },
+  des: { name: 'User Experience & Interaction Design', short: 'B.Des', degree: 'B.Des', school: 'School of Design' },
+  bba: { name: 'Bachelor of Business Administration', short: 'BBA', degree: 'BBA', school: 'School of Commerce & Management Studies' },
+  mba: { name: 'Master of Business Administration', short: 'MBA', degree: 'MBA', school: 'School of Commerce & Management Studies' },
+  phar: { name: 'Pharmaceutical Sciences', short: 'Pharmacy', degree: 'B.Pharm', school: 'College of Pharmaceutical Sciences' },
+  law: { name: 'School of Law', short: 'Law', degree: 'Law', school: 'School of Law' }
+};
+
+export function parseDsuIdentity(input = '') {
+  if (!input || typeof input !== 'string') return null;
+
+  const raw = input.trim().toLowerCase();
+  const cleaned = raw.split('@')[0];
+
+  const match1 = cleaned.match(/^(?:([a-z]{3,4})_?)?(\d{2})([a-z]{2,5})_?(\d{2,5})$/i);
+  if (match1) {
+    const [, , yearDigits, branchCode, rollDigits] = match1;
+    const branchInfo = BRANCH_MAP[branchCode.toLowerCase()];
+    const admissionYear = 2000 + parseInt(yearDigits, 10);
+    const graduationYear = admissionYear + 4;
+
+    return {
+      usn: cleaned.toUpperCase(),
+      email: `${cleaned}@dsu.edu.in`,
+      department: branchInfo ? branchInfo.name : 'School of Engineering & Technology',
+      shortBranch: branchInfo ? branchInfo.short : branchCode.toUpperCase(),
+      school: branchInfo ? branchInfo.school : 'School of Engineering & Technology',
+      degree: branchInfo ? branchInfo.degree : 'B.Tech',
+      admissionYear,
+      graduationYear,
+      rollNumber: rollDigits
+    };
+  }
+
+  const match2 = cleaned.match(/^1ds(\d{2})([a-z]{2,5})(\d{3,4})$/i);
+  if (match2) {
+    const [, yearDigits, branchCode, rollDigits] = match2;
+    const branchInfo = BRANCH_MAP[branchCode.toLowerCase()];
+    const admissionYear = 2000 + parseInt(yearDigits, 10);
+    const graduationYear = admissionYear + 4;
+
+    return {
+      usn: cleaned.toUpperCase(),
+      email: `${cleaned}@dsu.edu.in`,
+      department: branchInfo ? branchInfo.name : 'School of Engineering & Technology',
+      shortBranch: branchInfo ? branchInfo.short : branchCode.toUpperCase(),
+      school: branchInfo ? branchInfo.school : 'School of Engineering & Technology',
+      degree: branchInfo ? branchInfo.degree : 'B.Tech',
+      admissionYear,
+      graduationYear,
+      rollNumber: rollDigits
+    };
+  }
+
+  return null;
+}

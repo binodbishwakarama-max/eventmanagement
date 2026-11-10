@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DsuLogo } from '../components/DsuLogo';
+import { parseDsuIdentity } from '../utils/dsuRollParser';
 import { registerSchema } from '../features/auth/schemas';
 import {
   Eye,
@@ -9,7 +10,8 @@ import {
   Ticket,
   CheckCircle2,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -30,10 +32,20 @@ export function RegisterPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'usn' ? value.toUpperCase().trim() : value
-    }));
+    setFormData((prev) => {
+      const next = {
+        ...prev,
+        [name]: name === 'usn' ? value.toUpperCase().trim() : value
+      };
+      if (name === 'email') {
+        const parsed = parseDsuIdentity(value);
+        if (parsed) {
+          if (!prev.usn || prev.usn.length < 5) next.usn = parsed.usn;
+          if (parsed.department) next.department = parsed.department;
+        }
+      }
+      return next;
+    });
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -43,7 +55,14 @@ export function RegisterPage() {
     e.preventDefault();
     setFieldErrors({});
 
-    const validation = registerSchema.safeParse(formData);
+    const normalizedEmail = formData.email.includes('@')
+      ? formData.email.toLowerCase().trim()
+      : `${formData.email.toLowerCase().trim()}@dsu.edu.in`;
+
+    const validation = registerSchema.safeParse({
+      ...formData,
+      email: normalizedEmail
+    });
     if (!validation.success) {
       const errors = {};
       for (const issue of validation.error.issues) {
@@ -58,14 +77,14 @@ export function RegisterPage() {
     try {
       await register({
         name: formData.name.trim(),
-        email: formData.email.toLowerCase().trim(),
+        email: normalizedEmail,
         password: formData.password,
         usn: formData.usn,
         rollNumber: formData.usn,
         department: formData.department.trim()
       });
-      toast.success('Student account registered successfully!');
-      navigate('/dashboard');
+      toast.success('Welcome to Dayananda Sagar University!');
+      navigate('/onboarding');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {

@@ -5,6 +5,7 @@ import { env } from '../../config/env.js';
 import { User } from '../../models/User.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { DSU_USN_REGEX } from './auth.schemas.js';
+import { parseDsuIdentity } from '../../utils/dsuRollParser.js';
 import { sendPasswordResetEmail } from '../../services/email/email.service.js';
 
 const DUMMY_HASH = '$2a$12$e8YkZJ3.0G7xUqmYqF/8Iea1i7bTf75/4r1oXfQeH8/Lkm23Z9YGy';
@@ -79,6 +80,51 @@ export async function loginUser({ email, password }) {
 
   const token = signToken(user);
   return { token, user: user.toJSON() };
+}
+
+export async function googleLoginOrRegister({ email, name, credential, usn }) {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Institutional domain check in production
+  if (env.NODE_ENV === 'production' && env.ALLOWED_EMAIL_DOMAINS) {
+    const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
+    const domain = normalizedEmail.split('@')[1];
+    if (!allowed.includes(domain)) {
+      throw ApiError.badRequest(`Registration via Google is restricted to institutional accounts (@${allowed.join(', @')})`);
+    }
+  }
+
+  let user = await User.findOne({ email: normalizedEmail });
+
+  if (user) {
+    const token = signToken(user);
+    return { token, user: user.toJSON(), isNew: false };
+  }
+
+  // Auto-detect branch, department, and roll number from institutional email
+  const parsedIdentity = parseDsuIdentity(normalizedEmail);
+  const detectedUsn = (usn || parsedIdentity?.usn || normalizedEmail.split('@')[0]).toUpperCase().trim();
+  const detectedDepartment = parsedIdentity?.department || 'School of Engineering & Technology';
+
+  const randomPassword = crypto.randomBytes(24).toString('hex');
+  const passwordHash = await bcrypt.hash(randomPassword, 12);
+
+  user = await User.create({
+    name: name.trim(),
+    email: normalizedEmail,
+    passwordHash,
+    role: 'student',
+    department: detectedDepartment,
+    rollNumber: detectedUsn,
+    usn: detectedUsn,
+    isVerified: true, // Google institutional SSO is pre-authenticated
+    verificationStatus: 'verified',
+    verifiedAt: new Date(),
+    tokenVersion: 1
+  });
+
+  const token = signToken(user);
+  return { token, user: user.toJSON(), isNew: true };
 }
 
 export async function forgotPassword(email) {

@@ -32,8 +32,8 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
   usn: z
     .string()
-    .min(1, 'University Seat Number (USN) is required')
-    .regex(/^1DS\d{2}[A-Z]{2,3}\d{3}$/i, 'Invalid DSU USN format (e.g., 1DS23CS045)'),
+    .min(1, 'University Seat Number or Roll Number is required')
+    .regex(/^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i, 'Invalid DSU Roll/USN format (e.g. ENG25CS0453, ENG24AIML012, or 1DS23CS045)'),
   department: z
     .string()
     .min(1, 'Department / School of study is required')

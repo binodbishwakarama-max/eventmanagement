@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const DSU_USN_REGEX = /^1DS\d{2}[A-Za-z]{2,3}\d{3}$/i;
+export const DSU_USN_REGEX = /^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i;
 
 export const registerSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -31,4 +31,12 @@ export const resetPasswordSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Za-z]/, 'Password must contain at least one letter')
     .regex(/[0-9]/, 'Password must contain at least one number')
+});
+
+export const googleAuthSchema = z.object({
+  email: z.string().trim().email().toLowerCase(),
+  name: z.string().trim().min(1).max(80),
+  credential: z.string().optional(),
+  picture: z.string().optional(),
+  usn: z.string().optional()
 });

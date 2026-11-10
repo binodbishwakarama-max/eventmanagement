@@ -54,3 +54,4 @@ class MicroCache {
 }
 
 export const eventsCache = new MicroCache(5); // 5-second TTL for public events catalog
+

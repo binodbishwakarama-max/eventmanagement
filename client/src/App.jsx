@@ -34,6 +34,9 @@ const RegisterPage = lazy(() =>
 const ResetPasswordPage = lazy(() =>
   import('./pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage }))
 );
+const OnboardingPage = lazy(() =>
+  import('./pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage }))
+);
 
 function PageLoadingFallback() {
   return (
@@ -124,9 +127,10 @@ export function App() {
               }
             />
 
-            {/* Auth */}
+            {/* Auth & Duolingo Onboarding */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* 404 Catch All */}

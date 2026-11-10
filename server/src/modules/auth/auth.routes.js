@@ -4,6 +4,7 @@ import { validate } from '../../middleware/validate.js';
 import * as authController from './auth.controller.js';
 import {
   forgotPasswordSchema,
+  googleAuthSchema,
   loginSchema,
   registerSchema,
   resetPasswordSchema
@@ -13,6 +14,7 @@ const router = Router();
 
 router.post('/register', validate(registerSchema), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
+router.post('/google', validate(googleAuthSchema), authController.googleAuth);
 router.get('/me', authenticate, authController.getMe);
 router.post('/logout', authenticate, authController.logout);
 router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);

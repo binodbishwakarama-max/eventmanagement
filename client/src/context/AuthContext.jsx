@@ -52,16 +52,35 @@ export const AuthProvider = ({ children }) => {
     return receivedUser;
   };
 
-  const logout = () => {
-    localStorage.removeItem('dsu_token');
-    localStorage.removeItem('dsu_user');
-    setToken(null);
-    setUser(null);
-    toast.success('Logged out successfully');
+  const refreshUser = async () => {
+    try {
+      const res = await apiClient.get('/auth/me');
+      const refreshed = res.data.data;
+      setUser(refreshed);
+      localStorage.setItem('dsu_user', JSON.stringify(refreshed));
+      return refreshed;
+    } catch (err) {
+      console.error('Failed to refresh user:', err);
+      return null;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await apiClient.post('/auth/logout');
+    } catch {
+      // Ignore network failure on logout
+    } finally {
+      localStorage.removeItem('dsu_token');
+      localStorage.removeItem('dsu_user');
+      setToken(null);
+      setUser(null);
+      toast.success('Logged out successfully');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

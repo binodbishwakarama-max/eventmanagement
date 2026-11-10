@@ -6,15 +6,15 @@ import { createEventSchema, updateEventSchema } from './events.schemas.js';
 
 const router = Router();
 
-// Public routes
-router.get('/', eventsController.getEvents);
-router.get('/:id', optionalAuthenticate, eventsController.getEvent);
-
 // Admin / Organizer routes
 router.get('/admin/list', authenticate, authorize('admin', 'organizer'), eventsController.getAdminEvents);
 router.post('/', authenticate, authorize('admin', 'organizer'), validate(createEventSchema), eventsController.createEvent);
 router.put('/:id', authenticate, authorize('admin', 'organizer'), validate(updateEventSchema), eventsController.updateEvent);
 router.delete('/:id', authenticate, authorize('admin', 'organizer'), eventsController.deleteEvent);
+
+// Public routes
+router.get('/', eventsController.getEvents);
+router.get('/:id', optionalAuthenticate, eventsController.getEvent);
 
 export default router;
 

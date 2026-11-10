@@ -39,7 +39,7 @@ describe('Database Disaster Recovery & Backup Integrity Suite', () => {
         createdBy: user1._id
       });
 
-      const reg1 = await Registration.create({
+      await Registration.create({
         event: event1._id,
         student: user1._id,
         ticketCode: 'TKT-TEST-RESTORE',

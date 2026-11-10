@@ -21,7 +21,7 @@ const clubSchema = new Schema(
     },
     campus: {
       type: String,
-      enum: ['Harohalli Main Campus', 'City Innovation Campus (Kudlu Gate)', 'Other'],
+      enum: ['Harohalli Main Campus', 'Other'],
       default: 'Harohalli Main Campus'
     },
     description: {

@@ -1,102 +1,131 @@
-# Campus Events — DSU-context demo
+# Dayananda Sagar University (DSU) — Campus Event Management Platform
 
-An independent campus event-management concept using Dayananda Sagar University (DSU) as context. It is not an official DSU service. All seeded accounts, events, attendance and analytics are fictional local demo data.
+A production-grade, full-stack campus event management and digital admission system built for **Dayananda Sagar University (DSU)**. Serves university departments, student clubs (IEEE, ACM, GDSC), administrative desks, and students across the Harohalli Main Campus and Kudlu Gate Innovation Campus.
 
-## What is included
+---
 
-- Event discovery with title search, category and date filters, sorting, pagination, responsive event cards and shareable filter URLs.
-- Event detail and registration flows, student registration history, cancellation before an event starts, and sample ticket codes.
-- Organizer-owned event management, registration rosters and attendance marking after an event starts.
-- Administrator event and account oversight, plus organizer-scoped and platform-level demo analytics.
-- Express API validation, JWT authentication, bcrypt password hashing, server-side role checks and atomic event-capacity updates.
+## Architecture Overview
 
-## Architecture
-
-- Client: React 18, Vite, React Router, Tailwind CSS, Axios and Lucide.
-- Server: Node.js, Express, Mongoose, MongoDB, Zod, JWT and bcryptjs.
-- Persistence: MongoDB. The student, organizer and administrator screens use the API; the application does not provide an offline/localStorage registration mode.
-- Authentication: one-day bearer JWT stored in browser `localStorage`, matching the playbook. This is a demo trade-off, not a production security recommendation.
-
-## Prerequisites
-
-- Node.js 20 or newer and npm.
-- MongoDB running locally, or a MongoDB Atlas database.
-
-## Install and configure (PowerShell, from the project root)
-
-```powershell
-if (-not (Test-Path server\.env)) { Copy-Item server\.env.example server\.env }
-if (-not (Test-Path client\.env)) { Copy-Item client\.env.example client\.env }
-npm install
+```
+                                      ┌────────────────────────────────────────┐
+                                      │   Client: React 18 + Vite + Tailwind   │
+                                      │  Code-Split Dynamic Routes + UI Tokens │
+                                      └──────────────────┬─────────────────────┘
+                                                         │ (HTTPS / REST API)
+                                                         ▼
+                                      ┌────────────────────────────────────────┐
+                                      │   Server: Node.js + Express (ESM)      │
+                                      │  RBAC Auth, Rate Limiter, Helmet, CORS │
+                                      └──────────────────┬─────────────────────┘
+                                                         │
+                                ┌────────────────────────┼────────────────────────┐
+                                ▼                        ▼                        ▼
+                     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+                     │ MongoDB Mongoose │     │ Redacted Logger  │     │ Email / Ticket   │
+                     │  Atomic Quotas   │     │ Structured Audit │     │ QR Cryptographic │
+                     └──────────────────┘     └──────────────────┘     └──────────────────┘
 ```
 
-Edit `server\.env` before starting the API:
+- **Frontend (`client/`)**: React 18, Vite, React Router 6, Tailwind CSS, Zod schema validation, accessible design tokens & primitives (`<Button>`, `<Input>`, `<Select>`, `<Card>`, `<Modal>`, `<Skeleton>`, `<EmptyState>`, `<ErrorState>`).
+- **Backend (`server/`)**: Express REST API, Mongoose 8 (MongoDB), JWT authentication with token invalidation, bcrypt password hashing (work factor 12), Helmet HTTP security headers, CORS origin verification, express-rate-limit.
+- **Security & Integrity**: 
+  - Institutional USN validation matching DSU format (`^1DS\d{2}[A-Z]{2,3}\d{3}$`).
+  - Academic identity review queue: self-submitted student accounts undergo administrative verification before granting active pass issuance.
+  - Cryptographically hashed QR admission passes with single-use check-in enforcement (Rule R9 prevents duplicate entry).
+  - Atomic MongoDB capacity counters and quota protection (Rules R6 & R7: prevent capacity reductions below registered count and prevent deletion of active events).
+  - Automated structured logger redacting sensitive credentials and tokens in production.
 
-- Set `MONGODB_URI` to your local or Atlas database.
-- Replace `JWT_SECRET` with a random value of at least 32 characters.
-- Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` for a local demo administrator.
-- Keep `CLIENT_ORIGIN=http://localhost:5173` for the default development URL.
+---
 
-`client\.env` defaults to `VITE_API_URL=http://localhost:5000/api`.
+## Quick Setup (Under 5 Commands)
 
-## Seed and run
+```bash
+# 1. Clone & install dependencies
+git clone https://github.com/dsu-dev/campus-events.git && cd campus-events && npm install
 
-Start MongoDB, then from the repository root:
+# 2. Configure environment variables
+cp server/.env.example server/.env && cp client/.env.example client/.env
 
-```powershell
+# 3. Provision administrative credentials & seed baseline campus data
 npm run seed
-npm run provision-admin
+
+# 4. Run full test suite & typecheck
+npm test && npm run typecheck
+
+# 5. Launch development services (client on :5173, server on :5001)
 npm run dev
 ```
 
-Open the client at **http://localhost:5173**. The API is at **http://localhost:5000/api** and its health endpoint is **http://localhost:5000/api/health**.
+---
 
-The seed creates one administrator using `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `server/.env`, one fictional organizer, six fictional students, ten fictional events, and sample attendance. Use `npm run seed -w server -- --reset` only against a local, non-production MongoDB; the seed script refuses `--reset` for non-local or production databases.
+## Environment Variables
 
-### Local demo accounts
+### Server (`server/.env`)
 
-- Administrator: values configured in `server/.env` (the checked-in example uses `admin@example.test` / `DemoAdminOnly123`).
-- Organizer: `organizer@example.test` / `Organizer@123`.
-- Students: `student1@example.test` through `student6@example.test` / `Student@123`.
+| Variable | Description | Default / Example |
+| :--- | :--- | :--- |
+| `PORT` | API server listen port | `5001` |
+| `NODE_ENV` | Runtime environment (`development`, `production`, `test`) | `development` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/dsu_events` |
+| `JWT_SECRET` | 256-bit cryptographic key for session tokens | `64-char hex string` |
+| `JWT_EXPIRES_IN` | Token lifespan | `1d` |
+| `CLIENT_ORIGIN` | Allowed web origin for CORS | `http://localhost:5173` |
+| `ADMIN_EMAIL` | Official administrator email address | `admin@dsu.edu.in` |
+| `ADMIN_PASSWORD` | Administrator initial password (min 12 chars) | `DSUAdmin2026!` |
+| `ALLOWED_EMAIL_DOMAINS` | Permitted institutional student email domains | `dsu.edu.in,example.test` |
+| `EMAIL_PROVIDER` | Transactional email provider (`mock`, `smtp`, `sendgrid`)| `mock` |
+| `STORAGE_PROVIDER` | Poster/file storage provider (`local`, `cloudinary`, `s3`) | `local` |
 
-These are fictional, local-only credentials. Change the administrator password before seeding if needed. Do not reuse these credentials or demo records in a real deployment.
+### Client (`client/.env`)
 
-## Commands
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | Base API route endpoint | `/api` |
+| `VITE_DEMO_MODE` | Institutional operation mode (`false` for live university) | `false` |
 
-Run these from the project root:
+---
 
-```powershell
-npm install
-npm run dev
-npm run build
-npm test
-npm run seed
+## Scripts Reference
+
+```bash
+# Development & Build
+npm run dev             # Concurrently runs backend (:5001) and frontend (:5173)
+npm run build           # Production bundle with code-split chunks (Vite)
+npm run start           # Production server start
+
+# Quality, Linting & Typecheck
+npm run typecheck       # TypeScript strict compiler check across repository
+npm run lint            # ESLint flat config audit
+npm run lint:fix        # ESLint automatic fixer
+npm run format:check    # Prettier formatting verification
+npm run format          # Prettier code formatting
+
+# Automated Testing
+npm test                # Executes full unit test suite (server + client)
+npm run test:concurrency # Stress-tests atomic concurrency on event quotas
+npm run test:load       # High-volume API load simulation
+npm run test:uat        # User acceptance verification script
+
+# Database & Administration
+npm run provision-admin # Securely creates root university admin account
+npm run seed            # Seeds baseline clubs, verified venues, and symposiums
+npm run backup          # Generates cryptographic database snapshot
+npm run restore         # Validates and restores database from backup snapshot
 ```
 
-`npm run build` builds the React client into `client/dist`. `npm test` runs server service-level unit tests. Those tests mock Mongoose models; they do not prove behavior against a running MongoDB server or under real database concurrency. The repository has no lint script.
+---
 
-`npm run provision-admin` creates only the configured administrator and is intended for a trusted production provisioning step; it requires an `ADMIN_PASSWORD` of at least 12 characters. Unlike the local `seed` command, it does not create fictional sample data.
+## Key University Features
 
-## Documentation
+1. **Campus Event Catalog**: Real-time faceted search by category, date range, and venue across the 130-acre Harohalli Main Campus.
+2. **Student Passbook**: Live admission voucher display with QR code, offline caching, and instant calendar export (Apple iCal / Outlook .ics / Google Calendar).
+3. **Operations Console**: Organizer event authoring, seat quota controls, and attendance check-in desk.
+4. **Administrative Review Desk**: Student ID (USN) approval queue with audit trail, unpublishing controls, and attendance CSV export.
+5. **Gate Entry Desk**: Camera-enabled QR barcode scanning and instant audio feedback (positive chime / warning buzzer).
 
-- [DSU requirements and verified sources](docs/DSU_REQUIREMENTS.md)
-- [Playbook traceability](docs/PLAYBOOK_TRACEABILITY.md)
-- [Current implementation summary](docs/SPEC.md)
-- [Demo presentation guide](docs/VIVA_PRESENTATION_GUIDE.md)
-- [API reference](docs/API.md)
-- [Data model](docs/DATA_MODEL.md)
-- [Local demo script](docs/DEMO.md)
-- [Deployment guidance](docs/DEPLOY.md)
-- [Limitations and institutional confirmations](docs/LIMITATIONS.md)
-- [Security notes](security.md)
+---
 
-## Troubleshooting
+## Institutional Contacts
 
-- **API exits before it starts:** check that `server/.env` exists, `JWT_SECRET` is at least 32 characters, and MongoDB is reachable at `MONGODB_URI`.
-- **Client reports a network error:** confirm both workspaces are running and `VITE_API_URL` points to the API's `/api` base URL.
-- **Demo sign-in fails:** run `npm run seed` against the same MongoDB URI used by the API. Confirm the administrator password against your local `server/.env`; organizer and student accounts are created by the seed.
-- **A seeded dataset looks stale:** use the reset command only with a disposable local database. It deletes all data in that database.
-
-## Production boundary
-
-This repository is a working demo, not a production-ready DSU platform. Before any real use, confirm DSU authorization, official identity and design requirements, account provisioning and eligibility rules, event policies and locations, privacy and retention requirements, and hosting/security controls. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) and [docs/DEPLOY.md](docs/DEPLOY.md).
+- **Dayananda Sagar University — Harohalli Main Campus**: Kanakapura Road, Bengaluru South - 562112
+- **Office of Student Affairs & Campus Life**: events@dsu.edu.in

@@ -2,18 +2,25 @@
   "name": "dsu-campus-events",
   "version": "1.0.0",
   "private": true,
-  "description": "Independent campus event-management demo using DSU as context",
+  "description": "Dayananda Sagar University Official Campus Event Management Platform",
+  "type": "module",
   "workspaces": [
     "server",
     "client"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "start": "npm run start -w server",
     "build": "npm run build -w client",
-    "test": "npm run test -w server",
+    "test": "npm run test -w server && npm run test -w client",
     "test:concurrency": "npm run test:concurrency -w server",
     "test:load": "npm run test:load -w server",
     "test:uat": "npm run test:uat -w server",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format:check": "prettier --check \"**/*.{js,jsx,json,md}\"",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "seed": "npm run seed -w server",
     "provision-admin": "npm run provision-admin -w server",
     "seed:pilot": "npm run seed:pilot -w server",
@@ -21,6 +28,9 @@
     "restore": "npm run restore -w server"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "eslint": "^10.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
   }
 }

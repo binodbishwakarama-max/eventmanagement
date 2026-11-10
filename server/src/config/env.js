@@ -38,10 +38,24 @@ const envSchema = z.object({
   SMTP_SECURE: z.coerce.boolean().default(false),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().default('DSU Campus Events <no-reply@dsu.edu.in>'),
+  SMTP_FROM: z.string().default('Campus Events Demo <no-reply@example.test>'),
   SENDGRID_API_KEY: z.string().optional(),
   // Optional Error Monitoring
-  SENTRY_DSN: z.string().optional()
+  SENTRY_DSN: z.string().optional(),
+  // Production University Configuration
+  DEMO_MODE: z.coerce.boolean().default(process.env.NODE_ENV !== 'production'),
+  TRUST_PROXY: z.coerce.boolean().default(false),
+  ALLOWED_EMAIL_DOMAINS: z.string().default('dsu.edu.in,example.test')
+}).superRefine((data, ctx) => {
+  if (data.NODE_ENV === 'production') {
+    if (data.ADMIN_PASSWORD.length < 12) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['ADMIN_PASSWORD'],
+        message: 'ADMIN_PASSWORD must be at least 12 characters in production'
+      });
+    }
+  }
 });
 
 const parsed = envSchema.safeParse(process.env);

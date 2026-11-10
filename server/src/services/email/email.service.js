@@ -67,8 +67,9 @@ async function sendMail({ to, subject, html, text }) {
  * 1. Password Reset Email
  * CRITICAL RULE: Never log password-reset links or tokens in production!
  */
-export async function sendPasswordResetEmail({ to, studentName = 'DSU Student', resetUrl }) {
+export async function sendPasswordResetEmail({ to, studentName = 'Student', resetUrl }) {
   const isProduction = env.NODE_ENV === 'production';
+  const isDemo = env.DEMO_MODE;
 
   if (!isProduction) {
     console.log(`[Email:Dev:PasswordReset] Token/URL for ${to}: ${resetUrl}`);
@@ -77,16 +78,25 @@ export async function sendPasswordResetEmail({ to, studentName = 'DSU Student', 
     console.log(`[Email:Prod:PasswordReset] Security dispatch initiated for ${to}`);
   }
 
-  const subject = 'Reset Your DSU Campus Events Password';
+  const subject = isDemo
+    ? 'Reset Your Campus Events Demo Password'
+    : 'Reset Your DSU Campus Events Password';
+
+  const portalTitle = isDemo ? 'Campus Events Demo' : 'Dayananda Sagar University';
+  const portalSubtitle = isDemo ? 'Independent student project' : 'DSU Campus Events • Security Verification';
+  const disclaimerText = isDemo
+    ? 'This is an automated student project demo message. It is not sent by or on behalf of DSU.'
+    : 'Dayananda Sagar University • Main Campus (Harohalli) • Office of Student Affairs';
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #E5E7EB; border-radius: 8px;">
       <div style="background-color: #002B55; padding: 16px; border-radius: 6px; text-align: center; margin-bottom: 24px;">
-        <h2 style="color: #FFFFFF; margin: 0; font-size: 20px;">Dayananda Sagar University</h2>
-        <p style="color: #D9A521; margin: 4px 0 0 0; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Campus Events Platform</p>
+        <h2 style="color: #FFFFFF; margin: 0; font-size: 20px;">${portalTitle}</h2>
+        <p style="color: #D9A521; margin: 4px 0 0 0; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">${portalSubtitle}</p>
       </div>
       <p style="font-size: 15px; color: #1E293B;">Dear ${studentName},</p>
       <p style="font-size: 14px; color: #475569; line-height: 1.6;">
-        We received a request to reset your password for your DSU Campus Events account. Click the button below to establish a new password. This link is valid for <strong>15 minutes</strong>.
+        We received a request to reset your password for your DSU Campus Events account. Click below to choose a new password. This link is valid for <strong>15 minutes</strong>.
       </p>
       <div style="text-align: center; margin: 32px 0;">
         <a href="${resetUrl}" style="background-color: #002B55; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: bold; font-size: 14px; display: inline-block;">
@@ -98,8 +108,7 @@ export async function sendPasswordResetEmail({ to, studentName = 'DSU Student', 
       </p>
       <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 24px 0;" />
       <p style="font-size: 11px; color: #94A3B8; text-align: center;">
-        Dayananda Sagar University • Devarakaggalahalli, Harohalli, Bengaluru – 562112<br />
-        This is an automated institutional notification. Please do not reply directly.
+        ${disclaimerText}
       </p>
     </div>
   `;
@@ -111,7 +120,11 @@ export async function sendPasswordResetEmail({ to, studentName = 'DSU Student', 
  * 2. Event Registration Confirmation with QR Code & Ticket Pass Details
  */
 export async function sendRegistrationConfirmationEmail({ to, studentName, event, ticketCode }) {
-  const subject = `Pass Confirmed: ${event.title} | DSU Campus Events`;
+  const isDemo = env.DEMO_MODE;
+  const subject = isDemo
+    ? `Demo registration received: ${event.title} | Campus Events`
+    : `Registration Confirmed: ${event.title} | DSU Campus Events`;
+
   const formattedDate = new Date(event.startsAt).toLocaleDateString('en-IN', {
     weekday: 'long',
     year: 'numeric',
@@ -127,19 +140,19 @@ export async function sendRegistrationConfirmationEmail({ to, studentName, event
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #E5E7EB; border-radius: 8px;">
       <div style="background-color: #002B55; padding: 16px; border-radius: 6px; text-align: center; margin-bottom: 24px;">
         <h2 style="color: #FFFFFF; margin: 0; font-size: 20px;">Dayananda Sagar University</h2>
-        <p style="color: #D9A521; margin: 4px 0 0 0; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Official Campus Event Pass</p>
+        <p style="color: #D9A521; margin: 4px 0 0 0; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Official Event Admission Pass</p>
       </div>
       <p style="font-size: 15px; color: #1E293B;">Hello ${studentName},</p>
       <p style="font-size: 14px; color: #475569; line-height: 1.6;">
-        Your digital admission pass for <strong>${event.title}</strong> has been issued. Present this pass or ticket code at the venue gate for verification.
+        Your seat reservation for <strong>${event.title}</strong> has been confirmed. Please present the pass code or QR code at the campus entry gate for attendance verification.
       </p>
       
       <div style="background-color: #F8FAFC; border: 2px dashed #002B55; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
-        <span style="font-size: 11px; font-weight: bold; color: #64748B; text-transform: uppercase; letter-spacing: 1px;">Ticket Pass Code</span>
+        <span style="font-size: 11px; font-weight: bold; color: #64748B; text-transform: uppercase; letter-spacing: 1px;">Admission Pass Code</span>
         <div style="font-size: 26px; font-family: monospace; font-weight: bold; color: #002B55; margin: 8px 0; letter-spacing: 2px;">
           ${ticketCode}
         </div>
-        <p style="font-size: 12px; color: #64748B; margin: 0;">Unique Single-Use Pass Code</p>
+        <p style="font-size: 12px; color: #10B981; margin: 0; font-weight: bold;">DSU Verified Credential</p>
       </div>
 
       <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px;">
@@ -153,7 +166,7 @@ export async function sendRegistrationConfirmationEmail({ to, studentName, event
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #64748B;"><strong>Time:</strong></td>
-          <td style="padding: 8px 0; color: #0F172A;">${formattedTime}</td>
+          <td style="padding: 8px 0; color: #0F172A;">${formattedTime} IST</td>
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #64748B;"><strong>Venue:</strong></td>
@@ -161,14 +174,14 @@ export async function sendRegistrationConfirmationEmail({ to, studentName, event
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #64748B;"><strong>Organizer:</strong></td>
-          <td style="padding: 8px 0; color: #0F172A;">${event.organizerClub || 'DSU Council'}</td>
+          <td style="padding: 8px 0; color: #0F172A;">${event.organizerClub || 'DSU Student Affairs'}</td>
         </tr>
       </table>
 
       <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 24px 0;" />
       <p style="font-size: 11px; color: #94A3B8; text-align: center;">
-        Dayananda Sagar University • Devarakaggalahalli, Harohalli, Bengaluru – 562112<br />
-        To manage or review your registrations, visit your <a href="${env.CLIENT_ORIGIN}/dashboard" style="color: #002B55;">Student Passbook</a>.
+        Dayananda Sagar University • Office of Student Affairs & Campus Life<br />
+        Access your digital pass anytime in the <a href="${env.CLIENT_ORIGIN}/dashboard" style="color: #002B55; font-weight: bold;">Student Passbook</a>.
       </p>
     </div>
   `;
@@ -180,7 +193,11 @@ export async function sendRegistrationConfirmationEmail({ to, studentName, event
  * 3. Event Cancellation Notification
  */
 export async function sendEventCancellationEmail({ to, studentName, event, reason = 'Administrative cancellation' }) {
-  const subject = `Cancelled: ${event.title} | DSU Campus Notice`;
+  const isDemo = env.DEMO_MODE;
+  const subject = isDemo
+    ? `Demo event cancelled: ${event.title} | Campus Events`
+    : `Event Notice: ${event.title} Cancelled | DSU Campus Events`;
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #FCA5A5; border-radius: 8px; background-color: #FEF2F2;">
       <div style="background-color: #991B1B; padding: 16px; border-radius: 6px; text-align: center; margin-bottom: 24px;">
@@ -189,14 +206,14 @@ export async function sendEventCancellationEmail({ to, studentName, event, reaso
       </div>
       <p style="font-size: 15px; color: #1E293B;">Dear ${studentName},</p>
       <p style="font-size: 14px; color: #374151; line-height: 1.6;">
-        Please be advised that the campus event <strong>${event.title}</strong>, originally scheduled for <strong>${new Date(event.startsAt).toLocaleDateString('en-IN')}</strong> at <strong>${event.venue}</strong>, has been cancelled by the event organizers.
+        The event <strong>${event.title}</strong>, originally scheduled for <strong>${new Date(event.startsAt).toLocaleDateString('en-IN')}</strong> at <strong>${event.venue}</strong>, has been cancelled.
       </p>
       <div style="background-color: #FFFFFF; border-left: 4px solid #EF4444; padding: 12px 16px; margin: 20px 0; border-radius: 4px;">
         <strong style="color: #991B1B; font-size: 13px;">Reason / Details:</strong>
         <p style="margin: 4px 0 0 0; font-size: 13px; color: #4B5563;">${reason}</p>
       </div>
       <p style="font-size: 13px; color: #4B5563;">
-        Your digital pass has been deactivated. You can explore other upcoming university hackathons, workshops, and gatherings on the <a href="${env.CLIENT_ORIGIN}/events" style="color: #002B55; font-weight: bold;">DSU Campus Events Portal</a>.
+        Your registration has been cancelled. You can browse upcoming gatherings on the <a href="${env.CLIENT_ORIGIN}/events" style="color: #002B55; font-weight: bold;">DSU Campus Events Portal</a>.
       </p>
     </div>
   `;
@@ -208,7 +225,11 @@ export async function sendEventCancellationEmail({ to, studentName, event, reaso
  * 4. Event Update / Venue Change Notification
  */
 export async function sendEventUpdateEmail({ to, studentName, event, changeSummary }) {
-  const subject = `Update Notice: Changes to ${event.title} | DSU Campus Events`;
+  const isDemo = env.DEMO_MODE;
+  const subject = isDemo
+    ? `Demo event update: ${event.title} | Campus Events`
+    : `Event Update: ${event.title} | DSU Campus Events`;
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #E5E7EB; border-radius: 8px;">
       <div style="background-color: #002B55; padding: 16px; border-radius: 6px; text-align: center; margin-bottom: 24px;">
@@ -217,7 +238,7 @@ export async function sendEventUpdateEmail({ to, studentName, event, changeSumma
       </div>
       <p style="font-size: 15px; color: #1E293B;">Hello ${studentName},</p>
       <p style="font-size: 14px; color: #475569; line-height: 1.6;">
-        The schedule or venue details for <strong>${event.title}</strong> have been updated by the organizing faculty committee.
+        The schedule or venue details for <strong>${event.title}</strong> have been updated by the organizing committee.
       </p>
       <div style="background-color: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 6px; padding: 16px; margin: 20px 0;">
         <p style="margin: 0; font-size: 13px; color: #1E3A8A; font-weight: 500;">
@@ -228,12 +249,8 @@ export async function sendEventUpdateEmail({ to, studentName, event, changeSumma
         <strong>Updated Venue:</strong> ${event.venue}<br />
         <strong>Updated Start Time:</strong> ${new Date(event.startsAt).toLocaleString('en-IN')}
       </p>
-      <p style="font-size: 12px; color: #64748B; margin-top: 24px;">
-        Your existing ticket pass code remains valid.
-      </p>
     </div>
   `;
 
   return sendMail({ to, subject, html });
 }
-

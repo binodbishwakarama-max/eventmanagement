@@ -1,9 +1,9 @@
-import { ApiError } from '../utils/ApiError.js';
+import { logger } from '../utils/logger.js';
 
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, req, res, _next) {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal server error';
-  let errors = err.errors || [];
+  const errors = err.errors || [];
 
   // Mongoose CastError (invalid ObjectId)
   if (err.name === 'CastError') {
@@ -29,10 +29,25 @@ export function errorHandler(err, req, res, next) {
     message = 'Malformed JSON in request body';
   }
 
+  if (statusCode >= 500) {
+    logger.error(`Server Error: ${message}`, {
+      statusCode,
+      method: req.method,
+      path: req.path,
+      stack: err.stack
+    });
+  } else {
+    logger.warn(`Client Request Error: ${message}`, {
+      statusCode,
+      method: req.method,
+      path: req.path
+    });
+  }
+
   return res.status(statusCode).json({
     success: false,
     message,
+    code: err.code || `HTTP_${statusCode}`,
     ...(errors.length > 0 ? { errors } : {})
   });
 }
-

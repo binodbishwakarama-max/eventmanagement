@@ -1,18 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Calendar,
   Ticket,
   Shield,
-  Search,
   ChevronDown,
   LogOut,
   Menu,
   X,
   MapPin,
-  ExternalLink,
-  Phone,
-  GraduationCap,
   Bell
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -20,15 +15,7 @@ import { apiClient } from '../api/client';
 import { DsuLogo } from './DsuLogo';
 import { CampusMapModal } from './CampusMapModal';
 
-const DSU_SCHOOLS = [
-  { id: 'soe', name: 'School of Engineering (SOE)', fests: 'Hack Forge / Invento' },
-  { id: 'soca', name: 'School of Computer Applications (SOCA)', fests: 'ByteCraft Code Jam' },
-  { id: 'scms', name: 'School of Commerce & Management (SCMS)', fests: 'Feiern Conclave' },
-  { id: 'soadh', name: 'School of Arts, Design & Humanities (SOADH)', fests: 'Transmedia Showcase' },
-  { id: 'sbas', name: 'School of Basic & Applied Sciences (SBAS)', fests: 'Science Colloquium' },
-  { id: 'sol', name: 'School of Law (SOL)', fests: 'National Moot Court' },
-  { id: 'cdsimer', name: 'Dr. CDSIMER (Medical & Health Sciences)', fests: 'Health Innovation Summit' }
-];
+const EVENT_CATEGORIES = ['Technical', 'Workshop', 'Cultural', 'Sports', 'Seminar', 'Other'];
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -44,31 +31,25 @@ export function Navbar() {
 
   const [activePassCount, setActivePassCount] = useState(0);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(2);
+  const [unreadNotifications, setUnreadNotifications] = useState(1);
 
   const campusNotifications = [
     {
       id: 1,
-      title: 'Invento 2026 Keynote Registrations Live',
-      desc: 'Sir M. Visvesvaraya Auditorium bookings open for school tech symposium.',
-      time: '10m ago'
+      title: 'Academic Year 2026 Event Registration Open',
+      desc: 'Department conferences, technical symposiums, and varsity sports meet registrations are now live.',
+      time: 'Campus Desk'
     },
     {
       id: 2,
-      title: 'Harohalli Central Turf Scheduling',
-      desc: 'Inter-department sports rounds updated on campus calendar.',
-      time: '1h ago'
-    },
-    {
-      id: 3,
-      title: 'DSU Digital Pass Gate Verifications Active',
-      desc: 'Organizers can now scan student QR passes with high-speed camera verification.',
-      time: '3h ago'
+      title: 'Digital Gate Entry Guidelines',
+      desc: 'Students are requested to keep their encrypted admission QR code ready on mobile or printed passbook.',
+      time: 'Student Affairs'
     }
   ];
 
   const fetchActivePassCount = async () => {
-    if (!user) {
+    if (!user || user.role !== 'student') {
       setActivePassCount(0);
       return;
     }
@@ -128,40 +109,26 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-xs">
-        {/* Level 1: Slim Top Institutional Strip */}
-        <div className="bg-[#001B36] text-slate-200 px-4 py-1.5 text-xs">
+      <header className="sticky top-0 z-40 glass-nav border-b border-slate-200/80 shadow-2xs transition-all duration-200">
+        {/* University portal header bar */}
+        <div className="bg-[#00142A] text-slate-200 px-4 py-1.5 text-xs border-b border-white/5">
           <div className="max-w-[1280px] mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-white">Dayananda Sagar University</span>
               <span className="text-slate-500 hidden sm:inline">•</span>
-              <span className="text-slate-300 hidden sm:inline">Harohalli Main Campus, Bengaluru</span>
+              <span className="text-slate-300 hidden sm:inline">Harohalli Main Campus Events Portal</span>
             </div>
-
-            <div className="flex items-center gap-4 text-slate-300">
-              <span className="hidden md:inline">Admissions Helpline: 080 46461800</span>
-              <span className="text-slate-600 hidden md:inline">|</span>
-              <a
-                href="https://www.dsu.edu.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition flex items-center gap-1 font-medium"
-              >
-                <span>dsu.edu.in</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
-              </a>
-            </div>
+            <span className="text-slate-300 hidden sm:inline font-mono">Harohalli, Kanakapura Road • events@dsu.edu.in</span>
           </div>
         </div>
 
-        {/* Level 2: Primary University Navigation */}
+        {/* Primary project navigation */}
         <nav className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 py-2">
-            {/* Authentic DSU Logo */}
             <Link
               to="/events"
               className="flex items-center group focus:outline-none"
-              aria-label="Dayananda Sagar University Campus Events Home"
+              aria-label="Campus Events home"
             >
               <DsuLogo variant="with-tag" size="lg" />
             </Link>
@@ -170,45 +137,45 @@ export function Navbar() {
             <div className="hidden lg:flex items-center gap-1.5 text-sm font-medium text-slate-700">
               <Link
                 to="/events"
-                className={`px-3.5 py-2 rounded-lg transition-colors duration-150 ${
+                className={`px-3.5 py-2 rounded-xl transition-all duration-150 ${
                   isActive('/events')
-                    ? 'bg-[#002B55] text-white font-semibold shadow-xs'
+                    ? 'bg-[#002B55] text-white font-bold shadow-soft'
                     : 'hover:bg-slate-100 hover:text-[#002B55]'
                 }`}
               >
                 Campus Events
               </Link>
 
-              {/* Schools Dropdown */}
+              {/* Event category filter */}
               <div className="relative" ref={schoolsRef}>
                 <button
                   type="button"
                   onClick={() => setSchoolsDropdownOpen(!schoolsDropdownOpen)}
-                  className={`px-3.5 py-2 rounded-lg transition-colors duration-150 flex items-center gap-1.5 ${
+                  className={`px-3.5 py-2 rounded-xl transition-colors duration-150 flex items-center gap-1.5 ${
                     schoolsDropdownOpen
                       ? 'bg-slate-100 text-[#002B55]'
                       : 'hover:bg-slate-100 hover:text-[#002B55]'
                   }`}
                 >
-                  <span>Schools & Fests</span>
+                  <span>Categories</span>
                   <ChevronDown className="w-4 h-4 text-slate-400" />
                 </button>
 
                 {schoolsDropdownOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-84 rounded-xl bg-white border border-[#E5E7EB] shadow-xl p-2 text-xs z-50 animate-in fade-in duration-150">
-                    <div className="px-3 py-1.5 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                      Academic Schools & Fests
+                  <div className="absolute left-0 top-full mt-2 w-84 rounded-2xl bg-white border border-slate-200 shadow-xl p-2 text-xs z-50 animate-in fade-in duration-150">
+                    <div className="px-3 py-1.5 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono">
+                      Event Categories
                     </div>
                     <div className="space-y-0.5 py-1">
-                      {DSU_SCHOOLS.map((school) => (
+                      {EVENT_CATEGORIES.map((category) => (
                         <Link
-                          key={school.id}
-                          to={`/events?school=${encodeURIComponent(school.name)}`}
+                          key={category}
+                          to={`/events?category=${encodeURIComponent(category)}`}
                           onClick={() => setSchoolsDropdownOpen(false)}
-                          className="w-full text-left p-2.5 rounded-lg hover:bg-slate-50 transition block"
+                          className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition block"
                         >
-                          <p className="font-semibold text-slate-900 text-xs">{school.name}</p>
-                          <p className="text-[11px] text-[#002B55] font-medium mt-0.5">{school.fests}</p>
+                          <p className="font-bold text-slate-900 text-xs">{category}</p>
+                          <p className="text-[11px] text-slate-500 font-medium mt-0.5">Explore university gatherings & symposiums</p>
                         </Link>
                       ))}
                     </div>
@@ -220,25 +187,25 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMapModalOpen(true)}
-                className="px-3.5 py-2 rounded-lg hover:bg-slate-100 hover:text-[#002B55] transition-colors duration-150 flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl hover:bg-slate-100 hover:text-[#002B55] transition-colors duration-150 flex items-center gap-1.5"
               >
                 <MapPin className="w-4 h-4 text-[#D9A521]" />
-                <span>Harohalli Map</span>
+                <span>Campus Map & Venues</span>
               </button>
 
               {/* My Passes Link */}
               <Link
                 to="/dashboard"
-                className={`px-3.5 py-2 rounded-lg transition-colors duration-150 flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-xl transition-all duration-150 flex items-center gap-1.5 ${
                   isActive('/dashboard')
-                    ? 'bg-[#002B55] text-white font-semibold shadow-xs'
+                    ? 'bg-[#002B55] text-white font-bold shadow-soft'
                     : 'hover:bg-slate-100 hover:text-[#002B55]'
                 }`}
               >
                 <Ticket className="w-4 h-4" />
                 <span>My Passes</span>
                 {activePassCount > 0 && (
-                  <span className="ml-1 px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-bold">
+                  <span className="ml-1 px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-extrabold">
                     {activePassCount}
                   </span>
                 )}
@@ -262,7 +229,7 @@ export function Navbar() {
 
             {/* Right: Notifications & Profile */}
             <div className="hidden sm:flex items-center gap-3">
-              {/* Institutional Notifications Popover */}
+              {/* Static project notice */}
               <div className="relative" ref={notifRef}>
                 <button
                   type="button"
@@ -271,20 +238,20 @@ export function Navbar() {
                     setUnreadNotifications(0);
                   }}
                   className="relative p-2 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition bg-white text-slate-600 shadow-2xs"
-                  aria-label="Campus announcements and alerts"
-                  title="Campus announcements & updates"
+                  aria-label="Campus announcements"
+                  title="Campus announcements"
                 >
                   <Bell className="w-4 h-4 text-slate-600" />
                   {unreadNotifications > 0 && (
-                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-blue-900 rounded-full border-2 border-white" />
                   )}
                 </button>
 
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white border border-[#E5E7EB] shadow-xl p-3 text-xs z-50 animate-in fade-in duration-150">
+                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white border border-slate-200 shadow-xl p-3 text-xs z-50 animate-in fade-in duration-150">
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-                      <span className="font-bold text-[#002B55] text-xs uppercase tracking-wider">Campus Alerts</span>
-                      <span className="text-[10px] text-slate-400 font-mono">Live DSU Feed</span>
+                      <span className="font-bold text-[#002B55] text-xs uppercase tracking-wider">Campus Desk</span>
+                      <span className="text-[10px] text-slate-500 font-mono">Official Notices</span>
                     </div>
                     <div className="space-y-2">
                       {campusNotifications.map((n) => (
@@ -411,31 +378,15 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Level 3: Slim Announcement Strip */}
-        <div className="bg-[#F8FAFC] border-t border-b border-[#E5E7EB] px-4 py-2 overflow-hidden flex items-center text-xs group" title="Hover to pause announcement ticker">
+        {/* University announcements ticker */}
+        <div className="bg-[#F8FAFC] border-t border-b border-[#E5E7EB] px-4 py-2 overflow-hidden flex items-center text-xs group" title="Live University Notices">
           <div className="flex items-center gap-1.5 shrink-0 bg-[#002B55] text-[#D9A521] px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase mr-3">
-            <span>CIRCULARS</span>
+            <span>CAMPUS NOTICE</span>
           </div>
 
-          <div className="overflow-hidden relative w-full">
-            <div className="animate-ticker group-hover:[animation-play-state:paused] text-slate-700 text-xs font-medium flex items-center gap-8">
-              <span>
-                <strong className="text-[#002B55]">Hack Forge 2026</strong>: Registration open for School of Engineering & Computer Applications.
-              </span>
-              <span className="text-slate-300">•</span>
-              <span>
-                <strong className="text-[#002B55]">Sir M. Visvesvaraya Auditorium</strong>: Semester events and keynote hall bookings live.
-              </span>
-              <span className="text-slate-300">•</span>
-              <span>
-                <strong className="text-[#002B55]">Sports Meet</strong>: Inter-department athletics round scheduled at Harohalli Central Turf.
-              </span>
-              <span className="text-slate-300">•</span>
-              <span>
-                <strong className="text-[#002B55]">Admissions 2026</strong>: DSAT Entrance & KCET (Code: E240) applications underway at dsu.edu.in.
-              </span>
-            </div>
-          </div>
+          <p className="text-slate-700 text-xs font-medium">
+            Registrations are open for university technical symposia, national hackathons, and varsity championships.
+          </p>
         </div>
 
         {/* Mobile Navigation Drawer */}
@@ -456,7 +407,7 @@ export function Navbar() {
               }}
               className="w-full text-left p-2 rounded-lg text-slate-800 hover:bg-slate-100 flex items-center justify-between"
             >
-              <span>Harohalli Campus Map</span>
+              <span>DSU Campus Map & Venues</span>
               <MapPin className="w-4 h-4 text-[#D9A521]" />
             </button>
             <Link

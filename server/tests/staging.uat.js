@@ -7,10 +7,16 @@
  */
 
 import http from 'http';
-import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
-const API_BASE = 'http://localhost:5000/api';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const PORT = process.env.PORT || 5000;
+const API_BASE = process.env.API_BASE || `http://localhost:${PORT}/api`;
 
 // Helper to make HTTP requests
 function request(method, path, data = null, token = null, extraHeaders = {}) {
@@ -50,7 +56,7 @@ function request(method, path, data = null, token = null, extraHeaders = {}) {
         let json = null;
         try {
           json = JSON.parse(rawData);
-        } catch (e) {
+        } catch {
           json = { raw: rawData };
         }
         resolve({
@@ -174,7 +180,7 @@ async function runStagingUAT() {
     `Returned ${browseRes.data?.data?.items?.length} published events`
   );
 
-  const targetEvent = browseRes.data.data.items[0];
+  const targetEvent = browseRes.data.data.items.find(e => new Date(e.startsAt) > new Date() && e.status === 'published') || browseRes.data.data.items[0];
   const targetEventId = targetEvent._id;
   const initialRegisteredCount = targetEvent.registeredCount;
 
@@ -438,9 +444,11 @@ async function runStagingUAT() {
   console.log('\n--- PHASE 3: ADMINISTRATOR REAL USER JOURNEY ---');
 
   // 3.1 Administrator Login
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.test';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'DemoAdminOnly123';
   const adminLoginRes = await request('POST', '/auth/login', {
-    email: 'admin@demo.dsu.edu',
-    password: 'Admin@123'
+    email: adminEmail,
+    password: adminPassword
   });
   assert(
     'Admin Login: Successfully authenticated with admin role (HTTP 200)',

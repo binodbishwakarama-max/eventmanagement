@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../utils/calendar';
 import { DsuLogo } from '../components/DsuLogo';
 import { TicketQrCode } from '../components/TicketQrCode';
+import { ConfirmModal } from '../components/ConfirmModal';
+import { Skeleton, EmptyState, ErrorState, Button } from '../components/ui';
 import {
   Calendar,
   MapPin,
@@ -14,25 +16,16 @@ import {
   Printer,
   X,
   Award,
-  ArrowRight,
   ShieldCheck,
   QrCode,
   CalendarPlus,
-  Copy,
-  ExternalLink,
-  Sparkles,
-  ChevronRight,
-  GraduationCap,
-  Building,
-  UserCheck,
-  WifiOff,
-  Radio
+  WifiOff
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
 export function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -40,7 +33,14 @@ export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedPass, setSelectedPass] = useState(null);
   const [cancellingEventId, setCancellingEventId] = useState(null);
+  const [cancelTargetEventId, setCancelTargetEventId] = useState(null);
   const [liveSec, setLiveSec] = useState(new Date());
+
+  // Resubmission modal state
+  const [resubmitModalOpen, setResubmitModalOpen] = useState(false);
+  const [resubmitUsn, setResubmitUsn] = useState('');
+  const [resubmitDept, setResubmitDept] = useState('');
+  const [resubmitLoading, setResubmitLoading] = useState(false);
 
   // Tick the security second clock for live voucher verification
   useEffect(() => {
@@ -85,12 +85,17 @@ export function StudentDashboard() {
     fetchRegistrations();
   }, []);
 
-  const handleCancel = async (eventId) => {
-    if (!window.confirm('Are you sure you want to cancel your seat for this event?')) return;
-    setCancellingEventId(eventId);
+  const handleCancel = (eventId) => {
+    setCancelTargetEventId(eventId);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelTargetEventId) return;
+    setCancellingEventId(cancelTargetEventId);
     try {
-      await apiClient.delete(`/events/${eventId}/register`);
-      toast.success('Registration cancelled');
+      await apiClient.delete(`/events/${cancelTargetEventId}/register`);
+      toast.success('Registration cancelled successfully');
+      setCancelTargetEventId(null);
       fetchRegistrations();
       window.dispatchEvent(new Event('dsu-registrations-updated'));
     } catch (err) {
@@ -98,11 +103,6 @@ export function StudentDashboard() {
     } finally {
       setCancellingEventId(null);
     }
-  };
-
-  const handleCopyCode = (code) => {
-    navigator.clipboard.writeText(code);
-    toast.success('Pass code copied to clipboard');
   };
 
   const upcoming = registrations.filter(
@@ -127,7 +127,7 @@ export function StudentDashboard() {
           <div className="flex items-center gap-2.5">
             <WifiOff className="w-4 h-4 text-amber-700 shrink-0" />
             <span>
-              <strong>Offline Mode Active:</strong> Displaying your previously synced passes from local storage. Your QR codes remain 100% scannable at campus gates.
+              <strong>Showing cached demo data:</strong> These saved records may be stale. Changes require a server connection, and demo QR codes are not valid for real-world entry.
             </span>
           </div>
           <button
@@ -136,6 +136,35 @@ export function StudentDashboard() {
             className="font-semibold underline hover:text-amber-950 shrink-0"
           >
             Reconnect
+          </button>
+        </div>
+      )}
+
+      {/* Verification Rejection Alert Banner */}
+      {user?.verificationStatus === 'rejected' && (
+        <div className="mb-6 p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
+          <div className="flex items-start gap-3">
+            <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-sm text-rose-950">Verification Review Rejected</p>
+              <p className="text-rose-800 mt-1 leading-relaxed">
+                <strong>Feedback from Desk:</strong> {user?.rejectionReason || 'Institutional USN or identity records could not be verified by registrar desk.'}
+              </p>
+              <p className="text-slate-500 text-[11px] mt-1">
+                Please update your Dayananda Sagar University Serial Number (USN) to match registrar records (e.g. 1DS23CS045).
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setResubmitUsn(user?.usn || user?.rollNumber || '');
+              setResubmitDept(user?.department || '');
+              setResubmitModalOpen(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shrink-0 transition shadow-xs"
+          >
+            Update & Resubmit
           </button>
         </div>
       )}
@@ -152,21 +181,25 @@ export function StudentDashboard() {
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] tracking-tight">
                   {user?.name || 'DSU Student'}
                 </h1>
-                {user?.isVerified ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Verified Student ID
+                {user?.isVerified || user?.verificationStatus === 'verified' ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Verified DSU Student
+                  </span>
+                ) : user?.verificationStatus === 'rejected' ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-800 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                    <XCircle className="w-3.5 h-3.5 text-rose-600" /> Verification Rejected
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
-                    <Clock className="w-3.5 h-3.5 text-amber-600" /> Pending Verification
+                    <Clock className="w-3.5 h-3.5 text-amber-600" /> Verification Pending
                   </span>
                 )}
               </div>
               <p className="text-xs text-slate-500 font-mono mt-1">
-                USN: <span className="text-slate-800 font-bold">{user?.usn || user?.rollNumber || '1DS22CS042'}</span> • {user?.email}
+                University USN: <span className="text-slate-900 font-bold">{user?.usn || user?.rollNumber || '1DS23CS045'}</span> • {user?.email}
               </p>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {user?.department || 'School of Computer Applications'} • Dayananda Sagar University
+              <p className="text-xs text-slate-600 mt-0.5 font-medium">
+                {user?.department || 'School of Computer Science & Engineering'} • Official Student Account
               </p>
             </div>
           </div>
@@ -229,32 +262,42 @@ export function StudentDashboard() {
 
       {/* Registrations List */}
       {loading ? (
-        <div className="py-24 text-center">
-          <div className="w-8 h-8 border-2 border-[#002B55] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs text-slate-500 font-mono">Loading university passbook records...</p>
+        <div className="space-y-4 py-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-24 rounded-md" />
+              </div>
+              <Skeleton className="h-6 w-1/2 rounded-lg" />
+              <div className="flex gap-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : loadError ? (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center text-xs text-rose-800">
-          <p>{loadError}</p>
-          <button type="button" onClick={fetchRegistrations} className="mt-3 font-semibold underline text-rose-900">
-            Retry
-          </button>
+        <div className="py-6">
+          <ErrorState
+            title="Passbook Unavailable"
+            message={loadError}
+            onRetry={fetchRegistrations}
+            retryLabel="Reload Passes"
+          />
         </div>
       ) : displayedList.length === 0 ? (
-        <div className="dsu-card p-16 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4 text-slate-400">
-            <Ticket className="w-7 h-7 text-[#002B55]" />
-          </div>
-          <h3 className="text-lg font-bold text-slate-900">No Passes in this Section</h3>
-          <p className="text-xs text-slate-500 mt-1.5 max-w-sm mx-auto leading-relaxed">
-            Reserve passes for upcoming campus symposiums, technical hackathons, guest keynotes, and varsity tournaments.
-          </p>
-          <Link
-            to="/events"
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#002B55] text-white text-xs font-semibold hover:bg-[#001B36] transition shadow-xs"
-          >
-            Browse Campus Events
-          </Link>
+        <div className="py-6">
+          <EmptyState
+            icon={Ticket}
+            title="No Passes in this Section"
+            description="You have no registered events or passes under this tab. Browse upcoming university symposiums and workshops to book your seat."
+            action={
+              <Link to="/events">
+                <Button variant="primary">Browse Campus Events</Button>
+              </Link>
+            }
+          />
         </div>
       ) : (
         <div className="space-y-4">
@@ -358,16 +401,16 @@ export function StudentDashboard() {
         </div>
       )}
 
-      {/* Authentic DSU Digital Hall Ticket / Event Pass Modal */}
+      {/* Authentic Institutional E-Pass Voucher Modal */}
       {selectedPass && (
-        <div className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
-          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white rounded-2xl border border-slate-300">
+        <div className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white rounded-3xl border border-slate-300 ticket-stub">
             {/* Pass Header Banner */}
-            <div className="bg-[#002B55] text-white p-6 relative border-b-2 border-[#D9A521]">
+            <div className="bg-[#001B36] text-white p-6 relative border-b-2 border-[#D9A521]">
               <button
                 type="button"
                 onClick={() => setSelectedPass(null)}
-                className="absolute top-4 right-4 text-white/70 hover:text-white p-1 rounded-full hover:bg-white/10 transition"
+                className="absolute top-4 right-4 text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition"
                 aria-label="Close pass"
               >
                 <X className="w-5 h-5" />
@@ -377,40 +420,40 @@ export function StudentDashboard() {
                 <DsuLogo variant="white" size="sm" />
               </div>
 
-              <div className="mt-4 pt-3 border-t border-blue-900/60 flex items-center justify-between">
+              <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between">
                 <div>
-                  <span className="text-xs uppercase tracking-wider text-[#D9A521] block font-semibold">
-                    Official Student Entry Voucher
+                  <span className="text-[11px] uppercase tracking-wider text-[#F5C84C] block font-bold font-mono">
+                    Dayananda Sagar University Official E-Pass
                   </span>
-                  <h2 className="text-lg font-bold tracking-tight text-white">
-                    {selectedPass.attended ? 'Attendance Verification Certificate' : 'Event Entry Pass'}
+                  <h2 className="text-lg font-extrabold tracking-tight text-white mt-0.5">
+                    {selectedPass.attended ? 'Verified Attendance Record' : 'Official Admission Ticket'}
                   </h2>
                 </div>
-                <span className="text-xs bg-[#001B36] border border-[#D9A521]/40 text-[#D9A521] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
-                  Verified DSU ID
+                <span className="text-[11px] bg-[#00142A] border border-[#D9A521]/60 text-[#F5C84C] px-3 py-1 rounded-full font-bold uppercase tracking-wider shadow-xs">
+                  DSU Turnstile
                 </span>
               </div>
             </div>
 
             {/* Live Security Anti-Screenshot Bar */}
-            <div className="bg-slate-900 text-white px-6 py-2 flex items-center justify-between text-[11px] font-mono">
+            <div className="bg-slate-900 text-white px-6 py-2.5 flex items-center justify-between text-[11px] font-mono border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="text-emerald-400 font-semibold tracking-wider uppercase">Live Gate Pass</span>
+                <span className="text-emerald-400 font-bold tracking-wider uppercase">Live Turnstile Validated</span>
               </div>
-              <span className="text-slate-400">
+              <span className="text-slate-400 font-medium">
                 {liveSec.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })},{' '}
                 {liveSec.toLocaleTimeString('en-IN')} IST
               </span>
             </div>
 
             {/* Pass Details Shelf */}
-            <div className="p-6 space-y-4 text-slate-800">
+            <div className="p-6 space-y-4 text-slate-800 bg-white">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 block">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block font-mono">
                   Event Title
                 </span>
                 <h3 className="font-extrabold text-[#002B55] text-lg leading-snug mt-0.5">
@@ -418,27 +461,27 @@ export function StudentDashboard() {
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   Organized by{' '}
-                  <strong className="font-semibold text-slate-700">
-                    {selectedPass.event?.organizerClub || 'Dayananda Sagar University'}
+                  <strong className="font-bold text-slate-800">
+                    {selectedPass.event?.organizerClub || 'DSU Student Affairs'}
                   </strong>
                 </p>
               </div>
 
               {/* Student Credential Grid */}
-              <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
+              <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50/80 rounded-2xl border border-slate-200 text-xs">
                 <div>
-                  <span className="text-slate-500 block text-xs uppercase tracking-wider font-medium">Student Name</span>
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">Student Name</span>
                   <span className="font-bold text-[#002B55] text-xs">{user?.name}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-xs uppercase tracking-wider font-medium">University USN</span>
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">University USN</span>
                   <span className="font-mono font-bold text-[#002B55] text-xs">
-                    {user?.usn || user?.rollNumber || '1DS22CS042'}
+                    {user?.usn || user?.rollNumber || '1DS23CS045'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-xs uppercase tracking-wider font-medium">Schedule (IST)</span>
-                  <span className="font-medium text-slate-800 text-xs">
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">Schedule (IST)</span>
+                  <span className="font-bold text-slate-800 text-xs">
                     {new Date(selectedPass.event?.startsAt).toLocaleDateString('en-IN', {
                       month: 'short',
                       day: 'numeric',
@@ -448,17 +491,20 @@ export function StudentDashboard() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-xs uppercase tracking-wider font-medium">Allocated Hall</span>
-                  <span className="font-medium text-slate-800 truncate block text-xs">
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">Campus Venue</span>
+                  <span className="font-bold text-slate-800 truncate block text-xs">
                     {selectedPass.event?.venue}
                   </span>
                 </div>
               </div>
 
+              {/* Boarding Pass Perforated Notch Divider */}
+              <div className="ticket-notch-divider my-2" />
+
               {/* 2D Scannable QR Code Block */}
-              <div className="border-2 border-dashed border-[#002B55]/30 bg-blue-50/40 rounded-2xl p-5 text-center relative group">
-                <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider block mb-3">
-                  Gate Laser Verification Code
+              <div className="border border-slate-200 bg-slate-50/60 rounded-2xl p-5 text-center relative group">
+                <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider block mb-3 font-mono">
+                  Official Admission Passcode: {selectedPass.ticketCode}
                 </span>
 
                 <TicketQrCode
@@ -468,41 +514,35 @@ export function StudentDashboard() {
                   size={170}
                 />
 
-                {/* Perforated Divider */}
-                <div className="my-3 border-t border-dashed border-slate-300 relative">
-                  <div className="absolute -left-7 -top-2 w-4 h-4 rounded-full bg-white border border-slate-200"></div>
-                  <div className="absolute -right-7 -top-2 w-4 h-4 rounded-full bg-white border border-slate-200"></div>
-                </div>
-
-                <p className="text-[11px] text-slate-600 font-medium">
-                  Scan this live pass at the gate or present your University USN card
+                <p className="text-[11px] text-slate-500 font-medium mt-3">
+                  Present this QR pass on your mobile device or printed copy at the entrance turnstile.
                 </p>
               </div>
 
               {selectedPass.attended && (
-                <div className="flex items-center gap-2.5 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
+                <div className="flex items-center gap-2.5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
                   <Award className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Verified attendance record on file for university academic credits.</span>
+                  <span>Official Attendance Confirmed • Credited to DSU Student Activity Portfolio.</span>
                 </div>
               )}
             </div>
 
             {/* Pass Actions */}
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 rounded-b-3xl">
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#002B55] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002B55] hover:underline"
                 >
-                  <Printer className="w-3.5 h-3.5" /> Print Pass
+                  <Printer className="w-3.5 h-3.5" /> Print / Save PDF
                 </button>
 
                 <a
                   href={getGoogleCalendarUrl(selectedPass.event)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900"
                 >
                   <CalendarPlus className="w-3.5 h-3.5" /> Google Cal
                 </a>
@@ -511,14 +551,123 @@ export function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => setSelectedPass(null)}
-                className="px-5 py-2 rounded-xl bg-[#002B55] text-white text-xs font-bold hover:bg-[#001B36] transition shadow-xs"
+                className="px-6 py-2.5 rounded-xl bg-[#002B55] text-white text-xs font-bold hover:bg-[#001B36] transition shadow-xs active:scale-[0.98]"
               >
-                Done
+                Close Pass
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Resubmit Verification Modal */}
+      {resubmitModalOpen && (
+        <div className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
+            <button
+              type="button"
+              onClick={() => setResubmitModalOpen(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#002B55] flex items-center justify-center mx-auto mb-3">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-[#002B55]">Update Verification Details</h3>
+              <p className="text-xs text-slate-500 mt-1.5">
+                Resubmit your Dayananda Sagar University enrollment credentials for registrar desk review.
+              </p>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!resubmitUsn.trim()) return;
+                setResubmitLoading(true);
+                try {
+                  await apiClient.patch('/users/resubmit/me', {
+                    usn: resubmitUsn.trim().toUpperCase(),
+                    department: resubmitDept.trim()
+                  });
+                  toast.success('Verification details resubmitted for admin review!');
+                  setResubmitModalOpen(false);
+                  if (refreshUser) await refreshUser();
+                } catch (err) {
+                  toast.error(err.response?.data?.message || 'Failed to resubmit details');
+                } finally {
+                  setResubmitLoading(false);
+                }
+              }}
+              className="space-y-4 text-xs"
+            >
+              <div>
+                <label htmlFor="resubmit-usn" className="block font-semibold text-slate-700 mb-1.5">
+                  DSU Serial Number (USN) *
+                </label>
+                <input
+                  type="text"
+                  id="resubmit-usn"
+                  required
+                  placeholder="e.g. 1DS23CS045"
+                  value={resubmitUsn}
+                  onChange={(e) => setResubmitUsn(e.target.value.toUpperCase())}
+                  className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm font-mono text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55]"
+                />
+                <span className="text-[11px] text-slate-400 mt-1 block">
+                  Format: 1DS + 2-digit year + 2-3 char department + 3-digit roll (e.g. 1DS23CS045)
+                </span>
+              </div>
+
+              <div>
+                <label htmlFor="resubmit-dept" className="block font-semibold text-slate-700 mb-1.5">
+                  School / Department
+                </label>
+                <input
+                  type="text"
+                  id="resubmit-dept"
+                  placeholder="e.g. School of Computer Science & Engineering"
+                  value={resubmitDept}
+                  onChange={(e) => setResubmitDept(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setResubmitModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={resubmitLoading}
+                  className="px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-semibold transition shadow-xs disabled:opacity-50"
+                >
+                  {resubmitLoading ? 'Submitting...' : 'Submit to Review Queue'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Cancellation Confirmation Dialog */}
+      <ConfirmModal
+        isOpen={Boolean(cancelTargetEventId)}
+        title="Surrender Event Seat"
+        message="Are you sure you want to cancel your seat for this event? Your digital admission pass will be revoked and your quota will be released back to the university."
+        confirmText="Surrender Seat"
+        cancelText="Keep My Seat"
+        variant="danger"
+        isLoading={Boolean(cancellingEventId)}
+        onConfirm={handleConfirmCancel}
+        onCancel={() => setCancelTargetEventId(null)}
+      />
     </div>
   );
 }

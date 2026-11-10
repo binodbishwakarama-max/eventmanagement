@@ -1,8 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { EventArtwork } from '../components/EventArtwork';
 import { CampusMapModal } from '../components/CampusMapModal';
+import { AppleGlassCard } from '../components/AppleGlassCard';
+import {
+  Button,
+  EventCardSkeleton,
+  EmptyState,
+  ErrorState
+} from '../components/ui';
+import {
+  buildEventQueryParams,
+  cleanEventTitle
+} from '../features/events/utils/eventFilters';
 import {
   getSavedEventIds,
   toggleSaveEvent
@@ -16,24 +27,116 @@ import {
   ArrowRight,
   SlidersHorizontal,
   X,
-  Ticket,
-  ChevronRight,
   LayoutGrid,
   List,
   Bookmark,
   Share2,
-  Users
+  Sparkles,
+  Code2,
+  Palette,
+  Music2,
+  Trophy,
+  GraduationCap,
+  ShieldCheck,
+  CheckCircle2,
+  Compass,
+  Play,
+  Youtube,
+  ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const CATEGORIES = ['All', 'Technical', 'Workshop', 'Cultural', 'Sports', 'Seminar'];
+const CATEGORY_ITEMS = [
+  { name: 'All', label: 'All Gatherings', icon: Sparkles },
+  { name: 'Technical', label: 'Technical & AI', icon: Code2 },
+  { name: 'Workshop', label: 'Design & Labs', icon: Palette },
+  { name: 'Cultural', label: 'Cultural & Music', icon: Music2 },
+  { name: 'Sports', label: 'Varsity Sports', icon: Trophy },
+  { name: 'Seminar', label: 'Conferences', icon: GraduationCap }
+];
+
+const DSU_OFFICIAL_VIDEOS = [
+  {
+    id: 'e_ggPsSGwu0',
+    title: 'TARANGA 2026 | Annual Collegiate Cultural Extravaganza',
+    category: 'Cultural Fest',
+    organizer: 'Centre for Performing Arts (CPA)',
+    duration: 'Festival Highlights',
+    description: "Dayananda Sagar University's flagship cultural extravaganza featuring music ensembles, fashion spectacles, battle of the bands, and celebrity concert nights.",
+    thumbnail: '/thumb-taranga.jpg'
+  },
+  {
+    id: 'V-GfxWGafvo',
+    title: 'Harohalli Main Campus | World-Class 130-Acre Campus Tour',
+    category: 'Campus Tour',
+    organizer: 'Dayananda Sagar University Official',
+    duration: 'Aerial & Ground Tour',
+    description: "Experience the sprawling green Harohalli Main Campus on Kanakapura Road, advanced research centers, School of Engineering, and modern sports complexes.",
+    thumbnail: '/thumb-campus-tour.jpg'
+  },
+  {
+    id: 'Ob7ysjkBJsk',
+    title: 'DSU Engineering & Innovation Showcase | Tech Labs & Maker Spaces',
+    category: 'Technical Symposium',
+    organizer: 'School of Engineering & Technology',
+    duration: 'Collegiate Sprint',
+    description: 'HackGrid maker sprint highlights, AI & autonomous systems demonstrations, student robotics exhibitions, and faculty keynote colloquiums.',
+    thumbnail: '/thumb-engineering.jpg'
+  }
+];
+
+const DSU_CAMPUS_VIEWS = [
+  {
+    id: 'dsu-main-campus-admission',
+    title: 'Harohalli Main Campus & Academic Blocks',
+    subheading: 'Dayananda Sagar University Main Campus',
+    caption: 'Official 130-Acre Harohalli Campus Architecture & Academic Blocks',
+    description: 'The sprawling official campus along Kanakapura Road, Bengaluru, housing world-class engineering, health sciences, computing laboratories, and innovation research centers.',
+    image: '/dsu-main-campus-admission.jpg',
+    tag: 'Flagship Campus'
+  },
+  {
+    id: 'engineering-main',
+    title: 'School of Engineering & Main Gate',
+    subheading: 'Main Entrance & Administrative Tower',
+    caption: 'Iconic 8-Story Academic & Administrative Complex',
+    description: 'State-of-the-art engineering laboratories, high-performance computing centers, executive dean offices, and modern lecture theaters at Harohalli.',
+    image: '/dsu-harohalli-main.jpg',
+    tag: 'Academic Landmark'
+  },
+  {
+    id: 'campus-aerial',
+    title: '130-Acre Harohalli Main Campus',
+    subheading: 'Kanakapura Road, Bengaluru',
+    caption: 'Panoramic Aerial Grounds & Green Terraces',
+    description: 'Vast lush green grounds housing collegiate stadiums, student residential complexes, innovation parks, and central manicured lawns.',
+    image: '/dsu-campus-aerial.jpg',
+    tag: 'Sprawling Campus'
+  },
+  {
+    id: 'campus-quad',
+    title: 'Academic Quadrangle & Innovation Labs',
+    subheading: 'Central Academic Plaza',
+    caption: 'Student Collaboration Courtyards & Tech Corridors',
+    description: 'Home to the AIC-DSU Innovation Foundation, startup incubation cells, robotics maker studios, and open-air student amphitheater plazas.',
+    image: '/dsu-campus-quad.jpg',
+    tag: 'Innovation Hub'
+  },
+  {
+    id: 'auditorium-arenas',
+    title: 'Sir M. Visvesvaraya Auditorium & Arenas',
+    subheading: 'Cultural & Athletics Complex',
+    caption: 'Cultural & Collegiate Varsity Athletic Arenas',
+    description: 'Acoustically engineered 850-seat auditorium for Taranga cultural fests and FIFA-spec synthetic athletic turf for inter-varsity championships.',
+    image: '/dsu-campus-auditorium.jpg',
+    tag: 'Events & Athletics'
+  }
+];
 
 export function EventsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -41,6 +144,8 @@ export function EventsPage() {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'schedule'
   const [savedIds, setSavedIds] = useState(getSavedEventIds());
   const [mapModalOpen, setMapModalOpen] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [activeCampusViewIdx, setActiveCampusViewIdx] = useState(0);
 
   const search = searchParams.get('search') || '';
   const category = searchParams.get('category') || 'All';
@@ -79,18 +184,21 @@ export function EventsPage() {
       setLoading(true);
       setError('');
       try {
-        const params = { page, limit: 12 };
-        if (search) params.search = search;
-        if (category && category !== 'All' && category !== 'Saved') params.category = category;
-        if (from) params.from = from;
-        if (to) params.to = `${to.slice(0, 10)}T23:59:59.999`;
-        if (sort !== 'soonest') params.sort = sort;
+        const params = buildEventQueryParams({
+          page,
+          limit: 12,
+          search,
+          category,
+          school: schoolParam,
+          venue: venueParam,
+          from,
+          to,
+          sort
+        });
 
         const res = await apiClient.get('/events', { params, signal: controller.signal });
         const items = res.data?.data?.items || [];
         setEvents(items);
-        setTotalPages(res.data?.data?.totalPages || 1);
-        setTotalCount(res.data?.data?.total || items.length);
       } catch (err) {
         if (err.code !== 'ERR_CANCELED') {
           setError(
@@ -104,7 +212,7 @@ export function EventsPage() {
     }
     fetchEvents();
     return () => controller.abort();
-  }, [search, category, page, from, to, sort, retry]);
+  }, [search, category, schoolParam, venueParam, page, from, to, sort, retry]);
 
   const updateFilter = (key, value) => {
     setSearchParams((prev) => {
@@ -140,11 +248,12 @@ export function EventsPage() {
   const handleShare = (e, event) => {
     e.preventDefault();
     e.stopPropagation();
+    const cleanTitle = cleanEventTitle(event.title);
     const url = `${window.location.origin}/events/${event._id}`;
     if (navigator.share) {
       navigator.share({
-        title: event.title.replace(/^DEMO:\s*/, ''),
-        text: `Check out ${event.title} at Dayananda Sagar University!`,
+        title: cleanTitle,
+        text: `Explore ${cleanTitle} at Dayananda Sagar University`,
         url
       }).catch(() => {});
     } else {
@@ -199,202 +308,331 @@ export function EventsPage() {
   }, {});
 
   return (
-    <div className="min-h-screen pb-20 bg-[#F7F8FA]">
-      {/* Refined Institutional Hero Section */}
-      <section className="bg-white border-b border-[#E5E7EB] pt-8 pb-8">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-3">
-            <span>Dayananda Sagar University</span>
-            <span>/</span>
-            <span className="text-[#002B55] font-semibold">Campus Events</span>
-          </div>
+    <div className="min-h-screen pb-24 bg-[#F8FAFC] relative">
+      {/* Subtle Panoramic DSU Campus Backdrop Watermark across the page body (Desktop only to prevent redundant mobile downloads) */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.09] filter grayscale-0 hidden sm:block"
+        style={{ backgroundImage: `url('/dsu-main-campus-admission.jpg')` }}
+      />
 
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div className="max-w-3xl">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#002B55] tracking-tight leading-tight">
-                Discover Campus Events
-              </h1>
-              <p className="mt-3 text-base text-slate-600 leading-relaxed max-w-2xl">
-                Explore upcoming academic seminars, technical hackathons, cultural festivals, and sports tournaments across Dayananda Sagar University. Book your digital pass using your university USN.
-              </p>
+      {/* Big Tech Premium Hero Section with High-Visibility DSU Harohalli Campus Backdrop */}
+      <section className="relative overflow-hidden bg-[#000E1C] text-white pt-10 pb-16 sm:pb-20 border-b border-[#002B55] z-10">
+        {/* Real DSU Harohalli Main Campus Photographic Backdrop - 100% Bright, Vivid Clarity */}
+        <picture>
+          <source media="(max-width: 767px)" srcSet="/dsu-main-campus-admission-mobile.jpg" />
+          <source media="(min-width: 768px)" srcSet="/dsu-main-campus-admission.jpg" />
+          <img
+            src="/dsu-main-campus-admission-mobile.jpg"
+            alt="Dayananda Sagar University Harohalli Main Campus"
+            className="absolute inset-0 w-full h-full object-cover object-center sm:object-[right_center] opacity-100 pointer-events-none transform scale-100 transition-all duration-1000"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
+        {/* Directional Cinematic Scrim: Protects left text legibility strictly on the left, leaving the right side 100% unobstructed so the campus building is completely visible */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#000E1C]/95 via-[#00142A]/85 lg:via-[#00142A]/30 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#000E1C] via-transparent to-transparent pointer-events-none" />
+
+        {/* Ambient Subtle Radial Gold Glow */}
+        <div className="absolute -top-12 left-10 w-96 h-96 bg-[radial-gradient(circle,rgba(217,165,33,0.18),transparent_70%)] pointer-events-none" />
+
+        <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          {/* Two-Column Hero Row: Left (Branding, Headline, Indicators), Right (Campus Card) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column (8 cols): Eyebrow, Title, Description, Metrics */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-5">
+              {/* Eyebrow Status Badge */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold backdrop-blur-md shimmer-badge shadow-xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F5C84C] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D9A521]"></span>
+                  </span>
+                  <span>Dayananda Sagar University • Official Campus Experience Hub</span>
+                </div>
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/80 border border-[#D9A521]/40 text-[#F5C84C] text-xs font-mono font-medium backdrop-blur-md">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#D9A521]" />
+                  NAAC A+ Accredited Campus
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/80 border border-white/20 text-slate-200 text-xs font-medium backdrop-blur-md">
+                  <MapPin className="w-3.5 h-3.5 text-[#D9A521]" />
+                  Harohalli Main Campus (130 Acres)
+                </span>
+              </div>
+
+              {/* Headline & Description */}
+              <div className="max-w-3xl">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] mb-4 drop-shadow-md">
+                  Campus Life,{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5C84C] via-[#D9A521] to-[#FFE699]">
+                    Amplified.
+                  </span>
+                </h1>
+                <p className="text-slate-200 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl font-normal drop-shadow-sm">
+                  Discover and register for university hackathons, IEEE technical symposia, design sprints, annual cultural fests, and varsity athletics across the 130-acre DSU Harohalli Main Campus.
+                </p>
+              </div>
+
+              {/* Feature Indicators (Metrics bar) */}
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-200 pt-1">
+                <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-[#D9A521]"></span>
+                  <span><strong>Main Campus:</strong> Harohalli, Kanakapura Road</span>
+                </div>
+                <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span><strong>Instant Access:</strong> Free Turnstile QR Passes</span>
+                </div>
+                <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span><strong>Live Registrations:</strong> Active Academic Season</span>
+                </div>
+              </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex items-center gap-3">
+            {/* Right Column (4-5 cols): Apple-Grade Interactive Transparent Glass Card */}
+            <div className="lg:col-span-5 xl:col-span-4 flex justify-start lg:justify-end">
+              <AppleGlassCard className="w-full max-w-md lg:max-w-sm p-5 sm:p-6 cursor-pointer">
+                <div className="flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                    </span>
+                    <span className="font-extrabold text-[#F5C84C] tracking-wide uppercase font-mono text-[11px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      Harohalli Main Campus
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-md bg-black/40 text-white font-mono text-[10px] font-bold border border-white/30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                    NAAC A+
+                  </span>
+                </div>
+
+                <h2 className="text-base font-extrabold text-white leading-snug drop-shadow-[0_2px_5px_rgba(0,0,0,0.95)]">
+                  130-Acre World-Class University Architecture
+                </h2>
+                <p className="text-xs text-white leading-relaxed font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                  Sprawling green grounds nestled along Kanakapura Road, hosting advanced computing hubs, robotics labs, Sir M. Visvesvaraya Auditorium & collegiate sports arenas.
+                </p>
+
+                <div className="pt-1 flex flex-wrap items-center gap-2 text-[10px] font-mono">
+                  <span className="px-2.5 py-1 rounded-md bg-black/40 text-white border border-white/30 font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                    Kanakapura Rd
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-[#D9A521]/30 text-[#FFE699] border border-[#D9A521]/50 font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                    130 Acres
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-black/40 text-white border border-white/30 font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                    12°41'N 77°28'E
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setMapModalOpen(true)}
+                  className="w-full mt-2 py-2.5 px-4 rounded-xl bg-black/40 hover:bg-black/60 border border-white/35 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]"
+                >
+                  <Compass className="w-3.5 h-3.5 text-[#F5C84C]" />
+                  <span>Open Interactive Campus Map</span>
+                </button>
+              </AppleGlassCard>
+            </div>
+          </div>
+
+          {/* Full-Width Search & Filter Command Bar (Cleanly separated below 2-column grid) */}
+          <div className="w-full bg-white/95 backdrop-blur-xl rounded-2xl p-2.5 sm:p-3 shadow-2xl border border-white/20">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              {/* Search input with shortcut hint */}
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <input
+                  id="campus-event-search"
+                  type="text"
+                  aria-label="Search campus events"
+                  placeholder="Search events by title, organizing club, department, or venue..."
+                  value={searchDraft}
+                  onChange={(e) => setSearchDraft(e.target.value)}
+                  className="w-full pl-10 pr-12 py-3 bg-white border border-slate-200 focus:border-[#002B55] rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/10 transition shadow-2xs font-medium"
+                />
+                {searchDraft ? (
+                  <button
+                    type="button"
+                    onClick={() => setSearchDraft('')}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <kbd className="hidden sm:inline-flex absolute right-3.5 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] font-mono font-semibold text-slate-400 bg-slate-100 border border-slate-200 rounded">
+                    /
+                  </kbd>
+                )}
+              </div>
+
+              {/* Campus Map Trigger */}
               <button
                 type="button"
                 onClick={() => setMapModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[#E5E7EB] bg-slate-50 hover:bg-slate-100 text-xs font-medium text-slate-700 transition"
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition shrink-0 active:scale-[0.98]"
               >
-                <MapPin className="w-4 h-4 text-[#D9A521]" />
-                <span>Harohalli Campus Map</span>
+                <Compass className="w-4 h-4 text-[#D9A521]" />
+                <span>Campus Venues</span>
+              </button>
+
+              {/* Filters Toggle */}
+              <button
+                type="button"
+                onClick={() => setFiltersOpen(!filtersOpen)}
+                className={`inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-bold border transition shrink-0 active:scale-[0.98] ${
+                  filtersOpen || from || to || sort !== 'soonest'
+                    ? 'bg-[#002B55] text-white border-[#002B55] shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                <span>Filters {hasActiveFilters && '•'}</span>
               </button>
             </div>
-          </div>
 
-          {/* Search & Filter Controls */}
-          <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-              <input
-                id="campus-event-search"
-                type="text"
-                aria-label="Search campus events"
-                placeholder="Search by event title, organizer club, or venue..."
-                value={searchDraft}
-                onChange={(e) => setSearchDraft(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-lg text-sm text-[#172033] placeholder-slate-400 focus:outline-none transition shadow-2xs"
-              />
-              {searchDraft && (
-                <button
-                  type="button"
-                  onClick={() => setSearchDraft('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setFiltersOpen(!filtersOpen)}
-              className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold border transition ${
-                filtersOpen || from || to || sort !== 'soonest'
-                  ? 'bg-[#002B55] text-white border-[#002B55]'
-                  : 'bg-white text-slate-700 border-[#E5E7EB] hover:bg-slate-50'
-              }`}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              <span>Dates & Filters</span>
-            </button>
-          </div>
-
-          {/* Date Filter Drawer */}
-          {filtersOpen && (
-            <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-[#E5E7EB] space-y-3">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
-                <span>Filter by Date & Schedule</span>
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="text-xs font-normal text-slate-500 hover:text-[#002B55] underline"
-                >
-                  Reset filters
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label htmlFor="filter-from" className="block text-slate-600 font-medium mb-1">
-                    From Date
-                  </label>
-                  <input
-                    type="date"
-                    id="filter-from"
-                    value={from}
-                    onChange={(e) => updateFilter('from', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-white border border-[#E5E7EB] text-slate-800 focus:outline-none focus:border-[#002B55]"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="filter-to" className="block text-slate-600 font-medium mb-1">
-                    To Date
-                  </label>
-                  <input
-                    type="date"
-                    id="filter-to"
-                    value={to}
-                    onChange={(e) => updateFilter('to', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-white border border-[#E5E7EB] text-slate-800 focus:outline-none focus:border-[#002B55]"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="filter-sort" className="block text-slate-600 font-medium mb-1">
-                    Sort Order
-                  </label>
-                  <select
-                    id="filter-sort"
-                    value={sort}
-                    onChange={(e) => updateFilter('sort', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-white border border-[#E5E7EB] text-slate-800 focus:outline-none focus:border-[#002B55]"
+            {/* Expandable Filter Drawer */}
+            {filtersOpen && (
+              <div className="mt-3 pt-3 border-t border-slate-200 p-3 rounded-xl bg-slate-50 space-y-3 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                  <span>Filter by Date & Schedule</span>
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="text-xs font-semibold text-[#002B55] hover:underline"
                   >
-                    <option value="soonest">Chronological (Soonest first)</option>
-                    <option value="latest">Latest scheduled</option>
-                    <option value="title">Alphabetical (A - Z)</option>
-                  </select>
+                    Reset all filters
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label htmlFor="filter-from" className="block text-slate-600 font-semibold mb-1">
+                      From Date
+                    </label>
+                    <input
+                      type="date"
+                      id="filter-from"
+                      value={from}
+                      onChange={(e) => updateFilter('from', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[#002B55] font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="filter-to" className="block text-slate-600 font-semibold mb-1">
+                      To Date
+                    </label>
+                    <input
+                      type="date"
+                      id="filter-to"
+                      value={to}
+                      onChange={(e) => updateFilter('to', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[#002B55] font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="filter-sort" className="block text-slate-600 font-semibold mb-1">
+                      Sort Order
+                    </label>
+                    <select
+                      id="filter-sort"
+                      value={sort}
+                      onChange={(e) => updateFilter('sort', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[#002B55] font-medium"
+                    >
+                      <option value="soonest">Chronological (Soonest first)</option>
+                      <option value="latest">Latest scheduled</option>
+                      <option value="title">Alphabetical (A - Z)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        </div>
+      </section>
 
-          {/* Category Navigation Pills */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => handleCategoryChange(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition ${
-                    category === cat || (cat === 'All' && !category)
-                      ? 'bg-[#002B55] text-white'
-                      : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-[#E5E7EB]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+      {/* Modern Category Selector & View Switcher Bar */}
+      <section className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Category Pills with Icons */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+              {CATEGORY_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const isSelected = category === item.name || (item.name === 'All' && !category);
 
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => handleCategoryChange(item.name)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap active:scale-[0.98] ${
+                      isSelected
+                        ? 'bg-[#002B55] text-white shadow-soft'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#F5C84C]' : 'text-slate-500'}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+
+              {/* Saved Bookmarks Pill */}
               <button
                 type="button"
                 onClick={() => updateFilter('category', 'Saved')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap active:scale-[0.98] ${
                   category === 'Saved'
-                    ? 'bg-[#002B55] text-white'
-                    : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-[#E5E7EB]'
+                    ? 'bg-[#002B55] text-white shadow-soft'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
                 }`}
               >
-                <Bookmark className="w-3.5 h-3.5 text-[#D9A521]" />
+                <Bookmark className={`w-3.5 h-3.5 ${category === 'Saved' ? 'fill-[#F5C84C] text-[#F5C84C]' : 'text-[#D9A521]'}`} />
                 <span>Saved ({savedIds.length})</span>
               </button>
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-[#E5E7EB] text-slate-500">
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-slate-500">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-md transition ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
                   viewMode === 'grid' ? 'bg-white text-[#002B55] shadow-xs' : 'hover:text-slate-900'
                 }`}
                 title="Grid View"
                 aria-label="Grid View"
               >
-                <LayoutGrid className="w-4 h-4" />
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Grid</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('schedule')}
-                className={`p-1.5 rounded-md transition ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
                   viewMode === 'schedule' ? 'bg-white text-[#002B55] shadow-xs' : 'hover:text-slate-900'
                 }`}
                 title="Schedule View"
                 aria-label="Schedule View"
               >
-                <List className="w-4 h-4" />
+                <List className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Schedule</span>
               </button>
             </div>
           </div>
 
           {/* Active Filter Indicators */}
           {(schoolParam || venueParam) && (
-            <div className="mt-3 flex items-center gap-2 text-xs">
-              <span className="text-slate-500">Active filter:</span>
+            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center gap-2 text-xs">
+              <span className="text-slate-500 font-medium">Active filter:</span>
               {schoolParam && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-blue-50 text-[#002B55] font-medium border border-blue-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#002B55] font-semibold border border-blue-200">
                   School: {schoolParam}
                   <button type="button" onClick={() => updateFilter('school', '')} className="hover:text-rose-600">
                     <X className="w-3 h-3" />
@@ -402,7 +640,7 @@ export function EventsPage() {
                 </span>
               )}
               {venueParam && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-50 text-[#001B36] font-medium border border-amber-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-[#001B36] font-semibold border border-amber-200">
                   Venue: {venueParam}
                   <button type="button" onClick={() => updateFilter('venue', '')} className="hover:text-rose-600">
                     <X className="w-3 h-3" />
@@ -417,148 +655,182 @@ export function EventsPage() {
       {/* Main Content Area */}
       <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {loading ? (
-          <div className="py-24 text-center">
-            <div className="w-8 h-8 border-2 border-[#002B55] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-xs text-slate-500">Loading university events...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
           </div>
         ) : error ? (
-          <div className="dsu-card p-8 text-center max-w-lg mx-auto">
-            <p className="text-sm font-medium text-rose-600">{error}</p>
-            <button
-              type="button"
-              onClick={() => setRetry((r) => r + 1)}
-              className="mt-4 px-4 py-2 rounded-lg bg-[#002B55] text-white text-xs font-semibold hover:bg-[#001B36] transition"
-            >
-              Retry
-            </button>
+          <div className="py-12">
+            <ErrorState
+              title="Campus Events Unavailable"
+              message={error}
+              onRetry={() => setRetry((r) => r + 1)}
+            />
           </div>
         ) : displayedEvents.length === 0 ? (
-          <div className="dsu-card p-12 text-center max-w-md mx-auto">
-            <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-slate-900">No Events Found</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              There are no campus events matching your criteria. Try adjusting your search or category filters.
-            </p>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-4 px-4 py-2 rounded-lg bg-[#002B55] text-white text-xs font-medium"
-            >
-              Reset Filters
-            </button>
+          <div className="py-12">
+            <EmptyState
+              icon={Calendar}
+              title="No Campus Events Found"
+              description="There are no university symposiums, workshops, or activities matching your criteria. Try adjusting your query or resetting all filters."
+              action={
+                <Button variant="secondary" onClick={clearFilters}>
+                  Reset All Filters
+                </Button>
+              }
+            />
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Featured Event Section - Balanced Editorial Composition */}
-            {featuredEvent && (
-              <section className="dsu-card overflow-hidden shadow-xs hover:shadow-md transition-shadow duration-200">
-                <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-                  {/* Left Column (5/12): Carefully proportioned photographic cover */}
-                  <div className="lg:col-span-5 relative overflow-hidden bg-slate-100 min-h-[240px] sm:min-h-[280px] lg:min-h-full">
-                    <EventArtwork
-                      category={featuredEvent.category}
-                      title={featuredEvent.title}
-                      posterUrl={featuredEvent.posterUrl}
-                      className="w-full h-full object-cover object-center"
-                      featured={true}
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 rounded-md bg-[#002B55] text-white text-xs font-bold shadow-xs">
-                        Featured Gathering
-                      </span>
-                    </div>
+            {/* Featured Event Section - Editorial Showcase */}
+            {featuredEvent && (() => {
+              const starts = new Date(featuredEvent.startsAt);
+              const available = Math.max(0, featuredEvent.capacity - featuredEvent.registeredCount);
+              const fillPercent = Math.min(100, Math.round((featuredEvent.registeredCount / featuredEvent.capacity) * 100));
+              const title = cleanEventTitle(featuredEvent.title);
 
-                    <div className="absolute top-4 right-4 flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={(e) => handleToggleBookmark(e, featuredEvent._id)}
-                        aria-label={savedIds.includes(featuredEvent._id) ? 'Remove bookmark' : 'Save event'}
-                        className="w-8 h-8 rounded-lg bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition"
-                      >
-                        <Bookmark
-                          className={`w-4 h-4 ${
-                            savedIds.includes(featuredEvent._id) ? 'fill-[#D9A521] text-[#D9A521]' : 'text-slate-600'
-                          }`}
-                        />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => handleShare(e, featuredEvent)}
-                        aria-label="Share event"
-                        className="w-8 h-8 rounded-lg bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition"
-                      >
-                        <Share2 className="w-4 h-4 text-slate-600" />
-                      </button>
-                    </div>
-                  </div>
+              return (
+                <section className="dsu-card overflow-hidden border border-slate-200/90 shadow-card hover:shadow-card-hover transition-all duration-300">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                    {/* Left Column (5/12): Photographic Cover */}
+                    <div className="lg:col-span-5 relative overflow-hidden bg-slate-100 min-h-[260px] sm:min-h-[300px] lg:min-h-full group">
+                      <EventArtwork
+                        category={featuredEvent.category}
+                        title={featuredEvent.title}
+                        posterUrl={featuredEvent.posterUrl}
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                        featured={true}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-                  {/* Right Column (7/12): Well-structured editorial metadata & connected CTA */}
-                  <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#002B55]/10 text-[#002B55]">
-                          {featuredEvent.category}
+                      {/* Top Badges */}
+                      <div className="absolute top-4 left-4">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/90 backdrop-blur-md text-[#F5C84C] text-xs font-bold border border-[#D9A521]/40 shadow-xs">
+                          <Sparkles className="w-3.5 h-3.5 text-[#D9A521]" />
+                          <span>Featured Gathering</span>
                         </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-md bg-slate-100 text-xs font-semibold text-slate-700">
-                          <Calendar className="w-3.5 h-3.5 text-[#002B55]" />
+                      </div>
+
+                      <div className="absolute top-4 right-4 flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleBookmark(e, featuredEvent._id)}
+                          aria-label={savedIds.includes(featuredEvent._id) ? 'Remove bookmark' : 'Save event'}
+                          className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95"
+                        >
+                          <Bookmark
+                            className={`w-4 h-4 ${
+                              savedIds.includes(featuredEvent._id) ? 'fill-[#D9A521] text-[#D9A521]' : 'text-slate-600'
+                            }`}
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleShare(e, featuredEvent)}
+                          aria-label="Share event"
+                          className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95"
+                        >
+                          <Share2 className="w-4 h-4 text-slate-600" />
+                        </button>
+                      </div>
+
+                      {/* Bottom Floating Pill inside Photo */}
+                      <div className="absolute bottom-4 left-4 right-4 text-white">
+                        <span className="text-[11px] font-mono tracking-wider uppercase text-slate-200 block mb-0.5">
+                          Official Campus Schedule
+                        </span>
+                        <div className="flex items-center gap-2 text-xs font-semibold">
+                          <Calendar className="w-3.5 h-3.5 text-[#F5C84C]" />
                           <span>
-                            {new Date(featuredEvent.startsAt).toLocaleDateString('en-IN', {
+                            {starts.toLocaleDateString('en-IN', {
                               weekday: 'short',
                               month: 'short',
                               day: 'numeric'
-                            })} • {new Date(featuredEvent.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                            })} • {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
                           </span>
-                        </span>
-                      </div>
-
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] leading-snug tracking-tight">
-                        <Link to={`/events/${featuredEvent._id}`} className="hover:underline">
-                          {featuredEvent.title.replace(/^DEMO:\s*/, '')}
-                        </Link>
-                      </h2>
-
-                      <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
-                        {featuredEvent.description}
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                        <div className="flex items-center gap-2 truncate">
-                          <MapPin className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
-                          <span className="truncate">{featuredEvent.venue}</span>
-                        </div>
-                        <div className="flex items-center gap-2 truncate">
-                          <Building className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
-                          <span className="truncate">{featuredEvent.organizerClub || 'Dayananda Sagar University'}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Coupled Registration & Availability Bar */}
-                    <div className="mt-4 pt-4 border-t border-slate-100 bg-slate-50/80 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-5 sm:px-8 rounded-b-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                          <span className="font-bold text-slate-800">
-                            {Math.max(0, featuredEvent.capacity - featuredEvent.registeredCount)} of {featuredEvent.capacity} seats remaining
+                    {/* Right Column (7/12): Metadata & CTA */}
+                    <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-5 bg-white">
+                      <div className="space-y-3.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#002B55] text-white shadow-xs">
+                            {featuredEvent.category}
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            Turnstile Admission Pass
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">
-                          Free admission with Dayananda Sagar University student USN
+
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] leading-snug tracking-tight">
+                          <Link to={`/events/${featuredEvent._id}`} className="hover:text-[#001B36] hover:underline">
+                            {title}
+                          </Link>
+                        </h2>
+
+                        <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
+                          {featuredEvent.description}
                         </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 pt-3 border-t border-slate-100">
+                          <div className="flex items-center gap-2 truncate">
+                            <MapPin className="w-4 h-4 text-[#002B55] shrink-0" />
+                            <span className="truncate font-medium">{featuredEvent.venue}</span>
+                          </div>
+                          <div className="flex items-center gap-2 truncate">
+                            <Building className="w-4 h-4 text-[#002B55] shrink-0" />
+                            <span className="truncate font-medium">{featuredEvent.organizerClub || 'DSU Student Affairs'}</span>
+                          </div>
+                        </div>
+
+                        {/* Capacity Progress Meter */}
+                        <div className="pt-2 space-y-1.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-semibold text-slate-700">Capacity Availability</span>
+                            <span className="font-mono font-bold text-[#002B55]">
+                              {available > 0 ? `${available} seats remaining` : 'Full Capacity'}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/80">
+                            <div
+                              className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-emerald-500 to-[#D9A521]"
+                              style={{ width: `${fillPercent}%` }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
-                      <Link
-                        to={`/events/${featuredEvent._id}`}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-xs whitespace-nowrap active:scale-[0.98]"
-                      >
-                        <span>View Details & Register</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                      {/* Coupled Registration & Availability Bar */}
+                      <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span className="font-bold text-slate-900">
+                              Instant Admission for DSU Students
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500">
+                            Official University Event • Encrypted QR Turnstile Entry
+                          </p>
+                        </div>
+
+                        <Link
+                          to={`/events/${featuredEvent._id}`}
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-soft whitespace-nowrap active:scale-[0.98]"
+                        >
+                          <span>Explore & Register</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
-            )}
+                </section>
+              );
+            })()}
 
             {/* Event Listing Grid */}
             {viewMode === 'grid' ? (
@@ -567,35 +839,45 @@ export function EventsPage() {
                   const starts = new Date(ev.startsAt);
                   const isSaved = savedIds.includes(ev._id);
                   const available = Math.max(0, ev.capacity - ev.registeredCount);
+                  const fillPercent = Math.min(100, Math.round((ev.registeredCount / ev.capacity) * 100));
+                  const cleanTitleText = cleanEventTitle(ev.title);
 
                   return (
                     <div
                       key={ev._id}
-                      className="dsu-card overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all duration-200"
+                      className="dsu-card overflow-hidden flex flex-col justify-between group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 border border-slate-200/90"
                     >
                       <div>
-                        {/* Cover Image - Strict 16:9 Aspect Ratio with Unique Asset */}
+                        {/* Cover Image - 16:9 Aspect Ratio with Unique Asset */}
                         <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
                           <EventArtwork
                             category={ev.category}
                             title={ev.title}
                             posterUrl={ev.posterUrl}
-                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                           />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
 
-                          <div className="absolute top-3 left-3">
-                            <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#002B55] text-white shadow-xs">
-                              {ev.category}
+                          {/* Floating Date Badge (Top-Left) */}
+                          <div className="absolute top-3 left-3 rounded-xl bg-white/95 backdrop-blur-md px-2.5 py-1 text-center shadow-xs border border-white/60">
+                            <span className="block text-[10px] font-mono font-extrabold text-[#D9A521] uppercase leading-none">
+                              {starts.toLocaleDateString('en-IN', { month: 'short' })}
+                            </span>
+                            <span className="block text-sm font-extrabold text-[#002B55] leading-tight">
+                              {starts.getDate()}
                             </span>
                           </div>
 
-                          {/* Quick Actions */}
+                          {/* Floating Category Badge (Top-Right) */}
                           <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#00142A]/85 backdrop-blur-md text-white border border-white/20 shadow-xs">
+                              {ev.category}
+                            </span>
                             <button
                               type="button"
                               onClick={(e) => handleToggleBookmark(e, ev._id)}
                               aria-label={isSaved ? 'Remove bookmark' : 'Save event'}
-                              className="w-7 h-7 rounded-md bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition"
+                              className="w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-90"
                             >
                               <Bookmark
                                 className={`w-3.5 h-3.5 ${
@@ -607,67 +889,72 @@ export function EventsPage() {
                               type="button"
                               onClick={(e) => handleShare(e, ev)}
                               aria-label="Share event"
-                              className="w-7 h-7 rounded-md bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition"
+                              className="w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-90"
                             >
                               <Share2 className="w-3.5 h-3.5 text-slate-600" />
                             </button>
                           </div>
                         </div>
 
-                        {/* Content */}
-                        <div className="p-5 space-y-2.5">
-                          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#002B55]">
-                            <Calendar className="w-3.5 h-3.5 text-[#002B55]" />
-                            <span>
-                              {starts.toLocaleDateString('en-IN', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })} IST
-                            </span>
+                        {/* Card Body */}
+                        <div className="p-5 space-y-3">
+                          {/* Organizer verified badge */}
+                          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium truncate">
+                            <ShieldCheck className="w-3.5 h-3.5 text-[#D9A521] shrink-0" />
+                            <span className="truncate">{ev.organizerClub || 'DSU Student Affairs'}</span>
                           </div>
 
-                          <h3 className="font-bold text-[#172033] text-base leading-snug group-hover:text-[#002B55] transition line-clamp-2 min-h-[2.75rem]">
-                            <Link to={`/events/${ev._id}`}>{ev.title.replace(/^DEMO:\s*/, '')}</Link>
+                          {/* Event Title */}
+                          <h3 className="font-extrabold text-[#0F172A] text-base leading-snug group-hover:text-[#002B55] transition line-clamp-2 min-h-[2.75rem]">
+                            <Link to={`/events/${ev._id}`}>{cleanTitleText}</Link>
                           </h3>
 
-                          <div className="space-y-1 text-xs text-slate-500 pt-1">
-                            <div className="flex items-center gap-1.5 truncate">
+                          {/* Schedule & Location */}
+                          <div className="space-y-1.5 text-xs text-slate-600 pt-1">
+                            <div className="flex items-center gap-2 font-medium">
+                              <Clock className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
+                              <span>
+                                {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 truncate">
                               <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                               <span className="truncate">{ev.venue}</span>
                             </div>
-                            <div className="flex items-center gap-1.5 truncate">
-                              <Building className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                              <span className="truncate">{ev.organizerClub || 'Dayananda Sagar University'}</span>
+                          </div>
+
+                          {/* Capacity Gauge */}
+                          <div className="pt-2">
+                            <div className="flex items-center justify-between text-[11px] mb-1">
+                              <span className="text-slate-500 font-medium">Availability</span>
+                              <span className={`font-semibold ${available <= 10 ? 'text-amber-700' : 'text-emerald-700'}`}>
+                                {available > 0 ? `${available} seats left` : 'Full'}
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  fillPercent >= 90 ? 'bg-rose-500' : fillPercent >= 60 ? 'bg-[#D9A521]' : 'bg-emerald-500'
+                                }`}
+                                style={{ width: `${fillPercent}%` }}
+                              />
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Card Footer - Consistent Action Placement */}
-                      <div className="px-5 py-3.5 border-t border-slate-100 mt-auto flex items-center justify-between">
-                        <div className="text-xs font-semibold">
-                          {available > 0 ? (
-                            <span className="inline-flex items-center gap-1.5 text-emerald-700">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                              <span>{available} seats left</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 text-rose-600">
-                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                              <span>Full Capacity</span>
-                            </span>
-                          )}
-                        </div>
+                      {/* Card Footer */}
+                      <div className="px-5 py-3 border-t border-slate-100 mt-auto flex items-center justify-between bg-slate-50/50">
+                        <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          Free Student Pass
+                        </span>
 
                         <Link
                           to={`/events/${ev._id}`}
-                          className="px-3.5 py-1.5 rounded-lg bg-slate-50 hover:bg-[#002B55] hover:text-white text-[#002B55] border border-[#E5E7EB] text-xs font-bold transition flex items-center gap-1"
+                          className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-[#002B55] hover:text-white text-[#002B55] border border-slate-200 hover:border-[#002B55] text-xs font-bold transition flex items-center gap-1 shadow-2xs group-hover:border-[#002B55]"
                         >
-                          <span>View Details</span>
-                          <ArrowRight className="w-3 h-3" />
+                          <span>Register</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                         </Link>
                       </div>
                     </div>
@@ -679,51 +966,58 @@ export function EventsPage() {
               <div className="space-y-6">
                 {Object.entries(groupedSchedule).map(([dateLabel, items]) => (
                   <div key={dateLabel} className="space-y-3">
-                    <div className="sticky top-20 z-20 bg-[#F7F8FA]/95 py-2 border-b border-[#E5E7EB]">
-                      <span className="text-xs font-semibold text-[#002B55] bg-white px-3 py-1 rounded-md border border-[#E5E7EB]">
+                    <div className="sticky top-20 z-20 bg-[#F8FAFC]/95 backdrop-blur-md py-2 border-b border-slate-200">
+                      <span className="text-xs font-extrabold text-[#002B55] bg-white px-3.5 py-1.5 rounded-full border border-slate-200 shadow-2xs">
                         {dateLabel}
                       </span>
                     </div>
 
                     <div className="space-y-3">
-                      {items.map((ev) => (
-                        <div
-                          key={ev._id}
-                          className="dsu-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                        >
-                          <div className="space-y-1 min-w-0 flex-1">
-                            <div className="flex items-center gap-2 text-xs">
-                              <span className="font-semibold text-[#002B55]">{ev.category}</span>
-                              <span className="text-slate-300">•</span>
-                              <span className="text-slate-500">
-                                {new Date(ev.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
-                              </span>
+                      {items.map((ev) => {
+                        const cleanTitleText = cleanEventTitle(ev.title);
+                        const available = Math.max(0, ev.capacity - ev.registeredCount);
+
+                        return (
+                          <div
+                            key={ev._id}
+                            className="dsu-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-200"
+                          >
+                            <div className="space-y-1.5 min-w-0 flex-1">
+                              <div className="flex items-center gap-2 text-xs">
+                                <span className="font-bold text-[#002B55] bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-200">
+                                  {ev.category}
+                                </span>
+                                <span className="text-slate-300">•</span>
+                                <span className="text-slate-600 font-medium">
+                                  {new Date(ev.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                                </span>
+                              </div>
+
+                              <h4 className="font-extrabold text-base text-slate-900 hover:text-[#002B55] transition truncate">
+                                <Link to={`/events/${ev._id}`}>{cleanTitleText}</Link>
+                              </h4>
+
+                              <p className="text-xs text-slate-500 flex items-center gap-3 truncate">
+                                <span>{ev.venue}</span>
+                                <span className="text-slate-300">•</span>
+                                <span>{ev.organizerClub || 'DSU Student Affairs'}</span>
+                              </p>
                             </div>
 
-                            <h4 className="font-semibold text-base text-[#172033] hover:text-[#002B55] transition truncate">
-                              <Link to={`/events/${ev._id}`}>{ev.title.replace(/^DEMO:\s*/, '')}</Link>
-                            </h4>
-
-                            <p className="text-xs text-slate-500 flex items-center gap-3 truncate">
-                              <span>{ev.venue}</span>
-                              <span className="text-slate-300">•</span>
-                              <span>{ev.organizerClub || 'DSU Department'}</span>
-                            </p>
+                            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                              <span className="text-xs font-semibold text-slate-600">
+                                {available > 0 ? `${available} seats left` : 'Full Capacity'}
+                              </span>
+                              <Link
+                                to={`/events/${ev._id}`}
+                                className="px-4 py-2 rounded-xl bg-[#002B55] text-white text-xs font-bold hover:bg-[#001B36] transition shadow-xs"
+                              >
+                                View Event
+                              </Link>
+                            </div>
                           </div>
-
-                          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                            <span className="text-xs text-slate-500">
-                              {Math.max(0, ev.capacity - ev.registeredCount)} seats remaining
-                            </span>
-                            <Link
-                              to={`/events/${ev._id}`}
-                              className="px-4 py-2 rounded-lg bg-[#002B55] text-white text-xs font-semibold hover:bg-[#001B36] transition"
-                            >
-                              View Event
-                            </Link>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -731,7 +1025,265 @@ export function EventsPage() {
             )}
           </div>
         )}
+
+        {/* DSU in Action: Official Event Videos & Campus Highlights */}
+        <section className="mt-20 pt-12 border-t border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 mb-3">
+                <Youtube className="w-3.5 h-3.5 text-red-600" />
+                <span>DSU Media & Event Highlights</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] tracking-tight">
+                Experience DSU in Action
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl">
+                Watch official highlights from annual collegiate festivals, robotics sprints, technical symposia, and campus life across Harohalli Main Campus.
+              </p>
+            </div>
+
+            <a
+              href="https://www.youtube.com/results?search_query=Dayananda+Sagar+University"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#002B55] hover:text-[#D9A521] transition"
+            >
+              <span>Explore Official YouTube Channel</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {DSU_OFFICIAL_VIDEOS.map((video) => (
+              <div
+                key={video.id}
+                className="dsu-card overflow-hidden flex flex-col justify-between group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 border border-slate-200/90"
+              >
+                <div>
+                  {/* Video Thumbnail & Play Button Overlay */}
+                  <div
+                    onClick={() => setActiveVideo(video)}
+                    className="relative aspect-video w-full overflow-hidden bg-slate-900 cursor-pointer"
+                  >
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 group-hover:from-black/40 transition-colors pointer-events-none" />
+
+                    {/* Category Pill */}
+                    <div className="absolute top-3 left-3">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#00142A]/85 backdrop-blur-md text-white border border-white/20 shadow-xs">
+                        {video.category}
+                      </span>
+                    </div>
+
+                    {/* Duration Chip */}
+                    <div className="absolute bottom-3 right-3 bg-black/80 text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded">
+                      {video.duration}
+                    </div>
+
+                    {/* Centered Pulsing Play Button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-[#D9A521] text-[#001B36] flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#F5C84C] transition-all duration-300">
+                        <Play className="w-5 h-5 fill-current ml-0.5" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Video Body */}
+                  <div className="p-5 space-y-2">
+                    <span className="text-[11px] font-semibold text-slate-500 block truncate">
+                      {video.organizer}
+                    </span>
+                    <h3
+                      onClick={() => setActiveVideo(video)}
+                      className="font-extrabold text-slate-900 text-sm leading-snug group-hover:text-[#002B55] transition line-clamp-2 cursor-pointer"
+                    >
+                      {video.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                      {video.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card Action */}
+                <div className="px-5 py-3 border-t border-slate-100 mt-auto flex items-center justify-between bg-slate-50/50">
+                  <span className="text-[11px] font-mono text-slate-500 font-semibold">
+                    Official Coverage
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveVideo(video)}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002B55] hover:text-[#001B36]"
+                  >
+                    <span>Watch Highlight</span>
+                    <Play className="w-3 h-3 fill-current" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Harohalli Main Campus Interactive Landmark Showcase */}
+        <section className="mt-20 dsu-card overflow-hidden border border-slate-200/90 shadow-card">
+          <div className="p-6 sm:p-8 bg-white border-b border-slate-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#002B55] text-xs font-bold border border-blue-200 mb-2.5">
+                <Building className="w-3.5 h-3.5 text-[#D9A521]" />
+                <span>Dayananda Sagar University • Main Campus Grounds</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] tracking-tight">
+                Harohalli Main Campus Landmarks
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+                Explore authentic campus architecture, academic wings, the 850-seat auditorium, and collegiate athletics complex spanning 130 acres on Kanakapura Road, Bengaluru.
+              </p>
+            </div>
+
+            {/* Quick Campus Switcher Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+              {DSU_CAMPUS_VIEWS.map((view, idx) => (
+                <button
+                  key={view.id}
+                  type="button"
+                  onClick={() => setActiveCampusViewIdx(idx)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                    activeCampusViewIdx === idx
+                      ? 'bg-[#002B55] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  {view.title.split('&')[0].trim()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Panoramic Landmark Feature */}
+          {(() => {
+            const currentView = DSU_CAMPUS_VIEWS[activeCampusViewIdx];
+            return (
+              <div className="relative min-h-[460px] sm:min-h-[520px] flex items-end p-6 sm:p-10 text-white overflow-hidden group">
+                <img
+                  key={currentView.id}
+                  src={currentView.image}
+                  alt={currentView.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000 animate-in fade-in"
+                />
+                {/* Lighter gradient overlay: keeps the top 75% of the photo 100% luminous & unobstructed */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#000E1C] via-transparent to-black/25 pointer-events-none" />
+
+                {/* Floating Optical Glass Card for Details */}
+                <div className="relative z-10 max-w-2xl bg-[#001020]/80 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/20 shadow-2xl space-y-3.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D9A521] text-[#001020] text-xs font-extrabold shadow-xs uppercase tracking-wider font-mono">
+                      {currentView.tag}
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white text-xs font-semibold backdrop-blur-md">
+                      {currentView.subheading}
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                    {currentView.caption}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-xl">
+                    {currentView.description}
+                  </p>
+
+                  <div className="pt-2 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setMapModalOpen(true)}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#002B55] text-xs font-bold hover:bg-slate-100 transition shadow-xs active:scale-95"
+                    >
+                      <Compass className="w-4 h-4 text-[#D9A521]" />
+                      <span>Explore Interactive Campus Plan</span>
+                    </button>
+                    <Link
+                      to="/events?venue=Harohalli"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-md transition active:scale-95"
+                    >
+                      <span>Events at this Venue</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Interactive Thumbnail Gallery Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 p-3.5 bg-[#001020] border-t border-slate-800">
+            {DSU_CAMPUS_VIEWS.map((view, idx) => (
+              <button
+                key={view.id}
+                type="button"
+                onClick={() => setActiveCampusViewIdx(idx)}
+                className={`relative rounded-xl overflow-hidden aspect-[16/9] border-2 transition text-left group ${
+                  activeCampusViewIdx === idx
+                    ? 'border-[#D9A521] ring-2 ring-[#D9A521]/60 shadow-lg scale-[1.02]'
+                    : 'border-white/10 opacity-75 hover:opacity-100 hover:border-white/30'
+                }`}
+              >
+                <img
+                  src={view.image}
+                  alt={view.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <span className="absolute bottom-1.5 left-2 right-2 text-[10px] font-bold text-white truncate block drop-shadow-sm">
+                  {view.title}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
       </main>
+
+      {/* Interactive YouTube Video Modal */}
+      {activeVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/15">
+            <div className="p-4 bg-[#00142A] text-white flex items-center justify-between border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <Youtube className="w-5 h-5 text-red-500" />
+                <div>
+                  <h3 className="font-bold text-sm text-white truncate max-w-lg">{activeVideo.title}</h3>
+                  <p className="text-[11px] text-slate-400 font-mono">{activeVideo.organizer}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveVideo(null)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition"
+                aria-label="Close video"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="relative aspect-video w-full bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=1&rel=0`}
+                title={activeVideo.title}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Campus Map Navigator Modal */}
       <CampusMapModal

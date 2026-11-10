@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Camera, SwitchCamera, Upload, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { X, Camera, SwitchCamera, Upload, AlertCircle, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) {
@@ -8,9 +8,17 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
   const animFrameRef = useRef(null);
   const [cameraError, setCameraError] = useState('');
   const [facingMode, setFacingMode] = useState('environment'); // 'environment' (back) | 'user' (front)
-  const [scanning, setScanning] = useState(false);
   const [lastScannedCode, setLastScannedCode] = useState('');
   const lastScanTimeRef = useRef(0);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -27,7 +35,6 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
 
   const startCamera = async () => {
     setCameraError('');
-    setScanning(true);
     stopCamera();
 
     try {
@@ -154,7 +161,7 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
       } else {
         toast.error('No QR code detected in this photo. Please try another image.');
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to parse image QR code');
     }
   };
@@ -162,15 +169,24 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="DSU Turnstile QR Scanner"
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-150"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
+      >
         {/* Header */}
         <div className="bg-[#002B55] px-6 py-4 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Camera className="w-5 h-5 text-[#D9A521]" />
             <div>
-              <h3 className="font-bold text-sm tracking-wide">DSU Gate Pass Scanner</h3>
-              <p className="text-[11px] text-slate-300">Harohalli Campus Verification Point</p>
+              <h3 className="font-bold text-sm tracking-wide">DSU Turnstile QR Scanner</h3>
+              <p className="text-[11px] text-slate-300">Scan official student admission voucher for gate check-in</p>
             </div>
           </div>
           <button

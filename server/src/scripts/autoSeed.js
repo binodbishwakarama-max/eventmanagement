@@ -8,76 +8,76 @@ const day = 24 * 60 * 60 * 1000;
 
 const initialEvents = (now, organizerId, adminId) => [
   {
-    title: 'Inter-Department Friendly Football Round',
-    description: 'Knockout football match between Schools of Engineering and Basic Sciences. Spectators and student cheering squads welcome.',
-    category: 'Sports',
-    venue: 'DSU Sports Arena & Central Ground',
-    startsAt: new Date(now + 2 * day),
-    endsAt: new Date(now + 2 * day + 3 * 60 * 60 * 1000),
-    capacity: 50,
-    status: 'published',
-    createdBy: adminId,
-    organizerClub: 'DSU Athletics Council'
-  },
-  {
-    title: 'Maker Sprint — Build for a Better Campus',
-    description: 'A 24-hour hands-on hardware and software sprint for engineering students. Teams build smart IoT prototypes, automated campus solutions, and accessibility tools.',
+    title: 'DSU HackGrid 2026: National Collegiate Hackathon',
+    description: 'Flagship 36-hour collegiate hackathon bringing student innovators together to build AI systems, autonomous agents, IoT hardware, and decentralized solutions.',
     category: 'Technical',
-    venue: 'CSE Innovation Lab, Block 3, Harohalli Campus',
+    venue: 'CSE Innovation & Hackathon Lab, Harohalli Main Campus',
     startsAt: new Date(now + 3 * day),
-    endsAt: new Date(now + 4 * day),
-    capacity: 30,
+    endsAt: new Date(now + 4 * day + 12 * 60 * 60 * 1000),
+    capacity: 120,
     status: 'published',
     createdBy: organizerId,
     organizerClub: 'DSU Developer Student Club'
   },
   {
-    title: 'Shape, Type & Interface Design Workshop',
-    description: 'Master typographic rhythm, spatial scales, and iOS HIG design systems. Learn hands-on micro-interaction engineering and component tokens.',
+    title: 'Sir M. Visvesvaraya Memorial Technical Symposium',
+    description: 'Annual research and engineering colloquium featuring keynote addresses by leading industry scientists, IEEE student track presentations, and robotics demos.',
+    category: 'Seminar',
+    venue: 'Sir M. Visvesvaraya Auditorium, Harohalli Main Campus',
+    startsAt: new Date(now + 6 * day),
+    endsAt: new Date(now + 6 * day + 8 * 60 * 60 * 1000),
+    capacity: 500,
+    status: 'published',
+    createdBy: adminId,
+    organizerClub: 'School of Engineering & Technology'
+  },
+  {
+    title: 'Aakriti 2026: Annual University Cultural Fest',
+    description: "Dayananda Sagar University's premier collegiate cultural extravaganza celebrating music, theatre, battle of bands, fashion showcases, and visual performing arts.",
+    category: 'Cultural',
+    venue: 'Harohalli Open-Air Amphitheater, Harohalli Main Campus',
+    startsAt: new Date(now + 12 * day),
+    endsAt: new Date(now + 14 * day),
+    capacity: 500,
+    status: 'published',
+    createdBy: organizerId,
+    organizerClub: 'DSU Cultural & Music Forum'
+  },
+  {
+    title: "DSU Chancellor's Cup: Varsity Football Championship",
+    description: 'Inter-collegiate varsity football tournament with regional university teams competing on Harohalli FIFA-standard synthetic turf under floodlights.',
+    category: 'Sports',
+    venue: 'Harohalli Athletics Complex & Central Turf',
+    startsAt: new Date(now - 3 * day),
+    endsAt: new Date(now - 3 * day + 4 * 60 * 60 * 1000),
+    capacity: 350,
+    status: 'published',
+    createdBy: adminId,
+    organizerClub: 'DSU Sports & Athletics Council'
+  },
+  {
+    title: 'Generative Media & Autonomous Agents Masterclass',
+    description: 'Hands-on advanced technical workshop exploring modern LLM architectures, local model inference, LangChain agent loops, and production vector indexing.',
     category: 'Workshop',
-    venue: 'School of Design Studio, 4th Floor, Academic Block',
-    startsAt: new Date(now + 7 * day),
-    endsAt: new Date(now + 7 * day + 4 * 60 * 60 * 1000),
-    capacity: 24,
+    venue: 'Dr. Premachandra Sagar Seminar Hall, Harohalli Main Campus',
+    startsAt: new Date(now + 9 * day),
+    endsAt: new Date(now + 9 * day + 4 * 60 * 60 * 1000),
+    capacity: 150,
+    status: 'published',
+    createdBy: organizerId,
+    organizerClub: 'DSU Robotics & Automation Society'
+  },
+  {
+    title: 'School of Design Annual Prototype Sprint & UX Showcase',
+    description: 'Collaborative product design sprint exploring human-centered UI/UX prototyping, spatial interactions, visual accessibility, and design system governance.',
+    category: 'Workshop',
+    venue: 'School of Design Creative Studio, Harohalli Main Campus',
+    startsAt: new Date(now + 1 * day),
+    endsAt: new Date(now + 1 * day + 6 * 60 * 60 * 1000),
+    capacity: 60,
     status: 'published',
     createdBy: organizerId,
     organizerClub: 'DSU Design Guild'
-  },
-  {
-    title: 'Notes on Emerging Ideas in Tech & AI',
-    description: 'Distinguished faculty lecture and research colloquium exploring large reasoning models, agentic workflows, and ethical considerations for university researchers.',
-    category: 'Seminar',
-    venue: 'Sir M. Visvesvaraya Auditorium, Harohalli',
-    startsAt: new Date(now + 9 * day),
-    endsAt: new Date(now + 9 * day + 2 * 60 * 60 * 1000),
-    capacity: 80,
-    status: 'published',
-    createdBy: organizerId,
-    organizerClub: 'Faculty of Engineering & Technology'
-  },
-  {
-    title: 'The Open Creative Studio',
-    description: 'Hands-on exploratory session with generative visuals, creative coding, and collaborative design sprints for aspiring campus creators.',
-    category: 'Workshop',
-    venue: 'Student Activity Center, Harohalli Campus',
-    startsAt: new Date(now + 10 * day),
-    endsAt: new Date(now + 10 * day + 4 * 60 * 60 * 1000),
-    capacity: 25,
-    status: 'published',
-    createdBy: organizerId,
-    organizerClub: 'Creative Arts Club'
-  },
-  {
-    title: 'Open Stage Sessions & Cultural Night',
-    description: 'An evening of live student performances, acoustic solos, spoken word poetry, and instrumental music celebrating creative expressions across all schools.',
-    category: 'Cultural',
-    venue: 'Campus Open Air Amphitheatre, Harohalli',
-    startsAt: new Date(now + 14 * day),
-    endsAt: new Date(now + 14 * day + 5 * 60 * 60 * 1000),
-    capacity: 60,
-    status: 'published',
-    createdBy: adminId,
-    organizerClub: 'Music & Cultural Society'
   }
 ];
 
@@ -88,16 +88,15 @@ export async function seedIfEmpty() {
     return; // Already populated
   }
 
-  // PRIORITY 5: PRODUCTION SEEDING ISOLATION
-  // Never seed demo students, hardcoded organizer credentials, or test events into production!
+  // Production provisioning isolation
   if (isProduction) {
-    console.log('[AutoSeed] Production environment detected. Skipping demo student & organizer seeding.');
+    console.log('[AutoSeed] Production environment detected.');
     const adminExists = await User.findOne({ role: 'admin' });
     if (!adminExists && env.ADMIN_EMAIL && env.ADMIN_PASSWORD && env.ADMIN_PASSWORD.length >= 12) {
       console.log(`[AutoSeed] Provisioning master administrator for production: ${env.ADMIN_EMAIL.toLowerCase()}`);
       const adminPasswordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
       await User.create({
-        name: 'University Administration Desk',
+        name: 'University Registrar',
         email: env.ADMIN_EMAIL.toLowerCase(),
         passwordHash: adminPasswordHash,
         role: 'admin',
@@ -107,46 +106,91 @@ export async function seedIfEmpty() {
         verifiedAt: new Date()
       });
       console.log('[AutoSeed] Production master administrator provisioned successfully.');
-    } else if (!adminExists) {
-      console.warn('[AutoSeed Warning] Master administrator not yet provisioned. Run "npm run provision-admin" with secure credentials.');
     }
     return;
   }
 
-  console.log('[AutoSeed] Development mode: Seeding verified DSU institutional accounts and events...');
+  console.log('[AutoSeed] Initializing Dayananda Sagar University campus baseline data...');
 
   const adminPasswordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
   const admin = await User.create({
-    name: 'University Administration Desk',
+    name: 'University Registrar',
     email: env.ADMIN_EMAIL.toLowerCase(),
     passwordHash: adminPasswordHash,
     role: 'admin',
-    department: 'Registrar Office'
+    department: 'Office of Student Affairs & Campus Life',
+    isVerified: true,
+    verificationStatus: 'verified',
+    verifiedAt: new Date()
   });
 
   const organizerPasswordHash = await bcrypt.hash('Organizer@123', 12);
   const organizer = await User.create({
-    name: 'Prof. Ramesh K. (Faculty Advisor)',
+    name: 'Prof. Ramesh Kumar',
+    email: 'organizer@dsu.edu.in',
+    passwordHash: organizerPasswordHash,
+    role: 'organizer',
+    department: 'School of Computer Science & Engineering',
+    clubName: 'DSU Developer Student Club',
+    isVerified: true,
+    verificationStatus: 'verified',
+    verifiedAt: new Date()
+  });
+
+  // Keep compatibility organizer account for test suites
+  await User.create({
+    name: 'Faculty Coordinator',
     email: 'organizer@example.test',
     passwordHash: organizerPasswordHash,
     role: 'organizer',
-    department: 'Department of Computer Science & Engineering',
-    clubName: 'DSU Developer Student Club'
+    department: 'School of Engineering',
+    clubName: 'DSU Technical Council',
+    isVerified: true,
+    verificationStatus: 'verified',
+    verifiedAt: new Date()
   });
 
   const studentPasswordHash = await bcrypt.hash('Student@123', 12);
+  const studentProfiles = [
+    { name: 'Rahul Sharma', email: 'rahul.sharma@dsu.edu.in', usn: '1DS23CS045', dept: 'School of Computer Science & Engineering' },
+    { name: 'Ananya Rao', email: 'ananya.rao@dsu.edu.in', usn: '1DS23EC012', dept: 'Department of Electronics & Communication' },
+    { name: 'Kavya S. Gowda', email: 'kavya.gowda@dsu.edu.in', usn: '1DS23CS088', dept: 'School of Computer Science & Engineering' },
+    { name: 'Priya Verma', email: 'priya.verma@dsu.edu.in', usn: '1DS23AI019', dept: 'Department of Artificial Intelligence & Robotics' },
+    { name: 'Karthik N.', email: 'karthik.n@dsu.edu.in', usn: '1DS23ME034', dept: 'Department of Mechanical Engineering' },
+    { name: 'Aditi Joshi', email: 'aditi.joshi@dsu.edu.in', usn: '1DS23DS008', dept: 'School of Design & Creative Arts' }
+  ];
+
   const students = [];
-  for (let i = 1; i <= 6; i++) {
+  for (const s of studentProfiles) {
     const student = await User.create({
-      name: `DSU Scholar ${i}`,
+      name: s.name,
+      email: s.email,
+      passwordHash: studentPasswordHash,
+      role: 'student',
+      department: s.dept,
+      rollNumber: s.usn,
+      usn: s.usn,
+      isVerified: true,
+      verificationStatus: 'verified',
+      verifiedAt: new Date()
+    });
+    students.push(student);
+  }
+
+  // Pre-seed matching accounts for automated tests
+  for (let i = 1; i <= 6; i++) {
+    await User.create({
+      name: `Student Applicant ${i}`,
       email: `student${i}@example.test`,
       passwordHash: studentPasswordHash,
       role: 'student',
-      department: 'School of Engineering',
-      rollNumber: `1DS22CS0${40 + i}`,
-      usn: `1DS22CS0${40 + i}`
+      department: 'School of Computer Science & Engineering',
+      rollNumber: `1DS23CS0${40 + i}`,
+      usn: `1DS23CS0${40 + i}`,
+      isVerified: true,
+      verificationStatus: 'verified',
+      verifiedAt: new Date()
     });
-    students.push(student);
   }
 
   const events = [];
@@ -155,7 +199,7 @@ export async function seedIfEmpty() {
     events.push(ev);
   }
 
-  // Pre-seed initial registrations for testing
+  // Pre-seed baseline registrations
   if (events.length > 0 && students.length > 0) {
     await Registration.create({
       event: events[0]._id,
@@ -179,6 +223,5 @@ export async function seedIfEmpty() {
     await Event.findByIdAndUpdate(events[1]._id, { $inc: { registeredCount: 1 } });
   }
 
-  console.log('[AutoSeed] Seed completed successfully: 1 admin, 1 organizer, 6 students, 6 official events.');
+  console.log('[AutoSeed] Dayananda Sagar University campus baseline data initialized successfully.');
 }
-

@@ -202,31 +202,34 @@ export async function updateEvent(id, data, user) {
     throw ApiError.badRequest('End date/time must be after start date/time');
   }
 
+  const wasCancelled = event.status !== 'cancelled' && data.status === 'cancelled';
+  const venueChanged = data.venue && data.venue !== event.venue;
+  const timeChanged = data.startsAt && new Date(data.startsAt).getTime() !== new Date(event.startsAt).getTime();
+
+  let resultEvent = event;
   if (data.capacity !== undefined) {
     const updatedEvent = await Event.findOneAndUpdate(
       { _id: id, $expr: { $lte: ['$registeredCount', data.capacity] } },
       { $set: data },
       { new: true, runValidators: true }
     );
-    if (updatedEvent) return updatedEvent;
-
-    const currentEvent = await Event.findById(id);
-    if (!currentEvent) throw ApiError.notFound('Event not found');
-    if (data.capacity < currentEvent.registeredCount) {
-      throw ApiError.badRequest(`Capacity cannot be lower than current registrations (${currentEvent.registeredCount})`);
+    if (!updatedEvent) {
+      const currentEvent = await Event.findById(id);
+      if (!currentEvent) throw ApiError.notFound('Event not found');
+      if (data.capacity < currentEvent.registeredCount) {
+        throw ApiError.badRequest(`Capacity cannot be lower than current registrations (${currentEvent.registeredCount})`);
+      }
+      throw ApiError.conflict('Event changed while it was being updated. Reload and try again.');
     }
-    throw ApiError.conflict('Event changed while it was being updated. Reload and try again.');
+    resultEvent = updatedEvent;
+  } else {
+    Object.assign(event, data);
+    await event.save();
+    resultEvent = event;
   }
 
-  const wasCancelled = event.status !== 'cancelled' && data.status === 'cancelled';
-  const venueChanged = data.venue && data.venue !== event.venue;
-  const timeChanged = data.startsAt && new Date(data.startsAt).getTime() !== new Date(event.startsAt).getTime();
-
-  Object.assign(event, data);
-  await event.save();
-
   // Asynchronously notify registered students if cancelled or rescheduled
-  if (wasCancelled || (event.status === 'published' && (venueChanged || timeChanged))) {
+  if (wasCancelled || (resultEvent.status === 'published' && (venueChanged || timeChanged))) {
     Registration.find({ event: id, status: 'registered' })
       .populate('student', 'name email')
       .then((regs) => {
@@ -236,18 +239,18 @@ export async function updateEvent(id, data, user) {
               sendEventCancellationEmail({
                 to: r.student.email,
                 studentName: r.student.name,
-                event
+                event: resultEvent
               }).catch(() => {});
             } else if (venueChanged || timeChanged) {
               const summary = venueChanged && timeChanged
-                ? `Venue changed to ${event.venue} and start time rescheduled to ${new Date(event.startsAt).toLocaleTimeString('en-IN')}`
+                ? `Venue changed to ${resultEvent.venue} and start time rescheduled to ${new Date(resultEvent.startsAt).toLocaleTimeString('en-IN')}`
                 : venueChanged
-                ? `Venue moved to ${event.venue}`
-                : `Start time rescheduled to ${new Date(event.startsAt).toLocaleTimeString('en-IN')}`;
+                ? `Venue moved to ${resultEvent.venue}`
+                : `Start time rescheduled to ${new Date(resultEvent.startsAt).toLocaleTimeString('en-IN')}`;
               sendEventUpdateEmail({
                 to: r.student.email,
                 studentName: r.student.name,
-                event,
+                event: resultEvent,
                 changeSummary: summary
               }).catch(() => {});
             }
@@ -257,7 +260,7 @@ export async function updateEvent(id, data, user) {
       .catch(() => {});
   }
 
-  return event;
+  return resultEvent;
 }
 
 export async function deleteEvent(id, user) {

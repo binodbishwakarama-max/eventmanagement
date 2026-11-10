@@ -50,3 +50,4 @@ Thumbs.db
 
 # Testing & Coverage
 coverage/
+lighthouse*.json

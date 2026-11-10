@@ -1,6 +1,6 @@
 # Implementation audit and requirement mapping
 
-Reviewed against the current repository on 2026-10-29. This maps the follow-up brief to code present at review time; it does not certify institutional policy or production readiness.
+Historical review of the repository as it existed on 2026-10-29. It is not a description of the current UI or a certification of institutional policy or production readiness; see [current implementation summary](./SPEC.md) and [limitations](./LIMITATIONS.md).
 
 ## Current architecture
 

@@ -11,17 +11,17 @@ Campus Events is an independent DSU-context demo, not an official Dayananda Saga
 - **Client:** React 18, Vite, React Router, Tailwind CSS, Axios, and Lucide.
 - **API:** Node.js, Express, Mongoose, MongoDB, Zod, JWT, and bcryptjs.
 - **Tests:** Vitest service tests with mocked Mongoose model methods; no MongoDB-backed integration test is currently configured.
-- **Persistence:** MongoDB. Configure `MONGODB_URI` in `server/.env`; there is no offline registration mode.
+- **Persistence:** MongoDB through the API. Configure `MONGODB_URI` in `server/.env`; the student passbook may show read-only cached records offline, but writes require the API.
 - **Authentication:** bearer JWT stored in browser `localStorage`, retained from the playbook for this demo. Production token handling needs a separate security review.
 
 ## Roles and behavior
 
 - **Guest:** browse published events and open public event details.
-- **Student:** register for published events before their start, cancel before start, and view their registration history.
+- **Student:** register for published demo events before their start, cancel before start, and view their registration history and demo QR tickets.
 - **Organizer:** create and manage owned events, view owned-event registrations, and record attendance after event start.
-- **Administrator:** manage all events, view limited account profiles, and access platform-level demo analytics.
+- **Administrator:** manage all events, review submitted demo profiles, view limited account profiles, and access platform-level demo analytics.
 
-Public registration always creates a student-role account; it does not verify university identity. Organizer attendance and administrator read-only account oversight are product-request extensions to the playbook. Attendance check-in is available after the event starts; demo UI records a check-in once. A ticket code is a demo identifier, not an entry credential or credential of attendance.
+Public registration always creates a student-role account; it does not verify university identity. The administrator profile-review queue operates only on self-submitted demo data and has no external identity connection. Organizer attendance and administrator account oversight are product-request extensions to the playbook. Camera check-in is available after the event starts; the demo UI records a check-in once. Ticket codes and QR images are not real entry credentials or attendance records.
 
 ## Business-rule implementation
 

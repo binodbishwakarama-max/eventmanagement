@@ -29,10 +29,21 @@ export async function registerUser(data) {
     throw ApiError.conflict('An account with this email already exists');
   }
 
-  const passwordHash = await bcrypt.hash(data.password, 12);
+  // Institutional domain check in production
+  if (env.NODE_ENV === 'production' && env.ALLOWED_EMAIL_DOMAINS) {
+    const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
+    const domain = data.email.toLowerCase().split('@')[1];
+    if (!allowed.includes(domain)) {
+      throw ApiError.badRequest(`Registration is restricted to institutional accounts (@${allowed.join(', @')})`);
+    }
+  }
+
   const usnInput = (data.usn || data.rollNumber || '').toUpperCase().trim();
-  const isDsuEmail = data.email.toLowerCase().endsWith('@dsu.edu.in');
-  const isValidUsn = DSU_USN_REGEX.test(usnInput);
+  if (usnInput && !DSU_USN_REGEX.test(usnInput)) {
+    throw ApiError.badRequest('Invalid Dayananda Sagar University USN format. Example: 1DS23CS045');
+  }
+
+  const passwordHash = await bcrypt.hash(data.password, 12);
 
   // Academic Identity Review Queue: Never automatically trust self-submitted USN or email.
   // Registrations enter the administrator review queue as 'pending'.

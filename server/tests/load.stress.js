@@ -1,7 +1,5 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
-import { app } from '../src/app.js';
 import { Event } from '../src/models/Event.js';
 import { Registration } from '../src/models/Registration.js';
 import { User } from '../src/models/User.js';

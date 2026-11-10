@@ -12,15 +12,14 @@ import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 import { User } from '../models/User.js';
 import { Event } from '../models/Event.js';
-import { Registration } from '../models/Registration.js';
 
 export async function seedPilotEnvironment(customUri = null) {
   const uri = customUri || env.MONGODB_URI;
   console.log('[Pilot Seeder] Connecting to database...');
 
-  const conn = mongoose.connection.readyState === 1
-    ? mongoose.connection
-    : await mongoose.connect(uri);
+  if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(uri);
+  }
 
   console.log('[Pilot Seeder] Checking existing records...');
   

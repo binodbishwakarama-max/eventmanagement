@@ -3,23 +3,16 @@ import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { playSuccessChime, playErrorBuzzer } from '../utils/audio';
 import { QrCameraScannerModal } from '../components/QrCameraScannerModal';
+import { Skeleton, ErrorState } from '../components/ui';
 import {
   ArrowLeft,
   Check,
   Download,
-  Users,
   CheckCircle2,
   Search,
-  QrCode,
   Ticket,
   Volume2,
-  GraduationCap,
-  Building,
-  Camera,
-  ShieldCheck,
-  Clock,
-  Sparkles,
-  AlertTriangle
+  Camera
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -67,7 +60,7 @@ export const AttendancePage = () => {
         attended: true
       });
       playSuccessChime();
-      toast.success('Attendance verified');
+      toast.success('Attendee check-in recorded successfully');
       fetchRegistrations();
     } catch (err) {
       playErrorBuzzer();
@@ -84,7 +77,7 @@ export const AttendancePage = () => {
       const safeText = /^[\s]*[=+\-@]/.test(text) ? `'${text}` : text;
       return `"${safeText.replace(/"/g, '""')}"`;
     };
-    const headers = ['Student Name', 'University USN', 'Student Email', 'Department / School', 'Pass Code', 'Attendance Verified', 'Verified At']
+    const headers = ['Student Name', 'University USN', 'Email', 'Department', 'Ticket Pass Code', 'Checked In', 'Check-in Time']
       .map(csvCell)
       .join(',');
     const rows = registrations
@@ -106,10 +99,10 @@ export const AttendancePage = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `DSU_Attendance_${event?.title?.replace(/[^a-z0-9_-]+/gi, '_').slice(0, 40) || 'Event'}.csv`;
+    a.download = `Attendance_${event?.title?.replace(/[^a-z0-9_-]+/gi, '_').slice(0, 40) || 'Event'}.csv`;
     a.click();
     window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-    toast.success('Official attendee CSV roster downloaded');
+    toast.success('Attendance roster exported to CSV');
   };
 
   const verifyTicket = async (rawCode) => {
@@ -125,7 +118,6 @@ export const AttendancePage = () => {
       const verified = res.data?.data;
       setLastVerifiedStudent(verified);
       toast.success(`Check-in verified: ${verified.student?.name || 'Student'} (${verified.student?.usn || code})`, {
-        icon: '✅',
         duration: 4000
       });
       setTicketInput('');
@@ -133,7 +125,7 @@ export const AttendancePage = () => {
     } catch (err) {
       playErrorBuzzer();
       const msg = err.response?.data?.message || 'Verification failed';
-      toast.error(msg, { icon: '⚠️', duration: 4500 });
+      toast.error(msg, { duration: 4500 });
     } finally {
       setCheckingIn(false);
     }
@@ -165,24 +157,33 @@ export const AttendancePage = () => {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-28 text-center">
-        <div className="w-10 h-10 border-2 border-[#002B55] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-xs text-slate-500 font-mono">Loading attendance verification roster...</p>
+      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 animate-pulse">
+        <Skeleton className="h-6 w-32 rounded-lg" />
+        <Skeleton className="h-10 w-64 rounded-xl" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+        </div>
+        <Skeleton className="h-80 rounded-2xl" />
       </div>
     );
   }
 
   if (!event && loadError) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-28 text-center">
-        <p className="text-xs text-rose-600">{loadError}</p>
-        <button
-          type="button"
-          onClick={fetchRegistrations}
-          className="mt-6 px-6 py-2.5 rounded-full bg-[#002B55] text-white text-xs font-semibold hover:bg-[#001B36] transition shadow-sm"
-        >
-          Retry
-        </button>
+      <div className="mx-auto max-w-xl px-4 py-20 text-center">
+        <ErrorState
+          title="Attendance Roster Unavailable"
+          message={loadError}
+          onRetry={fetchRegistrations}
+          retryLabel="Retry"
+        />
+        <div className="mt-4">
+          <Link to="/admin" className="text-xs font-semibold text-[#002B55] hover:underline">
+            ← Return to Operations Console
+          </Link>
+        </div>
       </div>
     );
   }
@@ -202,7 +203,7 @@ export const AttendancePage = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#002B55] block mb-1">
-              Dayananda Sagar University • Verification Desk
+              DSU Official Attendance • Gate Verification Desk
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#002B55]">
               {event?.title.replace(/^DEMO:\s*/, '')}
@@ -349,7 +350,7 @@ export const AttendancePage = () => {
                   </span>
                 </div>
                 <p className="text-[11px] text-emerald-800 mt-0.5">
-                  {lastVerifiedStudent.student?.department || 'Dayananda Sagar University'} • Check-in recorded at{' '}
+                  {lastVerifiedStudent.student?.department || 'Demo account'} • Demo check-in recorded at{' '}
                   {new Date(lastVerifiedStudent.attendedAt || Date.now()).toLocaleTimeString('en-IN')}
                 </p>
               </div>
@@ -420,7 +421,7 @@ export const AttendancePage = () => {
                     <td className="py-3.5 px-4 font-mono text-slate-600">
                       {reg.student?.usn || reg.student?.rollNumber || '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'DSU'}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'Demo account'}</td>
                     <td className="py-3.5 px-4">
                       <span className="font-mono font-bold text-[#002B55] bg-blue-50/80 px-2 py-0.5 rounded border border-blue-200/60">
                         {reg.ticketCode}

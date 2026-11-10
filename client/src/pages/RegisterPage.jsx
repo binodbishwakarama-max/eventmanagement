@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DsuLogo } from '../components/DsuLogo';
+import { registerSchema } from '../features/auth/schemas';
 import {
   Eye,
   EyeOff,
   Ticket,
-  ShieldCheck,
   CheckCircle2,
-  Calendar,
-  Sparkles,
   ArrowRight,
-  GraduationCap
+  ShieldCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -24,18 +22,47 @@ export function RegisterPage() {
     email: '',
     password: '',
     usn: '',
-    department: ''
+    department: 'School of Engineering'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'usn' ? value.toUpperCase().trim() : value
+    }));
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFieldErrors({});
+
+    const validation = registerSchema.safeParse(formData);
+    if (!validation.success) {
+      const errors = {};
+      for (const issue of validation.error.issues) {
+        const field = issue.path[0];
+        if (!errors[field]) errors[field] = issue.message;
+      }
+      setFieldErrors(errors);
+      return;
+    }
+
     setLoading(true);
     try {
       await register({
-        ...formData,
-        rollNumber: formData.usn
+        name: formData.name.trim(),
+        email: formData.email.toLowerCase().trim(),
+        password: formData.password,
+        usn: formData.usn,
+        rollNumber: formData.usn,
+        department: formData.department.trim()
       });
       toast.success('Student account registered successfully!');
       navigate('/dashboard');
@@ -46,83 +73,91 @@ export function RegisterPage() {
     }
   };
 
-  const handleQuickStudentDemo = (num) => {
-    setFormData({
-      name: `Student Demo ${num}`,
-      email: `newstudent${num}@dsu.edu.in`,
-      password: 'Student@123',
-      usn: `1DS22CS0${50 + num}`,
-      department: 'School of Engineering (Computer Science)'
-    });
-  };
-
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center p-4 sm:p-6 lg:p-12">
-      <div className="max-w-5xl w-full dsu-card overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-xl border border-[#E5E7EB]">
-        {/* Left Visual Panel: Pass & Campus Benefits */}
-        <div className="lg:col-span-5 bg-[#001B36] text-white p-8 sm:p-10 flex flex-col justify-between relative border-r border-[#D9A521]/20">
-          <div>
+    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-slate-50">
+      <div className="max-w-5xl w-full bg-white rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-xl border border-slate-200">
+        {/* Left Column: Brand & Digital Pass preview */}
+        {/* Institutional brand column with authentic DSU Harohalli Campus Backdrop */}
+        <div className="lg:col-span-5 bg-blue-950 text-white p-8 sm:p-10 flex flex-col justify-between relative border-r border-amber-500/20 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none"
+            style={{ backgroundImage: `url('/dsu-main-campus-admission.jpg')` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#00142A] via-[#001B36]/85 to-[#002244]/80 pointer-events-none" />
+
+          <div className="relative z-10">
             <div className="mb-8">
               <DsuLogo variant="white" size="md" />
             </div>
 
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#D9A521] block mb-2">
-              Student Registration
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-400 block mb-2">
+              Official Student Enrollment
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-              One university pass for all campus symposia.
+              DSU Campus Life & Event Gateway
             </h2>
             <p className="text-xs text-slate-300 mt-3 leading-relaxed">
-              Register hackathon passes, workshop seats, and cultural showcase tickets with instant USN check-in.
+              Enroll with your Dayananda Sagar University credentials to participate in varsity
+              hackathons, academic symposiums, and cultural festivals.
             </p>
           </div>
 
-          {/* Interactive Digital Pass Mockup Preview */}
-          <div className="my-8 bg-[#002447] border border-blue-900/50 rounded-2xl p-5 shadow-inner">
-            <div className="flex items-center justify-between pb-3 border-b border-blue-900/40 text-xs">
-              <div className="flex items-center gap-2 font-bold tracking-wider text-[#D9A521]">
+          {/* Interactive Digital Pass Preview */}
+          <div className="my-8 bg-blue-900/60 border border-blue-800 rounded-2xl p-5 shadow-inner">
+            <div className="flex items-center justify-between pb-3 border-b border-blue-800/80 text-xs">
+              <div className="flex items-center gap-2 font-bold tracking-wider text-amber-400">
                 <Ticket className="w-4 h-4" />
-                <span className="text-xs uppercase font-semibold">STUDENT PASS</span>
+                <span className="text-xs uppercase font-semibold">DIGITAL PASS PREVIEW</span>
               </div>
-              <span className="font-mono text-slate-300 text-xs">DSU-PASS-2026</span>
+              <span className="font-mono text-emerald-400 text-xs flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                VERIFIED ID
+              </span>
             </div>
 
             <div className="pt-3.5 space-y-2">
               <p className="text-sm font-extrabold text-white">
-                {formData.name || 'Sample Student Pass'}
+                {formData.name || 'Student Name'}
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
                 <div>
-                  <span className="block text-slate-400 text-xs uppercase tracking-wider font-medium">University USN</span>
-                  <span className="font-mono font-bold text-[#D9A521]">{formData.usn || '1DS22CS042'}</span>
+                  <span className="block text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
+                    University USN
+                  </span>
+                  <span className="font-mono font-bold text-amber-400">
+                    {formData.usn || '1DS23CS001'}
+                  </span>
                 </div>
                 <div>
-                  <span className="block text-slate-400 text-xs uppercase tracking-wider font-medium">Access Tier</span>
-                  <span className="font-semibold text-emerald-400">Verified Scholar</span>
+                  <span className="block text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
+                    Department
+                  </span>
+                  <span className="font-semibold text-slate-200 truncate block">
+                    {formData.department || 'School of Engineering'}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Perforated divider */}
-            <div className="mt-4 pt-3 border-t border-dashed border-slate-700 flex items-center justify-between text-xs text-slate-300">
-              <span className="uppercase tracking-wider font-semibold">Scan Desk Pass</span>
-              <span className="text-emerald-400 font-bold">READY</span>
+            <div className="mt-4 pt-3 border-t border-dashed border-blue-700/80 flex items-center justify-between text-xs text-slate-300">
+              <span className="uppercase tracking-wider font-semibold text-[10px]">DSU Event Pass</span>
+              <span className="text-emerald-400 font-bold text-[10px]">ENCRYPTED QR</span>
             </div>
           </div>
 
           {/* Student Benefits Highlights */}
-          <div className="space-y-2 text-xs text-slate-300 border-t border-blue-900/50 pt-5">
+          <div className="space-y-2 text-xs text-slate-300 border-t border-blue-900/60 pt-5">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#D9A521] shrink-0" />
-              <span>Instant digital passes & gate verification codes</span>
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Official admission QR passes with tamper-proof hashing</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#D9A521] shrink-0" />
-              <span>Priority reservations for limited-capacity symposiums</span>
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Real-time seat quotas & live venue coordination</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#D9A521] shrink-0" />
-              <span>Harohalli Main Campus & Kudlu Innovation Campus</span>
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Harohalli Main Campus, Kanakapura Road (130-Acre Grounds)</span>
             </div>
           </div>
         </div>
@@ -132,91 +167,141 @@ export function RegisterPage() {
           <div>
             <div className="flex items-center justify-between gap-4 mb-8">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#002B55] block mb-1">
-                  New Student Registration
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-900 block mb-1">
+                  Student Enrollment
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#002B55]">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
                   Create Student Profile
                 </h1>
               </div>
 
               <Link
                 to="/login"
-                className="text-xs font-semibold text-[#002B55] hover:text-[#D9A521] transition"
+                className="text-xs font-bold text-blue-900 hover:text-blue-800 underline decoration-slate-300 hover:decoration-blue-900 underline-offset-4"
               >
                 Sign In Instead →
               </Link>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs" noValidate>
+              {/* Full Name */}
               <div>
-                <label htmlFor="register-name" className="block font-semibold text-slate-700 mb-1.5">
-                  Full Name *
+                <label
+                  htmlFor="register-name"
+                  className="block font-semibold text-slate-700 mb-1.5"
+                >
+                  Full Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="name"
                   id="register-name"
                   required
-                  placeholder="e.g. Rahul Sharma"
+                  placeholder="e.g. Aarav Sharma"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55] transition"
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition ${
+                    fieldErrors.name
+                      ? 'border-rose-400 focus:ring-rose-200'
+                      : 'border-slate-300 focus:ring-blue-900 focus:border-blue-900'
+                  }`}
                 />
+                {fieldErrors.name && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{fieldErrors.name}</p>
+                )}
               </div>
 
+              {/* USN & Department */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="register-usn" className="block font-semibold text-slate-700 mb-1.5">
-                    University USN / ID *
+                  <label
+                    htmlFor="register-usn"
+                    className="block font-semibold text-slate-700 mb-1.5"
+                  >
+                    DSU USN <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="usn"
                     id="register-usn"
                     required
-                    placeholder="e.g. 1DS22CS042"
+                    placeholder="e.g. 1DS23CS045"
                     value={formData.usn}
-                    onChange={(e) => setFormData({ ...formData, usn: e.target.value.toUpperCase() })}
-                    className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm font-mono text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55] transition"
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2.5 bg-white border rounded-xl text-sm font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition ${
+                      fieldErrors.usn
+                        ? 'border-rose-400 focus:ring-rose-200'
+                        : 'border-slate-300 focus:ring-blue-900 focus:border-blue-900'
+                    }`}
                   />
+                  {fieldErrors.usn && (
+                    <p className="text-xs text-rose-600 mt-1 font-medium">{fieldErrors.usn}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label htmlFor="register-department" className="block font-semibold text-slate-700 mb-1.5">
-                    School / Department
+                  <label
+                    htmlFor="register-department"
+                    className="block font-semibold text-slate-700 mb-1.5"
+                  >
+                    School / Department <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="department"
                     id="register-department"
-                    placeholder="e.g. School of Engineering (CSE)"
+                    required
+                    placeholder="e.g. Computer Science"
                     value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55] transition"
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition ${
+                      fieldErrors.department
+                        ? 'border-rose-400 focus:ring-rose-200'
+                        : 'border-slate-300 focus:ring-blue-900 focus:border-blue-900'
+                    }`}
                   />
+                  {fieldErrors.department && (
+                    <p className="text-xs text-rose-600 mt-1 font-medium">
+                      {fieldErrors.department}
+                    </p>
+                  )}
                 </div>
               </div>
 
+              {/* University Email */}
               <div>
-                <label htmlFor="register-email" className="block font-semibold text-slate-700 mb-1.5">
-                  Student Email *
+                <label
+                  htmlFor="register-email"
+                  className="block font-semibold text-slate-700 mb-1.5"
+                >
+                  Student Email (@dsu.edu.in) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
                   name="email"
                   id="register-email"
                   required
-                  placeholder="e.g. student@dsu.edu.in"
+                  placeholder="e.g. aarav.sharma@dsu.edu.in"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55] transition"
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition ${
+                    fieldErrors.email
+                      ? 'border-rose-400 focus:ring-rose-200'
+                      : 'border-slate-300 focus:ring-blue-900 focus:border-blue-900'
+                  }`}
                 />
+                {fieldErrors.email && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{fieldErrors.email}</p>
+                )}
               </div>
 
+              {/* Password */}
               <div>
-                <label htmlFor="register-password" className="block font-semibold text-slate-700 mb-1.5">
-                  Password *
+                <label
+                  htmlFor="register-password"
+                  className="block font-semibold text-slate-700 mb-1.5"
+                >
+                  Password (min 8 characters, uppercase, number) <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -226,8 +311,12 @@ export function RegisterPage() {
                     required
                     placeholder="••••••••"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-4 pr-11 py-2.5 bg-white border border-[#E5E7EB] focus:border-[#002B55] rounded-xl text-sm text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#002B55] transition"
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-11 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition ${
+                      fieldErrors.password
+                        ? 'border-rose-400 focus:ring-rose-200'
+                        : 'border-slate-300 focus:ring-blue-900 focus:border-blue-900'
+                    }`}
                   />
                   <button
                     type="button"
@@ -238,35 +327,36 @@ export function RegisterPage() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{fieldErrors.password}</p>
+                )}
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 bg-[#002B55] hover:bg-[#001B36] text-white font-semibold text-xs py-3 rounded-full transition shadow-xs active:scale-[0.98] disabled:opacity-50"
+                className="w-full mt-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm py-3 rounded-xl transition shadow flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {loading ? 'Creating Student Profile...' : 'Complete Registration & Enter'}
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Creating Student Profile...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Complete Enrollment & Enter</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
+          </div>
 
-            {/* Quick Demo Pre-fills */}
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-2">
-                Evaluation Demo Student Pre-fills
-              </span>
-              <div className="flex items-center gap-2">
-                {[1, 2, 3].map((num) => (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => handleQuickStudentDemo(num)}
-                    className="flex-1 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-[#E5E7EB] text-xs font-medium text-slate-700 transition text-center"
-                  >
-                    Student {num}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>Dayananda Sagar University Official Portal</span>
+            <Link to="/login" className="hover:text-blue-900 font-medium">
+              Existing Account Sign In →
+            </Link>
           </div>
         </div>
       </div>

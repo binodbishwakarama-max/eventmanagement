@@ -1,9 +1,12 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
+import compression from 'compression';
 import helmet from 'helmet';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import { env } from './config/env.js';
@@ -19,11 +22,21 @@ import { getStats } from './modules/stats/stats.controller.js';
 import { authenticate, authorize } from './middleware/auth.js';
 import usersRoutes from './modules/users/users.routes.js';
 import uploadRoutes from './modules/upload/upload.routes.js';
+import venuesRoutes from './modules/venues/venues.routes.js';
+import clubsRoutes from './modules/clubs/clubs.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const app = express();
+
+// Trust reverse proxy (Nginx, AWS ALB, Render, Cloudflare) when configured
+if (env.TRUST_PROXY || env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+// Production Gzip & Deflate Compression
+app.use(compression());
 
 // Priority 7: Request Correlation ID Middleware
 app.use((req, res, next) => {
@@ -58,12 +71,18 @@ app.use((req, res, next) => {
 });
 
 // Priority 4: Production CORS Whitelist Enforcement
-const allowedOrigins = env.CLIENT_ORIGIN.split(',').map((o) => o.trim());
+const configuredOrigins = env.CLIENT_ORIGIN.split(',').map((o) => o.trim().replace(/\/$/, ''));
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or same-origin)
-      if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      // Normalize origin removing any trailing slashes
+      const reqOrigin = origin ? origin.replace(/\/$/, '') : origin;
+      if (
+        !origin ||
+        configuredOrigins.includes(reqOrigin) ||
+        configuredOrigins.includes('*') ||
+        (env.NODE_ENV !== 'production' && (reqOrigin.includes('localhost') || reqOrigin.includes('127.0.0.1')))
+      ) {
         callback(null, true);
       } else {
         callback(new ApiError(403, `CORS policy violation: Origin '${origin}' is not authorized.`));
@@ -77,11 +96,23 @@ app.use(
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' }
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https://images.unsplash.com', 'https://*.cloudinary.com', 'https://res.cloudinary.com'],
+        connectSrc: ["'self'", 'https://*', 'http://localhost:*'],
+        upgradeInsecureRequests: null
+      }
+    }
   })
 );
 
-app.use(express.json({ limit: '100kb' }));
+app.use(cookieParser());
+app.use(express.json({ limit: '20kb' }));
 
 // Priority 1: Database Write Gatekeeper Middleware
 // Never allow writes if the authoritative database is disconnected
@@ -124,6 +155,7 @@ const registrationWriteLimiter = rateLimit({
   max: 30, // 30 registrations per minute per IP
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS' || env.NODE_ENV === 'test',
   message: { success: false, message: 'High registration frequency detected. Please wait a moment before trying again.' }
 });
 
@@ -157,16 +189,60 @@ app.get('/api/health/ready', async (req, res) => {
   return res.status(503).json({ status: 'not_ready', db: dbHealth });
 });
 
+// General API rate limiter for production (skipped in test mode)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => env.NODE_ENV === 'test',
+  message: { success: false, message: 'Too many requests, please try again later.' }
+});
+app.use('/api', apiLimiter);
+
 // Mount module routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/events/:id/register', registrationWriteLimiter);
 app.use('/api/events', eventsRoutes);
 app.use('/api', registrationsRoutes);
+app.use('/api/venues', venuesRoutes);
+app.use('/api/clubs', clubsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.get('/api/admin/stats', authenticate, authorize('admin', 'organizer'), getStats);
 app.use('/api/admin/users', usersRoutes);
+app.use('/api/users', usersRoutes);
 
-// 404 handler
+// Production Single-Port Deployment: Serve React client build if dist directory exists
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(
+    express.static(clientDistPath, {
+      maxAge: '1h',
+      setHeaders: (res, assetPath) => {
+        if (assetPath.includes('/assets/')) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (
+          assetPath.endsWith('.jpg') ||
+          assetPath.endsWith('.png') ||
+          assetPath.endsWith('.webp') ||
+          assetPath.endsWith('.woff2')
+        ) {
+          res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+        }
+      }
+    })
+  );
+  // SPA fallback for frontend client routing (non-API / non-uploads)
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.setHeader('Cache-Control', 'no-cache');
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
+// 404 handler for unmatched API requests
 app.use((req, res, next) => {
   next(ApiError.notFound(`Route not found: ${req.method} ${req.originalUrl}`));
 });

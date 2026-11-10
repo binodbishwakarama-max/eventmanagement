@@ -4,13 +4,23 @@ import { User } from '../models/User.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
-export const authenticate = asyncHandler(async (req, res, next) => {
+function extractToken(req) {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.split(' ')[1];
+  }
+  if (req.cookies && req.cookies.token) {
+    return req.cookies.token;
+  }
+  return null;
+}
+
+export const authenticate = asyncHandler(async (req, res, next) => {
+  const token = extractToken(req);
+  if (!token) {
     throw ApiError.unauthorized('Authentication required');
   }
 
-  const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
     const user = await User.findById(decoded.sub);
@@ -30,12 +40,11 @@ export const authenticate = asyncHandler(async (req, res, next) => {
 });
 
 export const optionalAuthenticate = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = extractToken(req);
+  if (!token) {
     return next();
   }
 
-  const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
     const user = await User.findById(decoded.sub);

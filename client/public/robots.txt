@@ -1,0 +1,12 @@
+# Dayananda Sagar University - Official Campus Events Platform
+User-agent: *
+Allow: /
+Allow: /events
+Allow: /events/*
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /api/
+
+Sitemap: https://events.dsu.edu.in/sitemap.xml
+

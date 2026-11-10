@@ -218,9 +218,17 @@ export async function verifyAndCheckInPass(eventId, ticketCode, user) {
 
   // Atomically mark attendance
   const now = new Date();
-  registration.attended = true;
-  registration.attendedAt = now;
-  await registration.save();
+  const updatedReg = await Registration.findOneAndUpdate(
+    { _id: registration._id, attended: false, status: 'registered' },
+    { $set: { attended: true, attendedAt: now } },
+    { new: true }
+  );
+
+  if (!updatedReg) {
+    const current = await Registration.findById(registration._id);
+    const timeStr = current?.attendedAt ? new Date(current.attendedAt).toLocaleTimeString('en-IN') : 'earlier';
+    throw ApiError.conflict(`Duplicate scan: pass already checked in at ${timeStr}`);
+  }
 
   return {
     registrationId: registration._id,

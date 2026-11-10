@@ -1,157 +1,82 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  MapPin,
-  Phone,
-  Mail,
-  ExternalLink,
-  ShieldCheck,
-  Building,
-  GraduationCap,
-  Globe,
-  Award
-} from 'lucide-react';
-import { DsuLogo } from './DsuLogo';
+import { CalendarDays, MapPin, Mail } from 'lucide-react';
 
 export function Footer() {
   return (
     <footer className="bg-[#001B36] text-white border-t-2 border-[#D9A521]/30">
-      {/* Top Gold Accent Line */}
-      <div className="dsu-gold-bar"></div>
-
-      {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-blue-900/40">
-          {/* Col 1: University Identity & Trust */}
-          <div className="lg:col-span-4 space-y-4">
-            <DsuLogo variant="white" size="lg" />
-
-            <p className="text-xs text-slate-300 leading-relaxed pt-2">
-              Established under the Karnataka Act No. 20 of 2014. Dayananda Sagar University is part of the Mahatma Gandhi Vidya Peetha (MGVP) trust legacy, dedicated to excellence in education, transformative research, and holistic student development.
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          {/* Main Institution Info */}
+          <div className="md:col-span-6 space-y-3">
+            <div className="flex items-center gap-2.5 font-bold text-base text-white">
+              <div className="w-8 h-8 rounded-lg bg-[#002B55] text-[#D9A521] border border-[#D9A521]/40 flex items-center justify-center">
+                <CalendarDays className="w-4 h-4 text-[#D9A521]" aria-hidden="true" />
+              </div>
+              <span>Dayananda Sagar University • Campus Events</span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed max-w-lg">
+              The official centralized platform for technical symposiums, hackathons, cultural festivals,
+              club gatherings, and varsity athletics across DSU Harohalli Main Campus.
             </p>
-
-            <div className="flex items-center gap-2 pt-2">
-              <span className="px-2.5 py-1 rounded bg-[#002B55] border border-[#D9A521]/40 text-[11px] font-semibold text-[#D9A521]">
-                UGC Recognized
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-2 text-xs text-slate-400">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#D9A521]" />
+                <span>Harohalli Main Campus, Kanakapura Road, Bengaluru</span>
               </span>
-              <span className="px-2.5 py-1 rounded bg-[#002B55] border border-[#D9A521]/40 text-[11px] font-semibold text-[#D9A521]">
-                AICTE Approved
-              </span>
-              <span className="px-2.5 py-1 rounded bg-[#002B55] border border-[#D9A521]/40 text-[11px] font-semibold text-[#D9A521]">
-                NAAC Accredited
+              <span className="hidden sm:inline text-slate-600">•</span>
+              <span className="flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-[#D9A521]" />
+                <span>events@dsu.edu.in</span>
               </span>
             </div>
           </div>
 
-          {/* Col 2: Campuses & Address */}
-          <div className="lg:col-span-3 space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D9A521] flex items-center gap-1.5">
-              <Building className="w-3.5 h-3.5" />
-              <span>University Campuses</span>
-            </h4>
-
-            <div className="space-y-3 text-xs text-slate-300">
-              <div className="p-3.5 rounded-xl bg-[#002447] border border-blue-900/60">
-                <p className="font-bold text-white flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#D9A521]" /> Main Campus (Harohalli)
-                </p>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Devarakaggalahalli, Harohalli, Kanakapura Road, Ramanagara District, Bengaluru, Karnataka – 562112
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-[#002447] border border-blue-900/60">
-                <p className="font-bold text-white flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#D9A521]" /> City Innovation Campus
-                </p>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Kudlu Gate, Hosur Main Road, Bengaluru, Karnataka – 560114
-                </p>
-              </div>
-            </div>
+          {/* Quick Nav Links */}
+          <div className="md:col-span-3 space-y-2.5">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#D9A521] block">
+              Quick Navigation
+            </span>
+            <ul className="space-y-2 text-xs text-slate-300">
+              <li>
+                <Link to="/events" className="inline-block py-1 hover:text-white transition">Explore Gatherings</Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className="inline-block py-1 hover:text-white transition">Student E-Passbook</Link>
+              </li>
+              <li>
+                <Link to="/admin" className="inline-block py-1 hover:text-white transition">Operations Console</Link>
+              </li>
+              <li>
+                <Link to="/login" className="inline-block py-1 hover:text-white transition">Institutional Sign In</Link>
+              </li>
+              <li>
+                <Link to="/register" className="inline-block py-1 hover:text-white transition">Student Registration</Link>
+              </li>
+            </ul>
           </div>
 
-          {/* Col 3: Examination & Admission Codes */}
-          <div className="lg:col-span-3 space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D9A521] flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5" />
-              <span>Official Institutional Codes</span>
-            </h4>
-
-            <div className="space-y-2 text-xs text-slate-300">
-              <div className="p-2.5 rounded-lg bg-[#002447] flex justify-between items-center border border-blue-900/30">
-                <span className="text-slate-400">CET Code (Engg):</span>
-                <strong className="text-white font-mono font-bold">E240</strong>
+          {/* Campus Grounds Info */}
+          <div className="md:col-span-3 space-y-2.5">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#D9A521] block">
+              Main Campus Grounds
+            </span>
+            <div className="text-xs text-slate-300 space-y-2">
+              <div>
+                <p className="font-semibold text-white">Harohalli Main Campus (130 Acres)</p>
+                <p className="text-[11px] text-slate-400">Kanakapura Road, Bengaluru South - 562112</p>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#002447] flex justify-between items-center border border-blue-900/30">
-                <span className="text-slate-400">COMED-K Code:</span>
-                <strong className="text-white font-mono font-bold">E182</strong>
+              <div className="pt-1 text-[11px] text-slate-400 space-y-1">
+                <p>• NAAC A+ Accredited University</p>
+                <p>• Engineering, Design & Health Sciences</p>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#002447] flex justify-between items-center border border-blue-900/30">
-                <span className="text-slate-400">PGCET Code (MBA):</span>
-                <strong className="text-white font-mono font-bold">B365MB</strong>
-              </div>
-              <div className="p-2.5 rounded-lg bg-[#002447] flex justify-between items-center border border-blue-900/30">
-                <span className="text-slate-400">PGCET Code (MCA):</span>
-                <strong className="text-white font-mono font-bold">C520MC</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* Col 4: Quick Links & Contact */}
-          <div className="lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D9A521] flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5" />
-              <span>Contact & Portals</span>
-            </h4>
-
-            <div className="space-y-2 text-xs">
-              <a
-                href="https://www.dsu.edu.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-300 hover:text-white flex items-center justify-between transition-colors"
-              >
-                <span>Official Website</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
-              </a>
-              <a
-                href="https://www.dsu.edu.in/admissions"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-300 hover:text-white flex items-center justify-between transition-colors"
-              >
-                <span>DSAT Admissions</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
-              </a>
-              <Link to="/events" className="text-slate-300 hover:text-white block transition-colors">
-                Browse Campus Events
-              </Link>
-              <Link to="/dashboard" className="text-slate-300 hover:text-white block transition-colors">
-                Student Passbook
-              </Link>
-              <Link to="/admin" className="text-slate-300 hover:text-white block transition-colors">
-                Organizer Desk
-              </Link>
-            </div>
-
-            <div className="pt-2 text-xs text-slate-300 space-y-1.5">
-              <p className="flex items-center gap-1.5 font-medium">
-                <Phone className="w-3.5 h-3.5 text-[#D9A521]" /> 080 46461800
-              </p>
-              <p className="flex items-center gap-1.5 truncate font-medium">
-                <Mail className="w-3.5 h-3.5 text-[#D9A521]" /> events@dsu.edu.in
-              </p>
             </div>
           </div>
         </div>
 
-        {/* Bottom Strip */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} Dayananda Sagar University (DSU). All rights reserved.</p>
-          <p className="text-slate-400">
-            Dayananda Sagar Institutions • Mahatma Gandhi Vidya Peetha Trust
-          </p>
+        <div className="mt-8 border-t border-blue-900/50 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+          <p>© {new Date().getFullYear()} Dayananda Sagar University. All rights reserved. Office of Student Affairs & Campus Life.</p>
+          <p className="text-[11px] text-slate-400 font-mono">Platform Version 2.0 • Institutional Deployment</p>
         </div>
       </div>
     </footer>

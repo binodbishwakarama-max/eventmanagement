@@ -33,9 +33,9 @@ export async function restoreDatabaseBackup(backupFolderName, targetUri = null) 
 
   console.log(`[Restore Engine] Snapshot Created At: ${manifest.createdAt} (${manifest.environment})`);
 
-  const conn = mongoose.connection.readyState === 1
-    ? mongoose.connection
-    : await mongoose.connect(uri);
+  if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(uri);
+  }
 
   const modelMap = {
     users: User,

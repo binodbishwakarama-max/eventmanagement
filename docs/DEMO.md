@@ -6,13 +6,13 @@ Every seeded account, event, registration, ticket code, attendance value and ana
 
 From the project root, configure `server/.env` and `client/.env` from their `.env.example` files, start a local MongoDB instance, then run:
 
-```powershell
+```sh
 npm install
 npm run seed
 npm run dev
 ```
 
-Open <http://localhost:5173>. The API health check is <http://localhost:5000/api/health>.
+Open <http://localhost:5173>. The default API health check is <http://localhost:5000/api/health>; if you changed `PORT` or `VITE_API_URL`, use the configured port.
 
 ## Student flow
 

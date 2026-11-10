@@ -31,8 +31,9 @@ The client uses React Router, Tailwind CSS, Axios, and React Context for authent
 - Create, edit, publish, and cancel events as an organizer or administrator.
 - Record attendance after the event start time and export a demo attendee CSV.
 - Review administrator account oversight and demo analytics.
+- Scan a sample QR code with the demo check-in screen and show the duplicate check-in response.
 
-Ticket codes and attendance displays are for application walkthroughs only. They are not real entry passes, official certificates, or institutional attendance records.
+Ticket codes, QR images, and attendance displays are for application walkthroughs only. They are not real entry passes, official certificates, or institutional attendance records. The venue planner is illustrative and not a real campus map.
 
 ## Engineering points
 

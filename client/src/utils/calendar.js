@@ -14,14 +14,14 @@ export function downloadIcsFile(event) {
   const end = formatDateToICS(event.endsAt);
   const now = formatDateToICS(new Date());
 
-  const cleanTitle = (event.title || 'DSU Event').replace(/^DEMO:\s*/, '').replace(/\r?\n/g, ' ');
+  const cleanTitle = (event.title || 'DSU Campus Event').replace(/^DEMO:\s*/, '').replace(/\r?\n/g, ' ');
   const cleanDesc = (event.description || '').replace(/\r?\n/g, '\\n');
-  const cleanLoc = (event.venue || 'Dayananda Sagar University, Harohalli Campus').replace(/\r?\n/g, ', ');
+  const cleanLoc = (event.venue || 'Dayananda Sagar University').replace(/\r?\n/g, ', ');
 
   const icsLines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Dayananda Sagar University//DSU Campus Events//EN',
+    'PRODID:-//Dayananda Sagar University//Campus Events//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
@@ -59,6 +59,5 @@ export function getGoogleCalendarUrl(event) {
     event.title.replace(/^DEMO:\s*/, '')
   )}&dates=${formatGDate(event.startsAt)}/${formatGDate(event.endsAt)}&details=${encodeURIComponent(
     event.description || ''
-  )}&location=${encodeURIComponent(event.venue || 'Dayananda Sagar University, Harohalli')}`;
+  )}&location=${encodeURIComponent(event.venue || 'Dayananda Sagar University')}`;
 }
-

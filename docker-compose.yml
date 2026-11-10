@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: dsu-events-mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.runCommand("ping").ok']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dsu-events-web
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - '5001:5001'
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+      - MONGODB_URI=mongodb://mongo:27017/dsu_events
+      - ALLOW_LOCAL_FALLBACK=false
+      - DEMO_MODE=false
+      - TRUST_PROXY=true
+      - ALLOWED_EMAIL_DOMAINS=dsu.edu.in
+      - JWT_SECRET=c6f4a8e2392576b92a40b91df79038d172e259b3699c277ef4f85e49c7198bb4
+      - JWT_EXPIRES_IN=1d
+      - ADMIN_EMAIL=admin@dsu.edu.in
+      - ADMIN_PASSWORD=ChangeThisSecurePassword123!
+      - STORAGE_PROVIDER=local
+      - EMAIL_PROVIDER=mock
+    volumes:
+      - uploads-data:/app/server/uploads
+
+volumes:
+  mongo-data:
+    driver: local
+  uploads-data:
+    driver: local
+

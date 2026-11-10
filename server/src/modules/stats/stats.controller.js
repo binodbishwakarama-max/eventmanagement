@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { Event } from '../../models/Event.js';
 import { Registration } from '../../models/Registration.js';
+import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ok } from '../../utils/respond.js';
 

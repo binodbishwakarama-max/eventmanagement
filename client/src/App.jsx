@@ -1,18 +1,48 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { EventsPage } from './pages/EventsPage';
-import { EventDetailPage } from './pages/EventDetailPage';
-import { StudentDashboard } from './pages/StudentDashboard';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { AttendancePage } from './pages/AttendancePage';
-import { CreateEventPage } from './pages/CreateEventPage';
-import { EditEventPage } from './pages/EditEventPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { useAuth } from './context/AuthContext';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ShieldAlert } from 'lucide-react';
+import { EventsPage } from './pages/EventsPage';
+
+const EventDetailPage = lazy(() =>
+  import('./pages/EventDetailPage').then((m) => ({ default: m.EventDetailPage }))
+);
+const StudentDashboard = lazy(() =>
+  import('./pages/StudentDashboard').then((m) => ({ default: m.StudentDashboard }))
+);
+const AdminDashboard = lazy(() =>
+  import('./pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard }))
+);
+const AttendancePage = lazy(() =>
+  import('./pages/AttendancePage').then((m) => ({ default: m.AttendancePage }))
+);
+const CreateEventPage = lazy(() =>
+  import('./pages/CreateEventPage').then((m) => ({ default: m.CreateEventPage }))
+);
+const EditEventPage = lazy(() =>
+  import('./pages/EditEventPage').then((m) => ({ default: m.EditEventPage }))
+);
+const LoginPage = lazy(() =>
+  import('./pages/LoginPage').then((m) => ({ default: m.LoginPage }))
+);
+const RegisterPage = lazy(() =>
+  import('./pages/RegisterPage').then((m) => ({ default: m.RegisterPage }))
+);
+const ResetPasswordPage = lazy(() =>
+  import('./pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage }))
+);
+
+function PageLoadingFallback() {
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center p-12 text-center min-h-[40vh]">
+      <div className="w-8 h-8 border-2 border-[#002B55] border-t-transparent rounded-full animate-spin mb-3" />
+      <p className="text-xs text-slate-500 font-mono">Loading campus portal...</p>
+    </div>
+  );
+}
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { user, isBootstrapping } = useAuth();
@@ -21,8 +51,8 @@ function ProtectedRoute({ children, allowedRoles }) {
   if (isBootstrapping) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-6 h-6 border-2 border-[#0071E3] border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p className="text-xs text-[#86868B] font-medium tracking-tight">Verifying DSU session...</p>
+        <div className="w-8 h-8 border-2 border-[#002B55] border-t-transparent rounded-full animate-spin mb-3" />
+        <p className="text-xs text-slate-500 font-mono">Restoring university session...</p>
       </div>
     );
   }
@@ -40,86 +70,93 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 export function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFC] text-[#1D1D1F]">
+    <div className="flex flex-col min-h-screen bg-[#F7F8FA] text-[#172033]">
       <Navbar />
       <main className="flex-1 flex flex-col">
-        <Routes>
-          <Route path="/" element={<Navigate to="/events" replace />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/events/:id" element={<EventDetailPage />} />
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoadingFallback />}>
+            <Routes>
+            <Route path="/" element={<EventsPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/events/:id" element={<EventDetailPage />} />
 
-          {/* Student Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['student']}>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Student Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['student', 'admin', 'organizer']}>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Admin & Organizer Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'organizer']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/events/new"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'organizer']}>
-                <CreateEventPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/events/:id/edit"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'organizer']}>
-                <EditEventPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/events/:id/attendance"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'organizer']}>
-                <AttendancePage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Admin & Organizer Protected Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'organizer']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/events/new"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'organizer']}>
+                  <CreateEventPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/events/:id/edit"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'organizer']}>
+                  <EditEventPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/events/:id/attendance"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'organizer']}>
+                  <AttendancePage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Auth */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+            {/* Auth */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-          {/* 404 Catch All */}
-          <Route
-            path="*"
-            element={
-              <div className="flex-1 flex flex-col items-center justify-center py-28 px-4 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-4 text-[#86868B] font-mono text-sm font-semibold">
-                  404
+            {/* 404 Catch All */}
+            <Route
+              path="*"
+              element={
+                <div className="flex-1 flex flex-col items-center justify-center py-28 px-4 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 text-[#002B55] mx-auto">
+                    <ShieldAlert className="w-7 h-7 text-rose-600" />
+                  </div>
+                  <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                    Page Not Found (404)
+                  </h1>
+                  <p className="text-slate-500 text-xs mt-1.5 max-w-sm mx-auto leading-relaxed">
+                    The requested university event page or administrative console does not exist.
+                  </p>
+                  <Link
+                    to="/events"
+                    className="mt-6 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-semibold shadow-xs transition"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" /> Return to Events
+                  </Link>
                 </div>
-                <h1 className="text-2xl font-bold tracking-tight text-[#1D1D1F]">Page Not Found</h1>
-                <p className="text-[#86868B] text-sm mt-1 max-w-sm">
-                  The requested campus event page or management destination does not exist.
-                </p>
-                <Link
-                  to="/events"
-                  className="mt-6 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1D1D1F] text-white text-xs font-medium hover:bg-black transition"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Return to Events
-                </Link>
-              </div>
-            }
-          />
-        </Routes>
-      </main>
-      <Footer />
+              }
+            />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </main>
+    <Footer />
     </div>
   );
 }

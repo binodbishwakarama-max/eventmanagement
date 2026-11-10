@@ -32,7 +32,7 @@ Organizer attendance is an intentional extension of the playbook's administrator
 - Registration currently requires a signed-in account with the `student` role. It does not enforce a university email domain, identity provider, department, year, student number, faculty eligibility, or approval workflow.
 - Dates are stored as instants and rendered using the browser's locale/time zone. The production time-zone convention remains to be confirmed.
 - The slate/navy and amber visual system is an independent design choice, not a DSU brand palette.
-- Ticket codes are demo identifiers only. No QR scanning, official pass, certificate, or entry entitlement is provided.
+- QR ticket display and camera check-in are implemented as demo workflows only. They are not official passes, certificates, or real-world entry/attendance entitlements.
 
 ## Confirm before real deployment
 

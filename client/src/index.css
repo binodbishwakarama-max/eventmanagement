@@ -11,9 +11,10 @@
 
   body {
     margin: 0;
-    background-color: #F7F8FA;
-    color: #172033;
+    background-color: #F8FAFC;
+    color: #0F172A;
     min-height: 100vh;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   :focus-visible {
@@ -22,18 +23,107 @@
   }
 }
 
-/* Authentic DSU Clean Card */
+/* Glassmorphism Navigation */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Big Tech Ultra-Premium Frosted Glass Panel */
+.glass-panel-luxury {
+  background: rgba(0, 16, 32, 0.78);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.gold-glow-badge {
+  box-shadow: 0 0 25px -4px rgba(217, 165, 33, 0.45);
+}
+
+/* Subtle Ambient Dot Grid */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(0, 43, 85, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Authentic DSU Premium Card */
 .dsu-card {
   background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease-in-out;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 6px 16px -4px rgba(0, 43, 85, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dsu-card:hover {
   border-color: #CBD5E1;
-  box-shadow: 0 8px 24px -4px rgba(0, 43, 85, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -6px rgba(0, 43, 85, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.03);
+}
+
+/* Interactive Apple Wallet Style Boarding Pass Notches */
+.ticket-stub {
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px -10px rgba(0, 27, 54, 0.12);
+}
+
+.ticket-notch-divider {
+  position: relative;
+  border-top: 2px dashed #E2E8F0;
+  margin: 0;
+}
+
+.ticket-notch-divider::before,
+.ticket-notch-divider::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  width: 24px;
+  height: 24px;
+  background-color: #F8FAFC;
+  border-radius: 50%;
+  border: 1px solid #CBD5E1;
+  z-index: 10;
+}
+
+.ticket-notch-divider::before {
+  left: -13px;
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+}
+
+.ticket-notch-divider::after {
+  right: -13px;
+  clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+}
+
+/* Animated Shimmer Pill */
+.shimmer-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 3s infinite;
 }
 
 /* Announcement Ticker */
@@ -61,11 +151,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #94A3B8;
 }
 
 /* Institutional Clean Print Layout */

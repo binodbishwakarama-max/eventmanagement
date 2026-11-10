@@ -24,7 +24,6 @@ export function DsuLogo({ variant = 'default', size = 'md', className = '' }) {
           alt="Dayananda Sagar University"
           onError={() => {
             if (isWhite) {
-              // Fallback to default if white asset fails
               setImgError(false);
             } else {
               setImgError(true);
@@ -50,7 +49,7 @@ export function DsuLogo({ variant = 'default', size = 'md', className = '' }) {
 
       {/* Subtitle badge for events portal */}
       {variant === 'with-tag' && (
-        <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-[#002B55] border border-slate-200">
+        <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#002B55]/5 text-[#002B55] border border-[#002B55]/15">
           Campus Events
         </span>
       )}

@@ -41,8 +41,25 @@ export async function connectDB(uri = env.MONGODB_URI) {
     if (env.ALLOW_LOCAL_FALLBACK || env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
       console.warn(`[Database Warning] Operating in ${env.NODE_ENV} mode. Initializing isolated local development engine...`);
       try {
+        let systemBinary = process.env.MONGOMS_SYSTEM_BINARY;
+        if (!systemBinary) {
+          const fs = await import('fs');
+          const path = await import('path');
+          const candidatePaths = [
+            path.resolve(process.cwd(), 'node_modules/.cache/mongodb-memory-server/mongod-arm64-darwin-8.2.6'),
+            path.resolve(process.cwd(), '../node_modules/.cache/mongodb-memory-server/mongod-arm64-darwin-8.2.6'),
+          ];
+          for (const cPath of candidatePaths) {
+            if (fs.existsSync(cPath)) {
+              systemBinary = cPath;
+              process.env.MONGOMS_SYSTEM_BINARY = cPath;
+              break;
+            }
+          }
+        }
         const { MongoMemoryServer } = await import('mongodb-memory-server');
         memoryServer = await MongoMemoryServer.create({
+          ...(systemBinary ? { binary: { systemBinary } } : {}),
           instance: {
             dbName: 'dsu_events'
           }

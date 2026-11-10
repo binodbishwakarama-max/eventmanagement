@@ -9,8 +9,6 @@ import { loginUser, registerUser } from '../src/modules/auth/auth.service.js';
 import {
   createEvent,
   deleteEvent,
-  getEventById,
-  getPublicEvents,
   updateEvent
 } from '../src/modules/events/events.service.js';
 import {

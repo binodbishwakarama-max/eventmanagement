@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Download, Check, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -7,10 +7,9 @@ import toast from 'react-hot-toast';
  * High-precision scannable 2D QR Code component.
  * Generates an SVG or high-resolution canvas QR Code with Dayananda Sagar University color accents.
  */
-export function TicketQrCode({ ticketCode, eventTitle, studentUsn, size = 180 }) {
+export function TicketQrCode({ ticketCode, size = 180 }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
-  const canvasRef = useRef(null);
 
   useEffect(() => {
     if (!ticketCode) return;

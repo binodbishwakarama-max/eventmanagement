@@ -75,7 +75,7 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-[calc(100vh-140px)] min-h-[calc(100dvh-140px)] flex items-center justify-center p-3 sm:p-6 lg:p-12 bg-slate-50">
-      <div className="max-w-5xl w-full bg-white rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-xl border border-slate-200">
+      <div className="max-w-5xl w-full bg-white rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-2xl border border-slate-200 apple-card apple-modal-spring">
         {/* Left Column: Brand & Digital Pass preview */}
         {/* Institutional brand column with authentic DSU Harohalli Campus Backdrop */}
         <div className="lg:col-span-5 bg-blue-950 text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative border-r border-amber-500/20 overflow-hidden">
@@ -102,7 +102,7 @@ export function RegisterPage() {
           </div>
 
           {/* Interactive Digital Pass Preview */}
-          <div className="my-8 bg-blue-900/60 border border-blue-800 rounded-2xl p-5 shadow-inner">
+          <div className="my-8 bg-blue-900/60 border border-blue-800 rounded-2xl p-5 shadow-inner apple-hologram">
             <div className="flex items-center justify-between pb-3 border-b border-blue-800/80 text-xs">
               <div className="flex items-center gap-2 font-bold tracking-wider text-amber-400">
                 <Ticket className="w-4 h-4" />
@@ -334,7 +334,7 @@ export function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm py-3 rounded-xl transition shadow flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full mt-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm py-3 rounded-xl transition shadow flex items-center justify-center gap-2 disabled:opacity-50 apple-press"
               >
                 {loading ? (
                   <>

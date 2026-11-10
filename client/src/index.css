@@ -106,13 +106,196 @@
   border: 1px solid #E2E8F0;
   border-radius: 16px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 6px 16px -4px rgba(0, 43, 85, 0.04);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  will-change: transform, box-shadow;
 }
 
 .dsu-card:hover {
   border-color: #CBD5E1;
-  transform: translateY(-2px);
-  box-shadow: 0 16px 32px -6px rgba(0, 43, 85, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.03);
+  transform: translateY(-5px) scale(1.005);
+  box-shadow: 0 4px 6px -1px rgba(0, 43, 85, 0.04), 0 24px 48px -12px rgba(0, 43, 85, 0.14), 0 0 0 1px rgba(0, 43, 85, 0.08);
+}
+
+/* =========================================================================
+   APPLE-GRADE FLUID DESIGN & ANIMATION ENGINE
+   ========================================================================= */
+
+/* Apple Physics Tokens & Custom Easing Curves */
+:root {
+  --apple-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --apple-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --apple-snappy: cubic-bezier(0.32, 0.72, 0, 1);
+  --apple-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Tactile Apple Physical Press */
+.apple-press {
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.16s ease, filter 0.16s ease;
+  will-change: transform;
+}
+.apple-press:active {
+  transform: scale3d(0.965, 0.965, 1);
+}
+
+/* Apple Fluid Hover Card */
+.apple-card {
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+.apple-card:hover {
+  transform: translateY(-6px) scale3d(1.008, 1.008, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 43, 85, 0.04), 0 28px 56px -14px rgba(0, 43, 85, 0.16), 0 0 0 1px rgba(0, 43, 85, 0.06);
+}
+
+/* Apple Frosted Glass Surface */
+.apple-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px -8px rgba(0, 43, 85, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Apple Dark Frosted Glass Surface */
+.apple-glass-dark {
+  background: rgba(0, 20, 42, 0.78);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Apple Holographic VIP Pass Sheen */
+.apple-hologram {
+  position: relative;
+  overflow: hidden;
+}
+.apple-hologram::before {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(245, 200, 76, 0.35) 45%,
+    rgba(64, 196, 255, 0.35) 55%,
+    rgba(255, 255, 255, 0.1) 65%,
+    transparent 80%
+  );
+  background-size: 200% 200%;
+  pointer-events: none;
+  animation: apple-hologram-sweep 7s ease-in-out infinite;
+  mix-blend-mode: overlay;
+  z-index: 5;
+}
+
+@keyframes apple-hologram-sweep {
+  0% { transform: translate3d(-50%, -50%, 0) rotate(0deg); }
+  50% { transform: translate3d(50%, 50%, 0) rotate(10deg); }
+  100% { transform: translate3d(-50%, -50%, 0) rotate(0deg); }
+}
+
+/* Apple Keyframes */
+@keyframes apple-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes apple-scale-in {
+  from {
+    opacity: 0;
+    transform: scale3d(0.95, 0.95, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes apple-modal-enter {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.94, 0.94, 1) translate3d(0, 12px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes apple-float-subtle {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -5px, 0); }
+}
+
+@keyframes apple-radar {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.apple-radar-indicator {
+  animation: apple-radar 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.apple-float {
+  animation: apple-float-subtle 4s ease-in-out infinite;
+}
+
+/* Staggered Entrance Animations */
+.apple-stagger-1 {
+  animation: apple-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+.apple-stagger-2 {
+  animation: apple-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+.apple-stagger-3 {
+  animation: apple-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+.apple-stagger-4 {
+  animation: apple-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+.apple-stagger-5 {
+  animation: apple-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+}
+
+/* Apple Modal Spring Entrance */
+.apple-modal-spring {
+  animation: apple-modal-enter 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+    scroll-behavior: auto !important;
+  }
+  .apple-press:active,
+  .dsu-card:hover,
+  .apple-card:hover {
+    transform: none !important;
+  }
 }
 
 /* Interactive Apple Wallet Style Boarding Pass Notches */

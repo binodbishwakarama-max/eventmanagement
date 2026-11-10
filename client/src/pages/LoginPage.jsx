@@ -84,7 +84,7 @@ export function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-140px)] min-h-[calc(100dvh-140px)] flex items-center justify-center p-3 sm:p-6 lg:p-12 bg-slate-50">
-      <div className="max-w-4xl w-full bg-white rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-xl border border-slate-200">
+      <div className="max-w-4xl w-full bg-white rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-2xl border border-slate-200 apple-card apple-modal-spring">
         {/* Institutional brand column with authentic DSU Harohalli Campus Backdrop */}
         <div className="lg:col-span-5 bg-blue-950 text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative border-r border-amber-500/20 overflow-hidden">
           <div
@@ -247,7 +247,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm py-3 rounded-xl transition shadow flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full mt-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm py-3 rounded-xl transition shadow flex items-center justify-center gap-2 disabled:opacity-50 apple-press"
               >
                 {loading ? (
                   <>
@@ -275,8 +275,8 @@ export function LoginPage() {
 
       {/* Forgot Password Modal */}
       {forgotModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative apple-modal-spring">
             <button
               type="button"
               onClick={() => {

@@ -379,8 +379,8 @@ export function EventsPage() {
             {/* Left Column: Eyebrow, Title, Description, Metrics */}
             <div className="md:col-span-7 xl:col-span-8 space-y-4 sm:space-y-5">
               {/* Eyebrow Status Badge */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold backdrop-blur-md shimmer-badge shadow-xs">
+              <div className="flex flex-wrap items-center gap-2 apple-stagger-1">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold backdrop-blur-md shimmer-badge shadow-xs apple-float">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F5C84C] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D9A521]"></span>
@@ -398,7 +398,7 @@ export function EventsPage() {
               </div>
 
               {/* Headline & Description */}
-              <div className="max-w-3xl">
+              <div className="max-w-3xl apple-stagger-2">
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] mb-4 drop-shadow-md">
                   Campus Life,{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5C84C] via-[#D9A521] to-[#FFE699]">
@@ -411,7 +411,7 @@ export function EventsPage() {
               </div>
 
               {/* Feature Indicators (Metrics bar) */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-200 pt-1">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-200 pt-1 apple-stagger-3">
                 <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
                   <span className="w-2 h-2 rounded-full bg-[#D9A521]"></span>
                   <span><strong>Main Campus:</strong> Harohalli, Kanakapura Road</span>
@@ -428,7 +428,7 @@ export function EventsPage() {
             </div>
 
             {/* Right Column: Apple-Grade Interactive Transparent Glass Card */}
-            <div className="md:col-span-5 xl:col-span-4 flex justify-start md:justify-end">
+            <div className="md:col-span-5 xl:col-span-4 flex justify-start md:justify-end apple-stagger-2">
               <AppleGlassCard className="w-full max-w-md lg:max-w-sm p-5 sm:p-6 cursor-pointer">
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-2">
@@ -477,7 +477,7 @@ export function EventsPage() {
           </div>
 
           {/* Full-Width Search & Filter Command Bar (Cleanly separated below 2-column grid) */}
-          <div className="w-full bg-white/95 backdrop-blur-xl rounded-2xl p-2.5 sm:p-3 shadow-2xl border border-white/20">
+          <div className="w-full bg-white/95 backdrop-blur-xl rounded-2xl p-2.5 sm:p-3 shadow-2xl border border-white/20 apple-stagger-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
               {/* Search input with shortcut hint */}
               <div className="relative flex-1">
@@ -489,13 +489,13 @@ export function EventsPage() {
                   placeholder="Search events by title, organizing club, department, or venue..."
                   value={searchDraft}
                   onChange={(e) => setSearchDraft(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 bg-white border border-slate-200 focus:border-[#002B55] rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/10 transition shadow-2xs font-medium"
+                  className="w-full pl-10 pr-12 py-3 bg-white border border-slate-200 focus:border-[#002B55] rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/10 transition-all duration-200 shadow-2xs font-medium"
                 />
                 {searchDraft ? (
                   <button
                     type="button"
                     onClick={() => setSearchDraft('')}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 apple-press"
                     aria-label="Clear search"
                   >
                     <X className="w-4 h-4" />
@@ -512,7 +512,7 @@ export function EventsPage() {
                 <button
                   type="button"
                   onClick={() => setMapModalOpen(true)}
-                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition shrink-0 active:scale-[0.98]"
+                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition shrink-0 apple-press"
                 >
                   <Compass className="w-4 h-4 text-[#D9A521] shrink-0" />
                   <span className="truncate">Campus Venues</span>
@@ -521,7 +521,7 @@ export function EventsPage() {
                 <button
                   type="button"
                   onClick={() => setFiltersOpen(!filtersOpen)}
-                  className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold border transition shrink-0 active:scale-[0.98] ${
+                  className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold border transition shrink-0 apple-press ${
                     filtersOpen || from || to || sort !== 'soonest'
                       ? 'bg-[#002B55] text-white border-[#002B55] shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -535,7 +535,7 @@ export function EventsPage() {
 
             {/* Expandable Filter Drawer */}
             {filtersOpen && (
-              <div className="mt-3 pt-3 border-t border-slate-200 p-3 rounded-xl bg-slate-50 space-y-3 animate-in fade-in duration-150">
+              <div className="mt-3 pt-3 border-t border-slate-200 p-3 rounded-xl bg-slate-50 space-y-3 apple-modal-spring">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                   <span>Filter by Date & Schedule</span>
                   <button
@@ -609,9 +609,9 @@ export function EventsPage() {
                     key={item.name}
                     type="button"
                     onClick={() => handleCategoryChange(item.name)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap active:scale-[0.98] ${
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 whitespace-nowrap apple-press ${
                       isSelected
-                        ? 'bg-[#002B55] text-white shadow-soft'
+                        ? 'bg-[#002B55] text-white shadow-soft scale-[1.02]'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
                     }`}
                   >
@@ -625,9 +625,9 @@ export function EventsPage() {
               <button
                 type="button"
                 onClick={() => updateFilter('category', 'Saved')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap active:scale-[0.98] ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 whitespace-nowrap apple-press ${
                   category === 'Saved'
-                    ? 'bg-[#002B55] text-white shadow-soft'
+                    ? 'bg-[#002B55] text-white shadow-soft scale-[1.02]'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
                 }`}
               >
@@ -641,7 +641,7 @@ export function EventsPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200 apple-press ${
                   viewMode === 'grid' ? 'bg-white text-[#002B55] shadow-xs' : 'hover:text-slate-900'
                 }`}
                 title="Grid View"
@@ -653,7 +653,7 @@ export function EventsPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('schedule')}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200 apple-press ${
                   viewMode === 'schedule' ? 'bg-white text-[#002B55] shadow-xs' : 'hover:text-slate-900'
                 }`}
                 title="Schedule View"
@@ -883,7 +883,7 @@ export function EventsPage() {
                   return (
                     <div
                       key={ev._id}
-                      className="dsu-card overflow-hidden flex flex-col justify-between group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 border border-slate-200/90"
+                      className="apple-card bg-white rounded-2xl overflow-hidden flex flex-col justify-between group border border-slate-200/90 shadow-soft"
                     >
                       <div>
                         {/* Cover Image - 16:9 Aspect Ratio with Unique Asset */}
@@ -892,7 +892,7 @@ export function EventsPage() {
                             category={ev.category}
                             title={ev.title}
                             posterUrl={ev.posterUrl}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
 
@@ -915,10 +915,10 @@ export function EventsPage() {
                               type="button"
                               onClick={(e) => handleToggleBookmark(e, ev._id)}
                               aria-label={isSaved ? 'Remove bookmark' : 'Save event'}
-                              className="w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-90"
+                              className="w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition apple-press"
                             >
                               <Bookmark
-                                className={`w-3.5 h-3.5 ${
+                                className={`w-3.5 h-3.5 transition-transform active:scale-125 ${
                                   isSaved ? 'fill-[#D9A521] text-[#D9A521]' : 'text-slate-600'
                                 }`}
                               />
@@ -927,7 +927,7 @@ export function EventsPage() {
                               type="button"
                               onClick={(e) => handleShare(e, ev)}
                               aria-label="Share event"
-                              className="w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-90"
+                              className="w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition apple-press"
                             >
                               <Share2 className="w-3.5 h-3.5 text-slate-600" />
                             </button>
@@ -989,7 +989,7 @@ export function EventsPage() {
 
                         <Link
                           to={`/events/${ev._id}`}
-                          className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-[#002B55] hover:text-white text-[#002B55] border border-slate-200 hover:border-[#002B55] text-xs font-bold transition flex items-center gap-1 shadow-2xs group-hover:border-[#002B55]"
+                          className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-[#002B55] hover:text-white text-[#002B55] border border-slate-200 hover:border-[#002B55] text-xs font-bold transition flex items-center gap-1 shadow-2xs group-hover:border-[#002B55] apple-press"
                         >
                           <span>Register</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

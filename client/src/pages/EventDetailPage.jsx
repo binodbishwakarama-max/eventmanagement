@@ -375,7 +375,7 @@ export function EventDetailPage() {
                   <button
                     type="button"
                     onClick={() => setCalendarMenuOpen(!calendarMenuOpen)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#002B55] hover:text-[#D9A521] transition"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#002B55] hover:text-[#D9A521] transition apple-press"
                   >
                     <CalendarPlus className="w-3.5 h-3.5 text-[#D9A521]" />
                     <span>Sync with Calendar</span>
@@ -383,11 +383,11 @@ export function EventDetailPage() {
                   </button>
 
                   {calendarMenuOpen && (
-                    <div className="absolute left-0 top-7 z-30 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl p-1.5 text-xs animate-in fade-in duration-150">
+                    <div className="absolute left-0 top-7 z-30 w-56 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-1.5 text-xs apple-modal-spring">
                       <button
                         type="button"
                         onClick={handleAppleCalendar}
-                        className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 text-slate-800 font-medium flex items-center justify-between transition"
+                        className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 text-slate-800 font-medium flex items-center justify-between transition apple-press"
                       >
                         <span>Apple / Outlook (.ics)</span>
                         <span className="text-xs text-slate-400">iCal</span>
@@ -395,7 +395,7 @@ export function EventDetailPage() {
                       <button
                         type="button"
                         onClick={handleGoogleCalendar}
-                        className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 text-slate-800 font-medium flex items-center justify-between transition"
+                        className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 text-slate-800 font-medium flex items-center justify-between transition apple-press"
                       >
                         <span>Google Calendar</span>
                         <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
@@ -524,7 +524,7 @@ export function EventDetailPage() {
                   type="button"
                   onClick={handleRegister}
                   disabled={actionLoading}
-                  className="w-full py-3.5 rounded-2xl bg-[#002B55] hover:bg-[#001B36] text-white text-sm font-bold shadow-md hover:shadow-lg transition active:scale-[0.98] disabled:opacity-50"
+                  className="w-full py-3.5 rounded-2xl bg-[#002B55] hover:bg-[#001B36] text-white text-sm font-bold shadow-md hover:shadow-lg transition disabled:opacity-50 apple-press"
                 >
                   {actionLoading ? 'Confirming seat reservation...' : 'Register for Event'}
                 </button>
@@ -532,7 +532,7 @@ export function EventDetailPage() {
                 <Link
                   to="/login"
                   state={{ from: { pathname: `/events/${id}` } }}
-                  className="w-full block py-3.5 rounded-2xl bg-[#002B55] hover:bg-[#001B36] text-white text-sm font-bold text-center shadow-md hover:shadow-lg transition active:scale-[0.98]"
+                  className="w-full block py-3.5 rounded-2xl bg-[#002B55] hover:bg-[#001B36] text-white text-sm font-bold text-center shadow-md hover:shadow-lg transition apple-press"
                 >
                   Sign in to Register
                 </Link>
@@ -549,7 +549,7 @@ export function EventDetailPage() {
       </div>
 
       {/* Floating Mobile Registration Action Bar */}
-      <div data-testid="floating-mobile-action-bar" className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 z-30 shadow-2xl flex items-center justify-between gap-3">
+      <div data-testid="floating-mobile-action-bar" className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 px-4 py-3 z-30 shadow-2xl flex items-center justify-between gap-3 apple-modal-spring">
         <div>
           <span className="block text-[11px] font-mono text-slate-500">
             {available > 0 ? `${available} seats left` : 'Full'}
@@ -562,7 +562,7 @@ export function EventDetailPage() {
         {isRegistered ? (
           <Link
             to="/dashboard"
-            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 apple-press"
           >
             <Ticket className="w-4 h-4" />
             <span>View Pass</span>
@@ -580,7 +580,7 @@ export function EventDetailPage() {
             type="button"
             onClick={handleRegister}
             disabled={actionLoading}
-            className="px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+            className="px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 disabled:opacity-50 apple-press"
           >
             <span>Register Now</span>
             <ArrowRight className="w-4 h-4" />

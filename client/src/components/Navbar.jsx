@@ -21,6 +21,7 @@ export function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [schoolsDropdownOpen, setSchoolsDropdownOpen] = useState(false);
@@ -32,6 +33,15 @@ export function Navbar() {
   const [activePassCount, setActivePassCount] = useState(0);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(1);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const campusNotifications = [
     {
@@ -109,7 +119,13 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 glass-nav border-b border-slate-200/80 shadow-2xs transition-all duration-200">
+      <header
+        className={`sticky top-0 z-40 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isScrolled
+            ? 'bg-white/92 backdrop-blur-2xl border-b border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(0,43,85,0.08)]'
+            : 'glass-nav border-b border-slate-200/60 shadow-2xs'
+        }`}
+      >
         {/* University portal header bar */}
         <div className="bg-[#00142A] text-slate-200 px-4 py-1.5 text-xs border-b border-white/5">
           <div className="max-w-[1280px] mx-auto flex items-center justify-between">
@@ -124,23 +140,27 @@ export function Navbar() {
 
         {/* Primary project navigation */}
         <nav className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 py-2">
+          <div
+            className={`flex items-center justify-between transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isScrolled ? 'h-16 py-1' : 'h-20 py-2'
+            }`}
+          >
             <Link
               to="/events"
-              className="flex items-center group focus:outline-none"
+              className="flex items-center group focus:outline-none apple-press"
               aria-label="Campus Events home"
             >
-              <DsuLogo variant="with-tag" size="lg" />
+              <DsuLogo variant="with-tag" size={isScrolled ? 'md' : 'lg'} />
             </Link>
 
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center gap-1.5 text-sm font-medium text-slate-700">
               <Link
                 to="/events"
-                className={`px-3.5 py-2 rounded-xl transition-all duration-150 ${
+                className={`px-3.5 py-2 rounded-xl transition-all duration-200 apple-press ${
                   isActive('/events')
                     ? 'bg-[#002B55] text-white font-bold shadow-soft'
-                    : 'hover:bg-slate-100 hover:text-[#002B55]'
+                    : 'hover:bg-slate-100/90 hover:text-[#002B55]'
                 }`}
               >
                 Campus Events
@@ -151,10 +171,10 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => setSchoolsDropdownOpen(!schoolsDropdownOpen)}
-                  className={`px-3.5 py-2 rounded-xl transition-colors duration-150 flex items-center gap-1.5 ${
+                  className={`px-3.5 py-2 rounded-xl transition-colors duration-150 flex items-center gap-1.5 apple-press ${
                     schoolsDropdownOpen
                       ? 'bg-slate-100 text-[#002B55]'
-                      : 'hover:bg-slate-100 hover:text-[#002B55]'
+                      : 'hover:bg-slate-100/90 hover:text-[#002B55]'
                   }`}
                 >
                   <span>Categories</span>
@@ -162,7 +182,7 @@ export function Navbar() {
                 </button>
 
                 {schoolsDropdownOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-84 rounded-2xl bg-white border border-slate-200 shadow-xl p-2 text-xs z-50 animate-in fade-in duration-150">
+                  <div className="absolute left-0 top-full mt-2 w-84 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-2 text-xs z-50 apple-modal-spring">
                     <div className="px-3 py-1.5 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono">
                       Event Categories
                     </div>
@@ -172,7 +192,7 @@ export function Navbar() {
                           key={category}
                           to={`/events?category=${encodeURIComponent(category)}`}
                           onClick={() => setSchoolsDropdownOpen(false)}
-                          className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition block"
+                          className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition block apple-press"
                         >
                           <p className="font-bold text-slate-900 text-xs">{category}</p>
                           <p className="text-[11px] text-slate-500 font-medium mt-0.5">Explore university gatherings & symposiums</p>
@@ -187,7 +207,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMapModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl hover:bg-slate-100 hover:text-[#002B55] transition-colors duration-150 flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl hover:bg-slate-100/90 hover:text-[#002B55] transition-colors duration-150 flex items-center gap-1.5 apple-press"
               >
                 <MapPin className="w-4 h-4 text-[#D9A521]" />
                 <span>Campus Map & Venues</span>
@@ -196,16 +216,16 @@ export function Navbar() {
               {/* My Passes Link */}
               <Link
                 to="/dashboard"
-                className={`px-3.5 py-2 rounded-xl transition-all duration-150 flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-xl transition-all duration-150 flex items-center gap-1.5 apple-press ${
                   isActive('/dashboard')
                     ? 'bg-[#002B55] text-white font-bold shadow-soft'
-                    : 'hover:bg-slate-100 hover:text-[#002B55]'
+                    : 'hover:bg-slate-100/90 hover:text-[#002B55]'
                 }`}
               >
                 <Ticket className="w-4 h-4" />
                 <span>My Passes</span>
                 {activePassCount > 0 && (
-                  <span className="ml-1 px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-extrabold">
+                  <span className="ml-1 px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-extrabold animate-pulse">
                     {activePassCount}
                   </span>
                 )}
@@ -237,7 +257,7 @@ export function Navbar() {
                     setNotificationsOpen(!notificationsOpen);
                     setUnreadNotifications(0);
                   }}
-                  className="relative p-2 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition bg-white text-slate-600 shadow-2xs"
+                  className="relative p-2 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition bg-white text-slate-600 shadow-2xs apple-press"
                   aria-label="Campus announcements"
                   title="Campus announcements"
                 >
@@ -248,7 +268,7 @@ export function Navbar() {
                 </button>
 
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white border border-slate-200 shadow-xl p-3 text-xs z-50 animate-in fade-in duration-150">
+                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-3 text-xs z-50 apple-modal-spring">
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
                       <span className="font-bold text-[#002B55] text-xs uppercase tracking-wider">Campus Desk</span>
                       <span className="text-[10px] text-slate-500 font-mono">Official Notices</span>
@@ -257,7 +277,7 @@ export function Navbar() {
                       {campusNotifications.map((n) => (
                         <div
                           key={n.id}
-                          className="p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100"
+                          className="p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100 apple-press"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <p className="font-bold text-slate-800 text-xs">{n.title}</p>
@@ -276,7 +296,7 @@ export function Navbar() {
                   <button
                     type="button"
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2.5 p-1.5 pr-3.5 rounded-full border border-slate-200 hover:border-slate-300 transition bg-white shadow-2xs"
+                    className="flex items-center gap-2.5 p-1.5 pr-3.5 rounded-full border border-slate-200 hover:border-slate-300 transition bg-white shadow-2xs apple-press"
                   >
                     <div className="w-8 h-8 rounded-full bg-[#002B55] text-white font-bold text-xs flex items-center justify-center">
                       {getInitials(user.name)}
@@ -293,7 +313,7 @@ export function Navbar() {
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-64 rounded-xl bg-white border border-[#E5E7EB] shadow-xl p-2 text-xs z-50 animate-in fade-in duration-150">
+                    <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-2 text-xs z-50 apple-modal-spring">
                       <div className="p-3 border-b border-slate-100 bg-slate-50 rounded-lg mb-1">
                         <p className="font-bold text-slate-900 text-sm truncate">{user.name}</p>
                         <p className="text-slate-500 text-[11px] font-mono truncate">{user.email}</p>
@@ -391,11 +411,11 @@ export function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#E5E7EB] bg-white p-4 space-y-2 text-sm font-medium max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain shadow-2xl animate-in slide-in-from-top-2 duration-150">
+          <div className="lg:hidden border-t border-[#E5E7EB] bg-white/95 backdrop-blur-xl p-4 space-y-2 text-sm font-medium max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain shadow-2xl apple-modal-spring">
             <Link
               to="/events"
               onClick={() => setMobileMenuOpen(false)}
-              className="block p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 font-semibold"
+              className="block p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 font-semibold apple-press"
             >
               Campus Events
             </Link>
@@ -411,7 +431,7 @@ export function Navbar() {
                     key={cat}
                     to={`/events?category=${encodeURIComponent(cat)}`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-2.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-[#002B55] hover:text-white transition font-medium text-center"
+                    className="px-2.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-[#002B55] hover:text-white transition font-medium text-center apple-press"
                   >
                     {cat}
                   </Link>
@@ -425,7 +445,7 @@ export function Navbar() {
                 setMobileMenuOpen(false);
                 setMapModalOpen(true);
               }}
-              className="w-full text-left p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-between font-semibold"
+              className="w-full text-left p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-between font-semibold apple-press"
             >
               <span>DSU Campus Map & Venues</span>
               <MapPin className="w-4 h-4 text-[#D9A521]" />
@@ -433,11 +453,11 @@ export function Navbar() {
             <Link
               to="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
-              className="block p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 font-semibold flex items-center justify-between"
+              className="block p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 font-semibold flex items-center justify-between apple-press"
             >
               <span>My Passes</span>
               {activePassCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-extrabold">
+                <span className="px-2 py-0.5 rounded-full bg-[#D9A521] text-[#001B36] text-[11px] font-extrabold animate-pulse">
                   {activePassCount} Active
                 </span>
               )}
@@ -446,7 +466,7 @@ export function Navbar() {
               <Link
                 to="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block p-2.5 rounded-xl text-[#002B55] bg-blue-50/50 hover:bg-blue-50 font-bold"
+                className="block p-2.5 rounded-xl text-[#002B55] bg-blue-50/50 hover:bg-blue-50 font-bold apple-press"
               >
                 Operations Console
               </Link>
@@ -461,26 +481,26 @@ export function Navbar() {
                     setMobileMenuOpen(false);
                     navigate('/login');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold flex items-center gap-2"
+                  className="w-full text-left p-2.5 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold flex items-center gap-2 apple-press"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out ({user.name})</span>
                 </button>
               ) : (
-                <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+                <div className="grid grid-cols-2 gap-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-3 rounded-xl text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200"
+                    className="p-2.5 rounded-xl bg-slate-100 text-slate-800 text-center font-bold apple-press"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-3 rounded-xl text-center font-bold text-white bg-[#002B55] hover:bg-[#001B36]"
+                    className="p-2.5 rounded-xl bg-[#002B55] text-white text-center font-bold apple-press"
                   >
-                    Register
+                    Join Portal
                   </Link>
                 </div>
               )}

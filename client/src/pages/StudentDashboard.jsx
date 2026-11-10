@@ -404,13 +404,13 @@ export function StudentDashboard() {
       {/* Authentic Institutional E-Pass Voucher Modal */}
       {selectedPass && (
         <div className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white rounded-3xl border border-slate-300 ticket-stub">
+          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white rounded-3xl border border-slate-300 ticket-stub apple-modal-spring">
             {/* Pass Header Banner */}
-            <div className="bg-[#001B36] text-white p-6 relative border-b-2 border-[#D9A521]">
+            <div className="bg-[#001B36] text-white p-6 relative border-b-2 border-[#D9A521] apple-hologram">
               <button
                 type="button"
                 onClick={() => setSelectedPass(null)}
-                className="absolute top-4 right-4 text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition"
+                className="absolute top-4 right-4 text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition z-10 apple-press"
                 aria-label="Close pass"
               >
                 <X className="w-5 h-5" />
@@ -551,7 +551,7 @@ export function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => setSelectedPass(null)}
-                className="px-6 py-2.5 rounded-xl bg-[#002B55] text-white text-xs font-bold hover:bg-[#001B36] transition shadow-xs active:scale-[0.98]"
+                className="px-6 py-2.5 rounded-xl bg-[#002B55] text-white text-xs font-bold hover:bg-[#001B36] transition shadow-xs apple-press"
               >
                 Close Pass
               </button>

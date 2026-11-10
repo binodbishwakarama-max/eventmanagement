@@ -148,11 +148,11 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
       aria-modal="true"
       aria-label="Harohalli Main Campus Venue Explorer"
       onClick={onClose}
-      className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 backdrop-blur-md transition-all duration-300"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh]"
+        className="bg-white rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] apple-modal-spring"
       >
         {/* Map header */}
         <div className="bg-[#002B55] text-white px-6 py-4 flex items-center justify-between border-b border-[#D9A521]/30">
@@ -173,7 +173,7 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-300 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition"
+            className="text-slate-300 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition apple-press"
             aria-label="Close Map"
           >
             <X className="w-5 h-5" />

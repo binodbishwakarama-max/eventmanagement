@@ -56,7 +56,7 @@ export function TicketQrCode({ ticketCode, size = 180 }) {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative p-2.5 bg-white rounded-2xl border-2 border-[#002B55]/15 shadow-sm group">
+      <div className="relative p-2.5 bg-white rounded-2xl border-2 border-[#002B55]/20 shadow-md group transition-all duration-300 hover:shadow-lg apple-press">
         {qrDataUrl ? (
           <img
             src={qrDataUrl}
@@ -80,7 +80,7 @@ export function TicketQrCode({ ticketCode, size = 180 }) {
           onClick={handleDownload}
           title="Download high-resolution QR pass image"
           aria-label="Download QR pass image"
-          className="absolute -bottom-2 -right-2 p-1.5 rounded-lg bg-[#002B55] text-white hover:bg-[#001B36] shadow-md transition-transform transform hover:scale-105"
+          className="absolute -bottom-2 -right-2 p-1.5 rounded-lg bg-[#002B55] text-white hover:bg-[#001B36] shadow-md transition-transform apple-press"
         >
           <Download className="w-3.5 h-3.5" />
         </button>
@@ -94,7 +94,7 @@ export function TicketQrCode({ ticketCode, size = 180 }) {
           type="button"
           onClick={handleCopy}
           title="Copy pass code"
-          className="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition"
+          className="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition apple-press"
         >
           {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
         </button>

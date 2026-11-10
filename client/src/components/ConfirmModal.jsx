@@ -35,17 +35,17 @@ export function ConfirmModal({
       aria-modal="true"
       aria-labelledby="confirm-title"
       aria-describedby="confirm-desc"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-300"
     >
       <div
-        className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-150"
+        className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative apple-modal-spring"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg apple-press"
           aria-label="Close dialog"
         >
           <X className="w-5 h-5" />
@@ -79,7 +79,7 @@ export function ConfirmModal({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition"
+            className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition apple-press"
           >
             {cancelText}
           </button>
@@ -89,7 +89,7 @@ export function ConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className={`px-4 py-2 rounded-xl text-white text-sm font-semibold transition shadow flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl text-white text-sm font-semibold transition shadow flex items-center gap-2 apple-press ${
               isDanger
                 ? 'bg-rose-600 hover:bg-rose-700 disabled:opacity-50'
                 : 'bg-blue-900 hover:bg-blue-800 disabled:opacity-50'

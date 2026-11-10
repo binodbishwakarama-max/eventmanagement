@@ -29,5 +29,5 @@ services:
       - key: EMAIL_PROVIDER
         value: smtp
       - key: CLIENT_ORIGIN
-        value: https://eventmanagement-qnsk.onrender.com,http://localhost:5173
+        value: https://dsu-campus-events.onrender.com,https://eventmanagement-qnsk.onrender.com,http://localhost:5173
 

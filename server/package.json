@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:concurrency": "node tests/concurrency.stress.js",
     "test:load": "node tests/load.stress.js",
-    "test:uat": "node tests/staging.uat.js"
+    "test:uat": "node tests/staging.uat.js",
+    "test:smoke": "node tests/browser.smoke.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

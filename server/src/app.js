@@ -72,27 +72,50 @@ app.use((req, res, next) => {
 
 // Priority 4: Production CORS Whitelist Enforcement
 const configuredOrigins = env.CLIENT_ORIGIN.split(',').map((o) => o.trim().replace(/\/$/, ''));
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Normalize origin removing any trailing slashes
-      const reqOrigin = origin ? origin.replace(/\/$/, '') : origin;
-      if (
-        !origin ||
-        configuredOrigins.includes(reqOrigin) ||
-        configuredOrigins.includes('*') ||
-        (env.NODE_ENV !== 'production' && (reqOrigin.includes('localhost') || reqOrigin.includes('127.0.0.1')))
-      ) {
-        callback(null, true);
-      } else {
-        callback(new ApiError(403, `CORS policy violation: Origin '${origin}' is not authorized.`));
-      }
-    },
+const corsOptionsDelegate = (req, callback) => {
+  const origin = req.headers.origin;
+  const reqHost = req.headers.host;
+  const reqOrigin = origin ? origin.replace(/\/$/, '') : origin;
+
+  const baseCorsOptions = {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-Id']
-  })
-);
+  };
+
+  // 1. Static assets and non-API requests never fail CORS
+  if (!req.path.startsWith('/api')) {
+    return callback(null, { origin: true });
+  }
+
+  // 2. Allow if origin matches current host (monolith same-host request)
+  if (reqHost && reqOrigin && reqOrigin.includes(reqHost)) {
+    return callback(null, { ...baseCorsOptions, origin: true });
+  }
+
+  // 3. Allow if origin is onrender.com or render.com (Render cloud deployments)
+  if (reqOrigin && (reqOrigin.includes('.onrender.com') || reqOrigin.includes('.render.com'))) {
+    return callback(null, { ...baseCorsOptions, origin: true });
+  }
+
+  // 4. Allow requests with no origin (mobile apps, server-to-server, curl)
+  if (!origin) {
+    return callback(null, { ...baseCorsOptions, origin: true });
+  }
+
+  // 5. Configured origins or local dev
+  if (
+    configuredOrigins.includes(reqOrigin) ||
+    configuredOrigins.includes('*') ||
+    (env.NODE_ENV !== 'production' && (reqOrigin.includes('localhost') || reqOrigin.includes('127.0.0.1')))
+  ) {
+    return callback(null, { ...baseCorsOptions, origin: true });
+  }
+
+  callback(new ApiError(403, `CORS policy violation: Origin '${origin}' is not authorized.`));
+};
+
+app.use(cors(corsOptionsDelegate));
 
 app.use(
   helmet({

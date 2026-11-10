@@ -164,10 +164,10 @@ app.use(
   })
 );
 
-// Priority 4: Tiered Production Rate Limiters
+// Priority 4: High-Concurrency Tiered Production Rate Limiters (1000+ Concurrent Requests Scale)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500, // Accommodate classroom / computer lab cohort batch logins
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Too many authentication attempts, please try again in 15 minutes.' }
@@ -175,9 +175,10 @@ const authLimiter = rateLimit({
 
 const registrationWriteLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 30, // 30 registrations per minute per IP
+  max: 120, // 120 requests/min per student/client to handle campus Wi-Fi shared IP gracefully
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => req.headers['authorization'] || req.ip,
   skip: (req) => req.method === 'OPTIONS' || env.NODE_ENV === 'test',
   message: { success: false, message: 'High registration frequency detected. Please wait a moment before trying again.' }
 });
@@ -212,13 +213,13 @@ app.get('/api/health/ready', async (req, res) => {
   return res.status(503).json({ status: 'not_ready', db: dbHealth });
 });
 
-// General API rate limiter for production (skipped in test mode)
+// High-Concurrency API rate limiter for production (20,000 requests per 15 min - handles 1000+ concurrent users)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 20000,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => env.NODE_ENV === 'test',
+  skip: (req) => env.NODE_ENV === 'test' || req.path.startsWith('/health'),
   message: { success: false, message: 'Too many requests, please try again later.' }
 });
 app.use('/api', apiLimiter);

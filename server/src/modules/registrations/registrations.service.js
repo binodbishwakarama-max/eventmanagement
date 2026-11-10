@@ -2,6 +2,7 @@ import { Event } from '../../models/Event.js';
 import { Registration } from '../../models/Registration.js';
 import { User } from '../../models/User.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { eventsCache } from '../../utils/cache.js';
 import { sendRegistrationConfirmationEmail } from '../../services/email/email.service.js';
 
 export async function registerForEvent(eventId, studentId) {
@@ -80,6 +81,7 @@ export async function registerForEvent(eventId, studentId) {
       }
     }).catch(() => {});
 
+    eventsCache.clear();
     return registration;
   } catch (err) {
     await Event.findByIdAndUpdate(eventId, { $inc: { registeredCount: -1 } });
@@ -125,6 +127,7 @@ export async function cancelRegistration(eventId, studentId) {
     throw ApiError.internal('Event registration count could not be updated');
   }
 
+  eventsCache.clear();
   return { message: 'Registration cancelled successfully' };
 }
 

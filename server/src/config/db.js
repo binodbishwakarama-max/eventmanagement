@@ -13,9 +13,9 @@ export async function connectDB(uri = env.MONGODB_URI) {
   // 1. Primary Authoritative Database Connection
   try {
     const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: isProduction ? 8000 : 2500,
-      maxPoolSize: isProduction ? 50 : 20,
-      minPoolSize: isProduction ? 5 : 1,
+      serverSelectionTimeoutMS: isProduction ? 5000 : 2500,
+      maxPoolSize: isProduction ? 100 : 30,
+      minPoolSize: isProduction ? 10 : 2,
       socketTimeoutMS: 45000,
       autoIndex: !isProduction
     });

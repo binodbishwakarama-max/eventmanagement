@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Event } from '../../models/Event.js';
 import { Registration } from '../../models/Registration.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { eventsCache } from '../../utils/cache.js';
 import {
   sendEventCancellationEmail,
   sendEventUpdateEmail
@@ -18,6 +19,13 @@ export async function getPublicEvents(query) {
 
   if (mongoose.connection.readyState !== 1) {
     throw ApiError.internal('Database connection unavailable. Please check database status.');
+  }
+
+  // Fast-Path: In-Memory Micro-Cache for High-Throughput Concurrency (1000+ simultaneous requests)
+  const cacheKey = `pub_events_${JSON.stringify(query)}`;
+  const cached = eventsCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   const filter = { status: 'published' };
@@ -69,18 +77,29 @@ export async function getPublicEvents(query) {
     filter.startsAt = { ...(filter.startsAt || {}), $lte: new Date(query.to) };
   }
 
-  const [items, total] = await Promise.all([
-    Event.find(filter).sort(sort).skip(skip).limit(limit),
+  const now = new Date();
+  const queryChain = Event.find(filter).sort(sort).skip(skip).limit(limit);
+  const [rawItems, total] = await Promise.all([
+    typeof queryChain.lean === 'function' ? queryChain.lean() : queryChain,
     Event.countDocuments(filter)
   ]);
 
-  return {
+  const items = (rawItems || []).map((item) => ({
+    ...item,
+    id: item._id ? item._id.toString() : item.id,
+    phase: now < item.startsAt ? 'upcoming' : now > item.endsAt ? 'completed' : 'ongoing'
+  }));
+
+  const result = {
     items,
     page,
     limit,
     total,
     totalPages: Math.ceil(total / limit) || 1
   };
+
+  eventsCache.set(cacheKey, result, 5);
+  return result;
 }
 
 export async function getEventById(id, currentUser) {
@@ -180,6 +199,7 @@ export async function createEvent(data, user) {
     organizerClub: user.clubName || data.organizerClub || 'DSU Events Club'
   });
 
+  eventsCache.clear();
   return event;
 }
 
@@ -260,6 +280,7 @@ export async function updateEvent(id, data, user) {
       .catch(() => {});
   }
 
+  eventsCache.clear();
   return resultEvent;
 }
 
@@ -283,5 +304,6 @@ export async function deleteEvent(id, user) {
   if (!deletedEvent) {
     throw ApiError.conflict('Event changed while deletion was in progress. Reload and try again.');
   }
+  eventsCache.clear();
   return { message: 'Event deleted successfully' };
 }

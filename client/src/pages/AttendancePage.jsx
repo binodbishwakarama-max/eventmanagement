@@ -350,7 +350,7 @@ export const AttendancePage = () => {
                   </span>
                 </div>
                 <p className="text-[11px] text-emerald-800 mt-0.5">
-                  {lastVerifiedStudent.student?.department || 'Demo account'} • Demo check-in recorded at{' '}
+                  {lastVerifiedStudent.student?.department || 'Dayananda Sagar University'} • Check-in recorded at{' '}
                   {new Date(lastVerifiedStudent.attendedAt || Date.now()).toLocaleTimeString('en-IN')}
                 </p>
               </div>
@@ -421,7 +421,7 @@ export const AttendancePage = () => {
                     <td className="py-3.5 px-4 font-mono text-slate-600">
                       {reg.student?.usn || reg.student?.rollNumber || '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'Demo account'}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'DSU Student'}</td>
                     <td className="py-3.5 px-4">
                       <span className="font-mono font-bold text-[#002B55] bg-blue-50/80 px-2 py-0.5 rounded border border-blue-200/60">
                         {reg.ticketCode}

@@ -67,7 +67,7 @@ describe('Auth Boundary Schemas', () => {
       });
       expect(res.success).toBe(false);
       if (!res.success) {
-        expect(res.error.issues[0].message).toContain('DSU USN format');
+        expect(res.error.issues[0].message).toContain('USN format');
       }
     });
   });

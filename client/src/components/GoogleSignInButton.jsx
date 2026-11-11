@@ -144,3 +144,4 @@ export function GoogleSignInButton({ onSuccess, className = '' }) {
     </div>
   );
 }
+

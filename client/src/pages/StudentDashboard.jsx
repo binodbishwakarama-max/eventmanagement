@@ -127,7 +127,7 @@ export function StudentDashboard() {
           <div className="flex items-center gap-2.5">
             <WifiOff className="w-4 h-4 text-amber-700 shrink-0" />
             <span>
-              <strong>Showing cached demo data:</strong> These saved records may be stale. Changes require a server connection, and demo QR codes are not valid for real-world entry.
+              <strong>Offline Mode:</strong> Showing cached passbook records. Connect to campus network to refresh passes.
             </span>
           </div>
           <button
@@ -404,7 +404,7 @@ export function StudentDashboard() {
       {/* Authentic Institutional E-Pass Voucher Modal */}
       {selectedPass && (
         <div className="fixed inset-0 z-50 dsu-overlay flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="dsu-pass-voucher max-w-lg w-full overflow-hidden shadow-2xl flex flex-col bg-white rounded-3xl border border-slate-300 ticket-stub apple-modal-spring">
+          <div className="dsu-pass-voucher max-w-lg w-full max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain shadow-2xl flex flex-col bg-white rounded-3xl border border-slate-300 ticket-stub apple-modal-spring">
             {/* Pass Header Banner */}
             <div className="bg-[#001B36] text-white p-6 relative border-b-2 border-[#D9A521] apple-hologram">
               <button

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, MapPin, Mail } from 'lucide-react';
+import { MapPin, Mail } from 'lucide-react';
+import { DsuLogo } from './DsuLogo';
 
 export function Footer() {
   return (
@@ -9,11 +10,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           {/* Main Institution Info */}
           <div className="md:col-span-6 space-y-3">
-            <div className="flex items-center gap-2.5 font-bold text-base text-white">
-              <div className="w-8 h-8 rounded-lg bg-[#002B55] text-[#D9A521] border border-[#D9A521]/40 flex items-center justify-center">
-                <CalendarDays className="w-4 h-4 text-[#D9A521]" aria-hidden="true" />
-              </div>
-              <span>Dayananda Sagar University • Campus Events</span>
+            <div className="flex items-center gap-2.5">
+              <DsuLogo variant="white" size="md" />
             </div>
             <p className="text-xs text-slate-300 leading-relaxed max-w-lg">
               The official centralized platform for technical symposiums, hackathons, cultural festivals,

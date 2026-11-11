@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { MobileBottomNav } from './components/layout/MobileBottomNav';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useAuth } from './context/AuthContext';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
@@ -75,7 +76,7 @@ export function App() {
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F8FA] text-[#172033]">
       <Navbar />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pb-20 md:pb-0">
         <ErrorBoundary>
           <Suspense fallback={<PageLoadingFallback />}>
             <Routes>
@@ -161,6 +162,7 @@ export function App() {
       </ErrorBoundary>
     </main>
     <Footer />
+    <MobileBottomNav />
     </div>
   );
 }

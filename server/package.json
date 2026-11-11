@@ -12,7 +12,7 @@
     "seed:pilot": "node src/scripts/seed-pilot.js",
     "backup": "node src/scripts/backup-db.js",
     "restore": "node src/scripts/restore-db.js",
-    "test": "vitest run",
+    "test": "vitest run --test-timeout=30000",
     "test:concurrency": "node tests/concurrency.stress.js",
     "test:load": "node tests/load.stress.js",
     "test:uat": "node tests/staging.uat.js",

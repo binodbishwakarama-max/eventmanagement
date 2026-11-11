@@ -314,165 +314,88 @@ export function EventsPage() {
         className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.06] filter grayscale-0 hidden sm:block dsu-campus-watermark"
       />
 
-      {/* Big Tech Premium Hero Section with High-Visibility DSU Harohalli Campus Backdrop */}
-      <section className="relative overflow-hidden bg-[#000E1C] text-white pt-8 sm:pt-10 pb-12 sm:pb-20 border-b border-[#002B55] z-10">
-        {/* Real DSU Harohalli Main Campus Photographic Backdrop - 100% Bright, Vivid Clarity across all Devices & Retina Screens */}
+      {/* Mobile-First Streamlined Hero Section */}
+      <section className="relative overflow-hidden bg-[#000E1C] text-white pt-6 sm:pt-10 pb-8 sm:pb-16 border-b border-[#002B55] z-10">
         <picture>
-          {/* Mobile High-DPI 2x/3x and standard WebP (Square-framed on Grand Admin Building) */}
           <source
             media="(max-width: 767px)"
             type="image/webp"
             srcSet="/dsu-campus-hero-mobile.webp 800w, /dsu-campus-hero-mobile-2x.webp 1280w"
             sizes="(max-width: 767px) 100vw, 800px"
           />
-          {/* Mobile Fallback JPEG */}
           <source
             media="(max-width: 767px)"
             srcSet="/dsu-campus-hero-mobile.jpg 800w, /dsu-campus-hero-mobile-2x.jpg 1280w"
             sizes="(max-width: 767px) 100vw, 800px"
           />
-          {/* 4K and Ultra-wide Displays (WebP) */}
           <source
             media="(min-width: 1921px)"
             type="image/webp"
             srcSet="/dsu-campus-hero-2560.webp 2560w, /dsu-campus-hero-4k.webp 3840w"
             sizes="100vw"
           />
-          {/* 4K and Ultra-wide Displays (JPEG) */}
           <source
             media="(min-width: 1921px)"
             srcSet="/dsu-campus-hero-2560.jpg 2560w, /dsu-campus-hero-4k.jpg 3840w"
             sizes="100vw"
           />
-          {/* Standard Desktop & Tablet (WebP) */}
           <source
             media="(min-width: 768px)"
             type="image/webp"
-            srcSet="/dsu-campus-hero-tablet.webp 1280w, /dsu-campus-hero-desktop.webp 1920w, /dsu-campus-hero-2560.webp 2560w"
+            srcSet="/dsu-campus-hero-tablet.webp 1280w, /dsu-campus-hero-desktop.webp 1920w"
             sizes="(max-width: 1280px) 100vw, 1920px"
           />
-          {/* Standard Desktop & Tablet (JPEG) */}
           <source
             media="(min-width: 768px)"
-            srcSet="/dsu-campus-hero-tablet.jpg 1280w, /dsu-campus-hero-desktop.jpg 1920w, /dsu-campus-hero-2560.jpg 2560w"
+            srcSet="/dsu-campus-hero-tablet.jpg 1280w, /dsu-campus-hero-desktop.jpg 1920w"
             sizes="(max-width: 1280px) 100vw, 1920px"
           />
-          {/* Universal Fallback Image */}
           <img
             src="/dsu-main-campus-admission.jpg"
             alt="Dayananda Sagar University Harohalli Main Campus"
-            className="absolute inset-0 w-full h-full object-cover object-center sm:object-[center_35%] lg:object-[right_center] opacity-100 pointer-events-none transform scale-100 transition-all duration-700"
+            className="absolute inset-0 w-full h-full object-cover object-center sm:object-[right_center] opacity-40 sm:opacity-50 pointer-events-none"
             fetchPriority="high"
             decoding="async"
           />
         </picture>
-        {/* Directional Cinematic Scrim: Protects left text legibility strictly on the left, leaving the right side 100% unobstructed so the campus building is completely visible */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#000E1C]/95 via-[#00142A]/85 lg:via-[#00142A]/30 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#000E1C] via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#000E1C] via-[#000E1C]/85 to-transparent pointer-events-none" />
 
-        {/* Ambient Subtle Radial Gold Glow */}
-        <div className="absolute -top-12 left-10 w-96 h-96 bg-[radial-gradient(circle,rgba(217,165,33,0.18),transparent_70%)] pointer-events-none" />
-
-        <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          {/* Two-Column Hero Row: Left (Branding, Headline, Indicators), Right (Campus Card) */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-center">
-            {/* Left Column: Eyebrow, Title, Description, Metrics */}
-            <div className="md:col-span-7 xl:col-span-8 space-y-4 sm:space-y-5">
-              {/* Eyebrow Status Badge */}
-              <div className="flex flex-wrap items-center gap-2 apple-stagger-1">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold backdrop-blur-md shimmer-badge shadow-xs apple-float">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F5C84C] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D9A521]"></span>
-                  </span>
-                  <span>Dayananda Sagar University • Official Campus Experience Hub</span>
-                </div>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/80 border border-[#D9A521]/40 text-[#F5C84C] text-xs font-mono font-medium backdrop-blur-md">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#D9A521]" />
-                  NAAC A+ Accredited Campus
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/80 border border-white/20 text-slate-200 text-xs font-medium backdrop-blur-md">
-                  <MapPin className="w-3.5 h-3.5 text-[#D9A521]" />
-                  Harohalli Main Campus (130 Acres)
-                </span>
+        <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+            {/* Left Column: Clean Streamlined Headline & Copy */}
+            <div className="md:col-span-8 space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-semibold backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#D9A521] animate-pulse" />
+                <span>Dayananda Sagar University • Official Events</span>
               </div>
 
-              {/* Headline & Description */}
-              <div className="max-w-3xl apple-stagger-2">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] mb-4 drop-shadow-md">
-                  Campus Life,{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5C84C] via-[#D9A521] to-[#FFE699]">
-                    Amplified.
-                  </span>
-                </h1>
-                <p className="text-slate-200 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl font-normal drop-shadow-sm">
-                  Discover and register for university hackathons, IEEE technical symposia, design sprints, annual cultural fests, and varsity athletics across the 130-acre DSU Harohalli Main Campus.
-                </p>
-              </div>
-
-              {/* Feature Indicators (Metrics bar) */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-200 pt-1 apple-stagger-3">
-                <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
-                  <span className="w-2 h-2 rounded-full bg-[#D9A521]"></span>
-                  <span><strong>Main Campus:</strong> Harohalli, Kanakapura Road</span>
-                </div>
-                <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span><strong>Instant Access:</strong> Free Turnstile QR Passes</span>
-                </div>
-                <div className="flex items-center gap-2 bg-[#00142A]/70 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
-                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                  <span><strong>Live Registrations:</strong> Active Academic Season</span>
-                </div>
-              </div>
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                DSU Campus Events
+              </h1>
+              <p className="text-slate-300 text-xs sm:text-base leading-relaxed max-w-xl font-normal">
+                Discover university hackathons, conferences, and cultural festivals across Harohalli Main Campus.
+              </p>
             </div>
 
-            {/* Right Column: Apple-Grade Interactive Transparent Glass Card */}
-            <div className="md:col-span-5 xl:col-span-4 flex justify-start md:justify-end apple-stagger-2">
-              <AppleGlassCard className="w-full max-w-md lg:max-w-sm p-5 sm:p-6 cursor-pointer">
-                <div className="flex items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-                    </span>
-                    <span className="font-extrabold text-[#F5C84C] tracking-wide uppercase font-mono text-[11px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                      Harohalli Main Campus
-                    </span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-md bg-black/40 text-white font-mono text-[10px] font-bold border border-white/30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                    NAAC A+
-                  </span>
+            {/* Right Column: Lightweight Campus Card */}
+            <div className="md:col-span-4 hidden md:flex justify-end">
+              <div className="w-full max-w-xs p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white space-y-2.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#F5C84C] uppercase text-[10px] tracking-wider">Harohalli Campus</span>
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px] font-mono border border-white/20">NAAC A+</span>
                 </div>
-
-                <h2 className="text-base font-extrabold text-white leading-snug drop-shadow-[0_2px_5px_rgba(0,0,0,0.95)]">
-                  130-Acre World-Class University Architecture
-                </h2>
-                <p className="text-xs text-white leading-relaxed font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                  Sprawling green grounds nestled along Kanakapura Road, hosting advanced computing hubs, robotics labs, Sir M. Visvesvaraya Auditorium & collegiate sports arenas.
+                <p className="text-xs text-slate-200 leading-snug">
+                  130-Acre Campus • Kanakapura Road, Bengaluru
                 </p>
-
-                <div className="pt-1 flex flex-wrap items-center gap-2 text-[10px] font-mono">
-                  <span className="px-2.5 py-1 rounded-md bg-black/40 text-white border border-white/30 font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                    Kanakapura Rd
-                  </span>
-                  <span className="px-2.5 py-1 rounded-md bg-[#D9A521]/30 text-[#FFE699] border border-[#D9A521]/50 font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                    130 Acres
-                  </span>
-                  <span className="px-2.5 py-1 rounded-md bg-black/40 text-white border border-white/30 font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
-                    12°41'N 77°28'E
-                  </span>
-                </div>
-
                 <button
                   type="button"
                   onClick={() => setMapModalOpen(true)}
-                  className="w-full mt-2 py-2.5 px-4 rounded-xl bg-black/40 hover:bg-black/60 border border-white/35 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]"
+                  className="w-full py-2 px-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 active:scale-95"
                 >
-                  <Compass className="w-3.5 h-3.5 text-[#F5C84C]" />
-                  <span>Open Interactive Campus Map</span>
+                  <MapPin className="w-3.5 h-3.5 text-[#F5C84C]" />
+                  <span>Campus Map & Venues</span>
                 </button>
-              </AppleGlassCard>
+              </div>
             </div>
           </div>
 
@@ -791,77 +714,56 @@ export function EventsPage() {
                       </div>
                     </div>
 
-                    {/* Right Column (7/12): Metadata & CTA */}
-                    <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-5 bg-white">
-                      <div className="space-y-3.5">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#002B55] text-white shadow-xs">
+                    {/* Right Column: Clean Metadata & Primary Action */}
+                    <div className="lg:col-span-7 p-5 sm:p-7 flex flex-col justify-between space-y-4 bg-white">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#002B55] text-white">
                             {featuredEvent.category}
                           </span>
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            Turnstile Admission Pass
+                          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            {available > 0 ? `${available} seats remaining` : 'Full capacity'}
                           </span>
                         </div>
 
-                        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002B55] leading-snug tracking-tight">
-                          <Link to={`/events/${featuredEvent._id}`} className="hover:text-[#001B36] hover:underline">
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug tracking-tight">
+                          <Link to={`/events/${featuredEvent._id}`} className="hover:text-[#002B55]">
                             {title}
                           </Link>
                         </h2>
 
-                        <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
                           {featuredEvent.description}
                         </p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 pt-3 border-t border-slate-100">
-                          <div className="flex items-center gap-2 truncate">
-                            <MapPin className="w-4 h-4 text-[#002B55] shrink-0" />
-                            <span className="truncate font-medium">{featuredEvent.venue}</span>
-                          </div>
-                          <div className="flex items-center gap-2 truncate">
-                            <Building className="w-4 h-4 text-[#002B55] shrink-0" />
-                            <span className="truncate font-medium">{featuredEvent.organizerClub || 'DSU Student Affairs'}</span>
-                          </div>
-                        </div>
-
-                        {/* Capacity Progress Meter */}
-                        <div className="pt-2 space-y-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-slate-700">Capacity Availability</span>
-                            <span className="font-mono font-bold text-[#002B55]">
-                              {available > 0 ? `${available} seats remaining` : 'Full Capacity'}
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                          <div className="flex items-center gap-1.5 font-medium text-slate-800">
+                            <Calendar className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
+                            <span>
+                              {starts.toLocaleDateString('en-IN', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
                             </span>
                           </div>
-                          <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/80">
-                            <div
-                              className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-emerald-500 to-[#D9A521]"
-                              style={{ width: `${fillPercent}%` }}
-                            />
+                          <div className="flex items-center gap-1.5 text-slate-500">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="truncate">{featuredEvent.venue}</span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Coupled Registration & Availability Bar */}
-                      <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span className="font-bold text-slate-900">
-                              Instant Admission for DSU Students
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-500">
-                            Official University Event • Encrypted QR Turnstile Entry
-                          </p>
-                        </div>
-
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-500">
+                          {featuredEvent.organizerClub || 'DSU Student Affairs'}
+                        </span>
                         <Link
                           to={`/events/${featuredEvent._id}`}
-                          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-soft whitespace-nowrap active:scale-[0.98]"
+                          className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001D3A] text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-xs active:scale-95"
                         >
-                          <span>Explore & Register</span>
-                          <ArrowRight className="w-4 h-4" />
+                          <span>Register for Event</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     </div>
@@ -934,65 +836,49 @@ export function EventsPage() {
                           </div>
                         </div>
 
-                        {/* Card Body */}
-                        <div className="p-5 space-y-3">
-                          {/* Organizer verified badge */}
-                          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium truncate">
-                            <ShieldCheck className="w-3.5 h-3.5 text-[#D9A521] shrink-0" />
-                            <span className="truncate">{ev.organizerClub || 'DSU Student Affairs'}</span>
-                          </div>
-
+                        {/* Card Body - Streamlined: Image, Title, Date, Venue, Registration Status / Seats */}
+                        <div className="p-4 sm:p-5 space-y-2.5">
                           {/* Event Title */}
-                          <h3 className="font-extrabold text-[#0F172A] text-base leading-snug group-hover:text-[#002B55] transition line-clamp-2 min-h-[2.75rem]">
+                          <h3 className="font-bold text-slate-900 text-base leading-snug group-hover:text-[#002B55] transition line-clamp-2 min-h-[2.5rem]">
                             <Link to={`/events/${ev._id}`}>{cleanTitleText}</Link>
                           </h3>
 
-                          {/* Schedule & Location */}
-                          <div className="space-y-1.5 text-xs text-slate-600 pt-1">
-                            <div className="flex items-center gap-2 font-medium">
-                              <Clock className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
+                          {/* Date & Venue */}
+                          <div className="space-y-1 text-xs text-slate-600">
+                            <div className="flex items-center gap-1.5 font-medium text-slate-700">
+                              <Calendar className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
                               <span>
-                                {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                                {starts.toLocaleDateString('en-IN', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })} • {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 truncate">
+                            <div className="flex items-center gap-1.5 truncate text-slate-500">
                               <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                               <span className="truncate">{ev.venue}</span>
-                            </div>
-                          </div>
-
-                          {/* Capacity Gauge */}
-                          <div className="pt-2">
-                            <div className="flex items-center justify-between text-[11px] mb-1">
-                              <span className="text-slate-500 font-medium">Availability</span>
-                              <span className={`font-semibold ${available <= 10 ? 'text-amber-700' : 'text-emerald-700'}`}>
-                                {available > 0 ? `${available} seats left` : 'Full'}
-                              </span>
-                            </div>
-                            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  fillPercent >= 90 ? 'bg-rose-500' : fillPercent >= 60 ? 'bg-[#D9A521]' : 'bg-emerald-500'
-                                }`}
-                                style={{ width: `${fillPercent}%` }}
-                              />
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Card Footer */}
-                      <div className="px-5 py-3 border-t border-slate-100 mt-auto flex items-center justify-between bg-slate-50/50">
-                        <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                          Free Student Pass
+                      {/* Card Footer: Registration Status & 1 Primary Action */}
+                      <div className="px-4 sm:px-5 py-3 border-t border-slate-100 mt-auto flex items-center justify-between bg-slate-50/50">
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                          available > 0
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : 'bg-slate-100 text-slate-600 border border-slate-200'
+                        }`}>
+                          {available > 0 ? `${available} seats open` : 'Full capacity'}
                         </span>
 
                         <Link
                           to={`/events/${ev._id}`}
-                          className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-[#002B55] hover:text-white text-[#002B55] border border-slate-200 hover:border-[#002B55] text-xs font-bold transition flex items-center gap-1 shadow-2xs group-hover:border-[#002B55] apple-press"
+                          className="min-h-[38px] px-4 py-1.5 rounded-xl bg-[#002B55] hover:bg-[#001D3A] text-white text-xs font-semibold transition flex items-center gap-1 shadow-xs active:scale-95"
                         >
                           <span>Register</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     </div>

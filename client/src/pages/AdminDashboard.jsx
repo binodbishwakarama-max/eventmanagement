@@ -118,9 +118,9 @@ export const AdminDashboard = () => {
         rejectionReason: reason
       });
       if (status === 'verified') {
-        toast.success('Demo profile marked as reviewed');
+        toast.success('Student profile marked as verified');
       } else {
-        toast('Demo profile review rejected', { icon: 'ℹ️' });
+        toast('Student profile verification rejected', { icon: 'ℹ️' });
       }
       setRejectModalUser(null);
       setRejectionReason('');

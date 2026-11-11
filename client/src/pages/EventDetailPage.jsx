@@ -548,8 +548,12 @@ export function EventDetailPage() {
         </div>
       </div>
 
-      {/* Floating Mobile Registration Action Bar */}
-      <div data-testid="floating-mobile-action-bar" className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 px-4 py-3 z-30 shadow-2xl flex items-center justify-between gap-3 apple-modal-spring">
+      {/* Floating Mobile Registration Action Bar (positioned cleanly above mobile bottom nav) */}
+      <div
+        data-testid="floating-mobile-action-bar"
+        className="lg:hidden fixed bottom-16 inset-x-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 px-4 py-2.5 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3"
+        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+      >
         <div>
           <span className="block text-[11px] font-mono text-slate-500">
             {available > 0 ? `${available} seats left` : 'Full'}

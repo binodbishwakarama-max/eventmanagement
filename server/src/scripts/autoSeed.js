@@ -82,6 +82,7 @@ const initialEvents = (now, organizerId, adminId) => [
 ];
 
 export async function seedIfEmpty() {
+  const isProduction = env.NODE_ENV === 'production';
   const eventCount = await Event.countDocuments();
   if (eventCount > 0) {
     return; // Already populated with events
@@ -89,6 +90,24 @@ export async function seedIfEmpty() {
 
   console.log('[AutoSeed] Initializing Dayananda Sagar University campus baseline data...');
 
+  // PRODUCTION ISOLATION:
+  // Never seed demo students, fake credentials, or hardcoded passwords in production.
+  // Administrative accounts are provisioned exclusively via Google SSO and the CLI bootstrap tool.
+  if (isProduction) {
+    const existingStaff = await User.findOne({ role: { $in: ['super_admin', 'admin', 'organizer'] } });
+    const staffId = existingStaff ? existingStaff._id : null;
+
+    const events = [];
+    for (const evData of initialEvents(Date.now(), staffId, staffId)) {
+      const ev = await Event.create(evData);
+      events.push(ev);
+    }
+    console.log(`[AutoSeed] Production: Initialized ${events.length} verified institutional events.`);
+    return;
+  }
+
+  // DEVELOPMENT / TESTING ONLY:
+  // Isolated mock fixtures for Vitest automated regression test suites
   const adminPassword = env.ADMIN_PASSWORD || 'DSUAdmin2026!';
   const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
   let admin = await User.findOne({ role: 'admin' });

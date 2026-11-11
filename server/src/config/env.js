@@ -18,8 +18,14 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().default('1d'),
   CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
-  ADMIN_EMAIL: z.string().email().default('admin@example.test'),
-  ADMIN_PASSWORD: z.string().min(8).default('Admin@DSU2026!'),
+  // Production Google OAuth 2.0 / OpenID Connect credentials
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REDIRECT_URI: z.string().optional(),
+  SESSION_SECRET: z.string().optional(),
+  // Initial Master Administrator Bootstrap (Explicit operator configured, never hardcoded)
+  ADMIN_EMAIL: z.string().email().optional(),
+  ADMIN_PASSWORD: z.string().min(8).optional(),
   STORAGE_PROVIDER: z.enum(['local', 's3', 'cloudinary']).default('local'),
   MAX_UPLOAD_SIZE_MB: z.coerce.number().default(5),
   // Cloudinary configuration (optional in dev, used when STORAGE_PROVIDER=cloudinary)
@@ -38,14 +44,14 @@ const envSchema = z.object({
   SMTP_SECURE: z.coerce.boolean().default(false),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().default('Campus Events Demo <no-reply@example.test>'),
+  SMTP_FROM: z.string().default('DSU Campus Events <no-reply@dsu.edu.in>'),
   SENDGRID_API_KEY: z.string().optional(),
   // Optional Error Monitoring
   SENTRY_DSN: z.string().optional(),
   // Production University Configuration
-  DEMO_MODE: z.coerce.boolean().default(process.env.NODE_ENV !== 'production'),
+  DEMO_MODE: z.coerce.boolean().default(false),
   TRUST_PROXY: z.coerce.boolean().default(false),
-  ALLOWED_EMAIL_DOMAINS: z.string().default('dsu.edu.in,example.test')
+  ALLOWED_EMAIL_DOMAINS: z.string().default('dsu.edu.in')
 }).superRefine((data, ctx) => {
   if (data.NODE_ENV === 'production') {
     if (data.ADMIN_PASSWORD && data.ADMIN_PASSWORD.length < 8) {

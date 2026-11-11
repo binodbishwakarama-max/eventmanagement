@@ -55,20 +55,51 @@ export async function updateUserVerification(userId, { status, role, rejectionRe
     }
   }
 
-  if (role && ['student', 'organizer', 'admin'].includes(role)) {
-    // Prevent self-demotion
-    if (adminUser && user._id.equals(adminUser._id) && role !== 'admin') {
-      throw ApiError.badRequest('Administrators cannot demote their own account role.');
+  if (role && ['student', 'faculty', 'organizer', 'admin', 'super_admin'].includes(role)) {
+    // Only super_admin can assign or demote admin / super_admin roles
+    if (['admin', 'super_admin'].includes(role) && adminUser.role !== 'super_admin' && adminUser.role !== 'admin') {
+      throw ApiError.forbidden('Only an authorized administrator can assign elevated privileges.');
     }
-    // Prevent demoting primary administrator
-    if (user.email === env.ADMIN_EMAIL && role !== 'admin') {
-      throw ApiError.badRequest('The primary institutional root administrator account cannot be demoted.');
+    // Protect super_admin from alteration by regular admin
+    if (user.role === 'super_admin' && adminUser.role !== 'super_admin') {
+      throw ApiError.forbidden('Cannot modify a Super Administrator account.');
+    }
+    // Prevent self-demotion
+    if (adminUser && user._id.equals(adminUser._id) && role !== user.role) {
+      throw ApiError.badRequest('Administrators cannot demote their own account role.');
     }
     user.role = role;
   }
 
   await user.save();
   return user;
+}
+
+export async function updateProfile(userId, { name, department, rollNumber, clubName }) {
+  const user = await User.findById(userId);
+  if (!user) throw ApiError.notFound('User not found');
+
+  if (name && typeof name === 'string' && name.trim().length >= 2) user.name = name.trim();
+  if (department && typeof department === 'string') user.department = department.trim();
+  if (rollNumber && typeof rollNumber === 'string') user.rollNumber = rollNumber.trim().toUpperCase();
+  if (clubName && typeof clubName === 'string') user.clubName = clubName.trim();
+
+  await user.save();
+  return user;
+}
+
+export async function deactivateAccount(userId) {
+  const user = await User.findById(userId);
+  if (!user) throw ApiError.notFound('User not found');
+
+  if (user.role === 'super_admin') {
+    throw ApiError.badRequest('Super Administrator accounts cannot be deactivated via self-service.');
+  }
+
+  user.accountStatus = 'deactivated';
+  user.tokenVersion = (user.tokenVersion || 1) + 1;
+  await user.save();
+  return { message: 'Your account has been deactivated and all active sessions terminated.' };
 }
 
 export async function resubmitStudentVerification(userId, { usn, department, idCardDocumentUrl }) {

@@ -7,6 +7,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { DSU_USN_REGEX } from './auth.schemas.js';
 import { parseDsuIdentity } from '../../utils/dsuRollParser.js';
 import { sendPasswordResetEmail } from '../../services/email/email.service.js';
+import { verifyGoogleIdToken, exchangeGoogleAuthCode } from '../../services/googleAuth.service.js';
 
 const DUMMY_HASH = '$2a$12$e8YkZJ3.0G7xUqmYqF/8Iea1i7bTf75/4r1oXfQeH8/Lkm23Z9YGy';
 
@@ -82,49 +83,84 @@ export async function loginUser({ email, password }) {
   return { token, user: user.toJSON() };
 }
 
-export async function googleLoginOrRegister({ email, name, credential, usn }) {
+export async function googleLoginOrRegister({ credential, code, usn }) {
+  // 1. Authenticate cryptographically against Google Accounts API
+  const googleUser = code
+    ? await exchangeGoogleAuthCode(code)
+    : await verifyGoogleIdToken(credential);
+
+  const { sub: googleId, email, name, picture } = googleUser;
   const normalizedEmail = email.toLowerCase().trim();
 
-  // Institutional domain check in production
-  if (env.NODE_ENV === 'production' && env.ALLOWED_EMAIL_DOMAINS) {
+  // 2. Enforce Institutional domain check (configurable via env)
+  if (env.ALLOWED_EMAIL_DOMAINS && env.ALLOWED_EMAIL_DOMAINS !== '*') {
     const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
     const domain = normalizedEmail.split('@')[1];
     if (!allowed.includes(domain)) {
-      throw ApiError.badRequest(`Registration via Google is restricted to institutional accounts (@${allowed.join(', @')})`);
+      throw ApiError.forbidden(`Access restricted to institutional Google accounts (@${allowed.join(', @')})`);
     }
   }
 
-  let user = await User.findOne({ email: normalizedEmail });
+  // 3. Find existing account by googleId OR by verified email
+  let user = await User.findOne({ googleId });
 
-  if (user) {
-    const token = signToken(user);
-    return { token, user: user.toJSON(), isNew: false };
+  if (!user) {
+    user = await User.findOne({ email: normalizedEmail });
+    if (user) {
+      // Securely link existing account with Google identity
+      user.googleId = googleId;
+      user.isEmailVerified = true;
+      if (!user.avatarUrl && picture) user.avatarUrl = picture;
+      await user.save();
+    }
   }
 
-  // Auto-detect branch, department, and roll number from institutional email
-  const parsedIdentity = parseDsuIdentity(normalizedEmail);
-  const detectedUsn = (usn || parsedIdentity?.usn || normalizedEmail.split('@')[0]).toUpperCase().trim();
-  const detectedDepartment = parsedIdentity?.department || 'School of Engineering & Technology';
+  // 4. Create new real account if it does not exist
+  let isNew = false;
+  if (!user) {
+    // Auto-detect USN and department from institutional email pattern
+    const parsedIdentity = parseDsuIdentity(normalizedEmail);
+    const detectedUsn = (usn || parsedIdentity?.usn || normalizedEmail.split('@')[0]).toUpperCase().trim();
+    const detectedDepartment = parsedIdentity?.department || 'School of Engineering & Technology';
 
-  const randomPassword = crypto.randomBytes(24).toString('hex');
-  const passwordHash = await bcrypt.hash(randomPassword, 12);
+    user = await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      googleId,
+      authProvider: 'google',
+      role: 'student', // Strictly 'student' by default for all public self-registrations
+      accountStatus: 'active',
+      isEmailVerified: true,
+      avatarUrl: picture || '',
+      department: detectedDepartment,
+      rollNumber: detectedUsn,
+      usn: detectedUsn,
+      isVerified: true,
+      verificationStatus: 'verified',
+      verifiedAt: new Date(),
+      lastLoginAt: new Date(),
+      tokenVersion: 1
+    });
+    isNew = true;
+  } else {
+    // Check if account has been suspended or deactivated
+    if (user.accountStatus === 'suspended') {
+      throw ApiError.forbidden('Your account has been suspended by the university administrator. Please contact registrar support.');
+    }
+    if (user.accountStatus === 'deactivated') {
+      // Reactivate on login
+      user.accountStatus = 'active';
+    }
 
-  user = await User.create({
-    name: name.trim(),
-    email: normalizedEmail,
-    passwordHash,
-    role: 'student',
-    department: detectedDepartment,
-    rollNumber: detectedUsn,
-    usn: detectedUsn,
-    isVerified: true, // Google institutional SSO is pre-authenticated
-    verificationStatus: 'verified',
-    verifiedAt: new Date(),
-    tokenVersion: 1
-  });
+    user.lastLoginAt = new Date();
+    if (picture && !user.avatarUrl) {
+      user.avatarUrl = picture;
+    }
+    await user.save();
+  }
 
   const token = signToken(user);
-  return { token, user: user.toJSON(), isNew: true };
+  return { token, user: user.toJSON(), isNew };
 }
 
 export async function forgotPassword(email) {

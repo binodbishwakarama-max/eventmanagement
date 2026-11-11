@@ -47,7 +47,12 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie('token');
+  return ok(res, { message: 'Logged out successfully' });
+});
+
+export const logoutAll = asyncHandler(async (req, res) => {
   const result = await authService.revokeUserSessions(req.user._id);
   res.clearCookie('token');
-  return ok(res, result);
+  return ok(res, result, 'Logged out from all active sessions and devices');
 });

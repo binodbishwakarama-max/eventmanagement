@@ -17,6 +17,7 @@ router.post('/login', validate(loginSchema), authController.login);
 router.post('/google', validate(googleAuthSchema), authController.googleAuth);
 router.get('/me', authenticate, authController.getMe);
 router.post('/logout', authenticate, authController.logout);
+router.post('/logout-all', authenticate, authController.logoutAll);
 router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);
 router.post('/reset-password', validate(resetPasswordSchema), authController.resetPassword);
 

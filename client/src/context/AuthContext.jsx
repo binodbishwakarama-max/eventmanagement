@@ -90,8 +90,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const logoutAll = async () => {
+    try {
+      await apiClient.post('/auth/logout-all');
+    } catch {
+      // Ignore network failure on logout
+    } finally {
+      localStorage.removeItem('dsu_token');
+      localStorage.removeItem('dsu_user');
+      setToken(null);
+      setUser(null);
+      toast.success('Logged out from all devices');
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, loginWithGoogle, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, loginWithGoogle, logout, logoutAll, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

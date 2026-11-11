@@ -27,9 +27,15 @@ export const authenticate = asyncHandler(async (req, res, next) => {
     if (!user) {
       throw ApiError.unauthorized('User no longer exists');
     }
-    // Priority 4: Session Revocation Validation
+    // Session Revocation & Suspension Validation
     if (decoded.v && user.tokenVersion && decoded.v !== user.tokenVersion) {
-      throw ApiError.unauthorized('Session has been revoked or password was changed. Please sign in again.');
+      throw ApiError.unauthorized('Session has been revoked across devices or password was changed. Please sign in again.');
+    }
+    if (user.accountStatus === 'suspended') {
+      throw ApiError.forbidden('Your account has been suspended by the university administrator.');
+    }
+    if (user.accountStatus === 'deactivated') {
+      throw ApiError.unauthorized('Account has been deactivated.');
     }
     req.user = user;
     next();
@@ -48,8 +54,10 @@ export const optionalAuthenticate = asyncHandler(async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
     const user = await User.findById(decoded.sub);
-    if (user) {
-      req.user = user;
+    if (user && user.accountStatus === 'active') {
+      if (!decoded.v || !user.tokenVersion || decoded.v === user.tokenVersion) {
+        req.user = user;
+      }
     }
   } catch {
     // Continue anonymously if token is invalid
@@ -59,7 +67,14 @@ export const optionalAuthenticate = asyncHandler(async (req, res, next) => {
 
 export const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user) {
+      return next(ApiError.unauthorized('Authentication required'));
+    }
+    // super_admin inherits administrative and organizer capabilities
+    if (req.user.role === 'super_admin') {
+      return next();
+    }
+    if (!roles.includes(req.user.role)) {
       return next(ApiError.forbidden('Access forbidden: insufficient role permissions'));
     }
     next();

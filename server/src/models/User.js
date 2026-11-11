@@ -14,16 +14,46 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      index: true
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true
+    },
+    authProvider: {
+      type: String,
+      enum: ['google', 'local'],
+      default: 'local'
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false
+    },
+    avatarUrl: {
+      type: String,
+      trim: true,
+      default: ''
     },
     passwordHash: {
       type: String,
-      required: true
+      required: false
     },
     role: {
       type: String,
-      enum: ['student', 'organizer', 'admin'],
+      enum: ['student', 'faculty', 'organizer', 'admin', 'super_admin'],
       default: 'student'
+    },
+    accountStatus: {
+      type: String,
+      enum: ['active', 'suspended', 'deactivated'],
+      default: 'active',
+      index: true
+    },
+    lastLoginAt: {
+      type: Date
     },
     department: {
       type: String,

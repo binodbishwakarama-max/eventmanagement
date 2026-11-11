@@ -34,9 +34,9 @@ export const resetPasswordSchema = z.object({
 });
 
 export const googleAuthSchema = z.object({
-  email: z.string().trim().email().toLowerCase(),
-  name: z.string().trim().min(1).max(80),
-  credential: z.string().optional(),
-  picture: z.string().optional(),
+  credential: z.string().min(1, 'Google credential token is required').optional(),
+  code: z.string().optional(),
   usn: z.string().optional()
+}).refine((data) => data.credential || data.code, {
+  message: 'Either Google ID credential token or OAuth authorization code is required'
 });

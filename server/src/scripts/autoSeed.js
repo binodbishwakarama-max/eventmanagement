@@ -82,115 +82,100 @@ const initialEvents = (now, organizerId, adminId) => [
 ];
 
 export async function seedIfEmpty() {
-  const isProduction = env.NODE_ENV === 'production';
-  const userCount = await User.countDocuments();
-  if (userCount > 0) {
-    return; // Already populated
-  }
-
-  // Production provisioning isolation
-  if (isProduction) {
-    console.log('[AutoSeed] Production environment detected.');
-    const adminExists = await User.findOne({ role: 'admin' });
-    if (!adminExists && env.ADMIN_EMAIL && env.ADMIN_PASSWORD && env.ADMIN_PASSWORD.length >= 12) {
-      console.log(`[AutoSeed] Provisioning master administrator for production: ${env.ADMIN_EMAIL.toLowerCase()}`);
-      const adminPasswordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
-      await User.create({
-        name: 'University Registrar',
-        email: env.ADMIN_EMAIL.toLowerCase(),
-        passwordHash: adminPasswordHash,
-        role: 'admin',
-        department: 'Registrar Office',
-        isVerified: true,
-        verificationStatus: 'verified',
-        verifiedAt: new Date()
-      });
-      console.log('[AutoSeed] Production master administrator provisioned successfully.');
-    }
-    return;
+  const eventCount = await Event.countDocuments();
+  if (eventCount > 0) {
+    return; // Already populated with events
   }
 
   console.log('[AutoSeed] Initializing Dayananda Sagar University campus baseline data...');
 
-  const adminPasswordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
-  const admin = await User.create({
-    name: 'University Registrar',
-    email: env.ADMIN_EMAIL.toLowerCase(),
-    passwordHash: adminPasswordHash,
-    role: 'admin',
-    department: 'Office of Student Affairs & Campus Life',
-    isVerified: true,
-    verificationStatus: 'verified',
-    verifiedAt: new Date()
-  });
-
-  const organizerPasswordHash = await bcrypt.hash('Organizer@123', 12);
-  const organizer = await User.create({
-    name: 'Prof. Ramesh Kumar',
-    email: 'organizer@dsu.edu.in',
-    passwordHash: organizerPasswordHash,
-    role: 'organizer',
-    department: 'School of Computer Science & Engineering',
-    clubName: 'DSU Developer Student Club',
-    isVerified: true,
-    verificationStatus: 'verified',
-    verifiedAt: new Date()
-  });
-
-  // Keep compatibility organizer account for test suites
-  await User.create({
-    name: 'Faculty Coordinator',
-    email: 'organizer@example.test',
-    passwordHash: organizerPasswordHash,
-    role: 'organizer',
-    department: 'School of Engineering',
-    clubName: 'DSU Technical Council',
-    isVerified: true,
-    verificationStatus: 'verified',
-    verifiedAt: new Date()
-  });
-
-  const studentPasswordHash = await bcrypt.hash('Student@123', 12);
-  const studentProfiles = [
-    { name: 'Rahul Sharma', email: 'rahul.sharma@dsu.edu.in', usn: '1DS23CS045', dept: 'School of Computer Science & Engineering' },
-    { name: 'Ananya Rao', email: 'ananya.rao@dsu.edu.in', usn: '1DS23EC012', dept: 'Department of Electronics & Communication' },
-    { name: 'Kavya S. Gowda', email: 'kavya.gowda@dsu.edu.in', usn: '1DS23CS088', dept: 'School of Computer Science & Engineering' },
-    { name: 'Priya Verma', email: 'priya.verma@dsu.edu.in', usn: '1DS23AI019', dept: 'Department of Artificial Intelligence & Robotics' },
-    { name: 'Karthik N.', email: 'karthik.n@dsu.edu.in', usn: '1DS23ME034', dept: 'Department of Mechanical Engineering' },
-    { name: 'Aditi Joshi', email: 'aditi.joshi@dsu.edu.in', usn: '1DS23DS008', dept: 'School of Design & Creative Arts' }
-  ];
-
-  const students = [];
-  for (const s of studentProfiles) {
-    const student = await User.create({
-      name: s.name,
-      email: s.email,
-      passwordHash: studentPasswordHash,
-      role: 'student',
-      department: s.dept,
-      rollNumber: s.usn,
-      usn: s.usn,
+  const adminPassword = env.ADMIN_PASSWORD || 'DSUAdmin2026!';
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+  let admin = await User.findOne({ role: 'admin' });
+  if (!admin) {
+    admin = await User.create({
+      name: 'University Registrar',
+      email: (env.ADMIN_EMAIL || 'admin@dsu.edu.in').toLowerCase(),
+      passwordHash: adminPasswordHash,
+      role: 'admin',
+      department: 'Office of Student Affairs & Campus Life',
       isVerified: true,
       verificationStatus: 'verified',
       verifiedAt: new Date()
     });
-    students.push(student);
   }
 
-  // Pre-seed matching accounts for automated tests
-  for (let i = 1; i <= 6; i++) {
-    await User.create({
-      name: `Student Applicant ${i}`,
-      email: `student${i}@example.test`,
-      passwordHash: studentPasswordHash,
-      role: 'student',
+  const organizerPasswordHash = await bcrypt.hash('Organizer@123', 12);
+  let organizer = await User.findOne({ role: 'organizer' });
+  if (!organizer) {
+    organizer = await User.create({
+      name: 'Prof. Ramesh Kumar',
+      email: 'organizer@dsu.edu.in',
+      passwordHash: organizerPasswordHash,
+      role: 'organizer',
       department: 'School of Computer Science & Engineering',
-      rollNumber: `1DS23CS0${40 + i}`,
-      usn: `1DS23CS0${40 + i}`,
+      clubName: 'DSU Developer Student Club',
       isVerified: true,
       verificationStatus: 'verified',
       verifiedAt: new Date()
     });
+
+    await User.create({
+      name: 'Faculty Coordinator',
+      email: 'organizer@example.test',
+      passwordHash: organizerPasswordHash,
+      role: 'organizer',
+      department: 'School of Engineering',
+      clubName: 'DSU Technical Council',
+      isVerified: true,
+      verificationStatus: 'verified',
+      verifiedAt: new Date()
+    });
+  }
+
+  const studentCount = await User.countDocuments({ role: 'student' });
+  const students = [];
+  if (studentCount === 0) {
+    const studentPasswordHash = await bcrypt.hash('Student@123', 12);
+    const studentProfiles = [
+      { name: 'Rahul Sharma', email: 'rahul.sharma@dsu.edu.in', usn: '1DS23CS045', dept: 'School of Computer Science & Engineering' },
+      { name: 'Ananya Rao', email: 'ananya.rao@dsu.edu.in', usn: '1DS23EC012', dept: 'Department of Electronics & Communication' },
+      { name: 'Kavya S. Gowda', email: 'kavya.gowda@dsu.edu.in', usn: '1DS23CS088', dept: 'School of Computer Science & Engineering' },
+      { name: 'Priya Verma', email: 'priya.verma@dsu.edu.in', usn: '1DS23AI019', dept: 'Department of Artificial Intelligence & Robotics' },
+      { name: 'Karthik N.', email: 'karthik.n@dsu.edu.in', usn: '1DS23ME034', dept: 'Department of Mechanical Engineering' },
+      { name: 'Aditi Joshi', email: 'aditi.joshi@dsu.edu.in', usn: '1DS23DS008', dept: 'School of Design & Creative Arts' }
+    ];
+
+    for (const s of studentProfiles) {
+      const student = await User.create({
+        name: s.name,
+        email: s.email,
+        passwordHash: studentPasswordHash,
+        role: 'student',
+        department: s.dept,
+        rollNumber: s.usn,
+        usn: s.usn,
+        isVerified: true,
+        verificationStatus: 'verified',
+        verifiedAt: new Date()
+      });
+      students.push(student);
+    }
+
+    for (let i = 1; i <= 6; i++) {
+      await User.create({
+        name: `Student Applicant ${i}`,
+        email: `student${i}@example.test`,
+        passwordHash: studentPasswordHash,
+        role: 'student',
+        department: 'School of Computer Science & Engineering',
+        rollNumber: `1DS23CS0${40 + i}`,
+        usn: `1DS23CS0${40 + i}`,
+        isVerified: true,
+        verificationStatus: 'verified',
+        verifiedAt: new Date()
+      });
+    }
   }
 
   const events = [];
@@ -199,7 +184,6 @@ export async function seedIfEmpty() {
     events.push(ev);
   }
 
-  // Pre-seed baseline registrations
   if (events.length > 0 && students.length > 0) {
     await Registration.create({
       event: events[0]._id,
@@ -223,5 +207,5 @@ export async function seedIfEmpty() {
     await Event.findByIdAndUpdate(events[1]._id, { $inc: { registeredCount: 1 } });
   }
 
-  console.log('[AutoSeed] Dayananda Sagar University campus baseline data initialized successfully.');
+  console.log(`[AutoSeed] Dayananda Sagar University campus baseline data initialized with ${events.length} events.`);
 }

@@ -44,9 +44,14 @@ export function errorHandler(err, req, res, _next) {
     });
   }
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const clientMessage = (statusCode >= 500 && isProduction && !err.isOperational)
+    ? 'An unexpected error occurred. Please try again later.'
+    : message;
+
   return res.status(statusCode).json({
     success: false,
-    message,
+    message: clientMessage,
     code: err.code || `HTTP_${statusCode}`,
     ...(errors.length > 0 ? { errors } : {})
   });

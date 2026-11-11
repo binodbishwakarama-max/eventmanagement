@@ -9,18 +9,29 @@ function sanitizeUri(uri) {
 
 export async function connectDB(uri = env.MONGODB_URI) {
   const isProduction = env.NODE_ENV === 'production';
+  const isLocalhostUri = /^mongodb:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(uri);
+
+  // If in production and MONGODB_URI is localhost or unset, log prominent notice
+  if (isProduction && isLocalhostUri && !process.env.MONGODB_URI) {
+    console.warn('\n================================================================');
+    console.warn('[DSU DATABASE NOTICE] MONGODB_URI is not set in Render environment.');
+    console.warn('To enable persistent cloud storage, set MONGODB_URI in Render Dashboard:');
+    console.warn('e.g. mongodb+srv://<user>:<password>@<cluster>.mongodb.net/dsu_events');
+    console.warn('================================================================\n');
+  }
 
   // 1. Primary Authoritative Database Connection
   try {
     const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: isProduction ? 5000 : 2500,
+      serverSelectionTimeoutMS: isProduction ? (isLocalhostUri ? 3000 : 30000) : 2500,
+      connectTimeoutMS: 30000,
       maxPoolSize: isProduction ? 100 : 30,
-      minPoolSize: isProduction ? 10 : 2,
+      minPoolSize: isProduction ? 2 : 1,
       socketTimeoutMS: 45000,
       autoIndex: !isProduction
     });
 
-    console.log(`[Database] Authoritative database connected at ${sanitizeUri(uri)} (Pool: ${isProduction ? 50 : 20})`);
+    console.log(`[Database] Authoritative database connected at ${sanitizeUri(uri)} (Pool: ${isProduction ? 100 : 30})`);
     
     // Auto-seed baseline institutional data only if empty
     const { seedIfEmpty } = await import('../scripts/autoSeed.js');
@@ -30,16 +41,12 @@ export async function connectDB(uri = env.MONGODB_URI) {
   } catch (err) {
     console.error(`[Database Error] Primary connection failed: ${err.message}`);
 
-    // PRIORITY 1: PRODUCTION SPLIT-BRAIN DEFENSE
-    // In production, local in-memory fallback is strictly prohibited to prevent data divergence.
-    if (isProduction) {
-      console.error('[Database FATAL] SPLIT-BRAIN PREVENTION: Writes cannot be diverted to local storage in production.');
-      throw new Error(`Authoritative production database unavailable: ${err.message}`);
-    }
+    // If fallback is enabled (ALLOW_LOCAL_FALLBACK=true or in development/test),
+    // initialize isolated local engine to keep platform responsive
+    const allowFallback = env.ALLOW_LOCAL_FALLBACK || env.NODE_ENV !== 'production';
 
-    // 2. Development & Testing Isolated Fallback ONLY
-    if (env.ALLOW_LOCAL_FALLBACK || env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-      console.warn(`[Database Warning] Operating in ${env.NODE_ENV} mode. Initializing isolated local development engine...`);
+    if (allowFallback) {
+      console.warn(`[Database Warning] Operating in resilient fallback mode. Initializing isolated local engine...`);
       try {
         let systemBinary = process.env.MONGOMS_SYSTEM_BINARY;
         if (!systemBinary) {
@@ -58,12 +65,14 @@ export async function connectDB(uri = env.MONGODB_URI) {
           }
         }
         const { MongoMemoryServer } = await import('mongodb-memory-server');
-        memoryServer = await MongoMemoryServer.create({
-          ...(systemBinary ? { binary: { systemBinary } } : {}),
-          instance: {
-            dbName: 'dsu_events'
-          }
-        });
+        if (!memoryServer) {
+          memoryServer = await MongoMemoryServer.create({
+            ...(systemBinary ? { binary: { systemBinary } } : {}),
+            instance: {
+              dbName: 'dsu_events'
+            }
+          });
+        }
 
         const localUri = memoryServer.getUri();
         const conn = await mongoose.connect(localUri);

@@ -11,6 +11,7 @@ import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import { env } from './config/env.js';
 import { checkDatabaseHealth } from './config/db.js';
+import { sanitize } from './middleware/sanitize.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { ApiError } from './utils/ApiError.js';
 import { ok } from './utils/respond.js';
@@ -136,6 +137,7 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json({ limit: '20kb' }));
+app.use(sanitize);
 
 // Priority 1: Database Write Gatekeeper Middleware
 // Never allow writes if the authoritative database is disconnected
@@ -181,6 +183,14 @@ const registrationWriteLimiter = rateLimit({
   keyGenerator: (req) => req.headers['authorization'] || req.ip,
   skip: (req) => req.method === 'OPTIONS' || env.NODE_ENV === 'test',
   message: { success: false, message: 'High registration frequency detected. Please wait a moment before trying again.' }
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30, // 30 poster uploads per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Upload rate limit reached. Please wait before uploading more posters.' }
 });
 
 // Priority 7: Observability & Production Health Probes
@@ -231,7 +241,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api', registrationsRoutes);
 app.use('/api/venues', venuesRoutes);
 app.use('/api/clubs', clubsRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.get('/api/admin/stats', authenticate, authorize('admin', 'organizer'), getStats);
 app.use('/api/admin/users', usersRoutes);
 app.use('/api/users', usersRoutes);

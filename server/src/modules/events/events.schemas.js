@@ -27,3 +27,26 @@ export const updateEventSchema = z.object({
   organizerClub: z.string().trim().max(100).optional(),
   posterUrl: z.string().trim().max(1000).optional()
 });
+
+export const publicEventQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(9),
+  search: z.string().trim().max(100).optional(),
+  category: z.string().trim().max(50).optional(),
+  venue: z.string().trim().max(160).optional(),
+  organizerClub: z.string().trim().max(100).optional(),
+  school: z.string().trim().max(100).optional(),
+  upcoming: z.union([z.boolean(), z.enum(['true', 'false'])]).optional(),
+  startDate: z.string().datetime().optional().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/).optional()),
+  endDate: z.string().datetime().optional().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/).optional()),
+  sort: z.enum(['soonest', 'latest', 'popular']).default('soonest')
+}).passthrough();
+
+export const adminEventQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  search: z.string().trim().max(100).optional(),
+  status: z.enum(['draft', 'published', 'cancelled']).optional(),
+  category: z.string().trim().max(50).optional()
+}).passthrough();
+

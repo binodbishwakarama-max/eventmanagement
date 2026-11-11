@@ -11,6 +11,7 @@ export const validate = (schema, source = 'body') => (req, res, next) => {
   }
   if (source === 'query') {
     req.validatedQuery = result.data;
+    req.query = result.data;
   } else {
     req[source] = result.data;
   }

@@ -1,5 +1,6 @@
 import { User } from '../../models/User.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { env } from '../../config/env.js';
 import { DSU_USN_REGEX } from '../auth/auth.schemas.js';
 
 function escapeRegex(text) {
@@ -55,6 +56,14 @@ export async function updateUserVerification(userId, { status, role, rejectionRe
   }
 
   if (role && ['student', 'organizer', 'admin'].includes(role)) {
+    // Prevent self-demotion
+    if (adminUser && user._id.equals(adminUser._id) && role !== 'admin') {
+      throw ApiError.badRequest('Administrators cannot demote their own account role.');
+    }
+    // Prevent demoting primary administrator
+    if (user.email === env.ADMIN_EMAIL && role !== 'admin') {
+      throw ApiError.badRequest('The primary institutional root administrator account cannot be demoted.');
+    }
     user.role = role;
   }
 

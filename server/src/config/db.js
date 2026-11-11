@@ -20,9 +20,14 @@ export async function connectDB(uri = env.MONGODB_URI) {
     console.warn('================================================================\n');
   }
 
+  // Extract or default database name to 'dsu_events'
+  const targetDbMatch = uri.match(/\/([^/?]+)(\?|$)/);
+  const targetDb = (targetDbMatch && targetDbMatch[1] && targetDbMatch[1] !== 'test') ? targetDbMatch[1] : 'dsu_events';
+
   // 1. Primary Authoritative Database Connection
   try {
     const conn = await mongoose.connect(uri, {
+      dbName: targetDb,
       serverSelectionTimeoutMS: isProduction ? (isLocalhostUri ? 3000 : 30000) : 2500,
       connectTimeoutMS: 30000,
       maxPoolSize: isProduction ? 100 : 30,

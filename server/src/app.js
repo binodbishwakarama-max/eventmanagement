@@ -124,10 +124,33 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://accounts.google.com', 'https://www.youtube.com', 'https://s.ytimg.com'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-        imgSrc: ["'self'", 'data:', 'blob:', 'https://images.unsplash.com', 'https://*.cloudinary.com', 'https://res.cloudinary.com'],
+        imgSrc: [
+          "'self'",
+          'data:',
+          'blob:',
+          'https://images.unsplash.com',
+          'https://*.cloudinary.com',
+          'https://res.cloudinary.com',
+          'https://i.ytimg.com',
+          'https://*.ytimg.com',
+          'https://img.youtube.com'
+        ],
+        frameSrc: [
+          "'self'",
+          'https://www.youtube.com',
+          'https://www.youtube-nocookie.com',
+          'https://accounts.google.com'
+        ],
+        childSrc: [
+          "'self'",
+          'https://www.youtube.com',
+          'https://www.youtube-nocookie.com',
+          'https://accounts.google.com'
+        ],
+        mediaSrc: ["'self'", 'blob:', 'data:'],
         connectSrc: ["'self'", 'https://*', 'http://localhost:*'],
         upgradeInsecureRequests: null
       }

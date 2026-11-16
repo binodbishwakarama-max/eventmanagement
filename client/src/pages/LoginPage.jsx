@@ -22,12 +22,21 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [emailInput, setEmailInput] = useState('');
+  const [emailInput, setEmailInput] = useState(localStorage.getItem('dsu_remembered_email') || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(Boolean(localStorage.getItem('dsu_remembered_email')));
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [showCredentialsForm, setShowCredentialsForm] = useState(false);
+
+  const fillDemo = (email, pass, roleLabel) => {
+    setEmailInput(email);
+    setPassword(pass);
+    setFieldErrors({});
+    toast.success(`Loaded ${roleLabel} credentials`, {
+      duration: 2000
+    });
+  };
 
   // Forgot password modal state
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
@@ -71,6 +80,11 @@ export function LoginPage() {
     setLoading(true);
     try {
       const user = await login(normalizedEmail, password);
+      if (rememberMe) {
+        localStorage.setItem('dsu_remembered_email', normalizedEmail);
+      } else {
+        localStorage.removeItem('dsu_remembered_email');
+      }
       const returnTo = location.state?.from;
       const fallback =
         user.role === 'admin' || user.role === 'organizer' ? '/admin' : '/dashboard';
@@ -120,139 +134,178 @@ export function LoginPage() {
         {/* Main Card Container */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_12px_40px_rgba(0,43,85,0.06)] border border-slate-100">
           {/* Logo & Headline */}
-          <div className="text-center mb-7">
+          <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <DsuLogo size="lg" className="mx-auto" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              Welcome to DSU Campus Events
+            <h1 className="text-2xl font-bold tracking-tight text-[#002B55]">
+              Sign in to Campus Events
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
-              Official student and faculty events portal
+            <p className="text-xs text-slate-500 mt-1">
+              Dayananda Sagar University • Main Campus
             </p>
           </div>
 
-          {/* Primary Action: Official Google Sign-In */}
-          <div className="space-y-4">
-            <GoogleSignInButton onSuccess={handleGoogleSuccess} />
+          {/* Institutional Credentials Form */}
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <div>
+              <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Email or Roll Number
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  id="login-email"
+                  name="email"
+                  autoComplete="username"
+                  required
+                  value={emailInput}
+                  onChange={(e) => {
+                    setEmailInput(e.target.value);
+                    if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: null }));
+                  }}
+                  placeholder="name@dsu.edu.in or ENG25CS0453"
+                  className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
+                    fieldErrors.email ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
+                  }`}
+                />
+              </div>
+              {fieldErrors.email && (
+                <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{fieldErrors.email}</span>
+                </p>
+              )}
+            </div>
 
-            {/* Subtle Divider */}
-            <div className="relative flex items-center justify-center my-5">
-              <div className="border-t border-slate-200 w-full" />
+            <div>
+              <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="login-password"
+                  name="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: null }));
+                  }}
+                  placeholder="Enter your password"
+                  className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
+                    fieldErrors.password ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition p-1"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {fieldErrors.password && (
+                <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{fieldErrors.password}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between pt-0.5">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-3.5 h-3.5 text-[#002B55] rounded border-slate-300 focus:ring-[#002B55] cursor-pointer"
+                />
+                <span className="text-xs text-slate-600 font-medium">Remember me</span>
+              </label>
               <button
                 type="button"
-                onClick={() => setShowCredentialsForm(!showCredentialsForm)}
-                className="bg-white px-3 text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition absolute flex items-center gap-1 active:scale-95"
+                onClick={() => setForgotModalOpen(true)}
+                className="text-xs font-medium text-[#002B55] hover:underline"
               >
-                <span>{showCredentialsForm ? 'Hide password sign-in' : 'or sign in with password'}</span>
+                Forgot password?
               </button>
             </div>
 
-            {/* Collapsible Secondary Institutional Credentials Form */}
-            {showCredentialsForm && (
-              <form onSubmit={handleSubmit} className="space-y-3.5 pt-2" noValidate>
-                <div>
-                  <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                    DSU Email or Roll Number
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="text"
-                      id="login-email"
-                      name="email"
-                      autoComplete="username"
-                      required
-                      value={emailInput}
-                      onChange={(e) => setEmailInput(e.target.value)}
-                      placeholder="e.g. ENG25CS0453 or name@dsu.edu.in"
-                      className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
-                        fieldErrors.email ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
-                      }`}
-                    />
-                  </div>
-                  {fieldErrors.email && (
-                    <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3 shrink-0" />
-                      <span>{fieldErrors.email}</span>
-                    </p>
-                  )}
-                </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-xl bg-[#002B55] hover:bg-[#001D3A] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-98 transition flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700">
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setForgotModalOpen(true)}
-                      className="text-[11px] font-medium text-[#002B55] hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      id="login-password"
-                      name="password"
-                      autoComplete="current-password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
-                        fieldErrors.password ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  {fieldErrors.password && (
-                    <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3 shrink-0" />
-                      <span>{fieldErrors.password}</span>
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#002B55] hover:bg-[#001D3A] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-98 transition flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    'Sign In with Password'
-                  )}
-                </button>
-              </form>
-            )}
+          {/* Subtle Google SSO Divider */}
+          <div className="relative flex items-center justify-center my-6">
+            <div className="border-t border-slate-200 w-full" />
+            <span className="bg-white px-3 text-[11px] font-medium text-slate-400 absolute uppercase tracking-wider">
+              or
+            </span>
           </div>
 
-          {/* Minimal Footnote & Register Link */}
-          <div className="mt-8 pt-5 border-t border-slate-100 text-center">
+          <GoogleSignInButton onSuccess={handleGoogleSuccess} />
+
+          {/* Quick Demo Access (Evaluation) */}
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
+              <span className="font-semibold text-slate-600">Quick Test Profiles</span>
+              <span className="text-[10px] text-slate-400 font-mono">1-click fill</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => fillDemo('admin@dsu.edu.in', 'DSUAdmin2026!', 'Administrator')}
+                className="py-1.5 px-2 rounded-lg border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition text-center"
+              >
+                Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo('organizer@demo.dsu.edu', 'Organizer@123', 'Organizer')}
+                className="py-1.5 px-2 rounded-lg border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition text-center"
+              >
+                Organizer
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo('student1@demo.dsu.edu', 'Student@123', 'Student')}
+                className="py-1.5 px-2 rounded-lg border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition text-center"
+              >
+                Student
+              </button>
+            </div>
+          </div>
+
+          {/* Footer Navigation */}
+          <div className="mt-6 pt-4 border-t border-slate-100 text-center">
             <p className="text-xs text-slate-500">
-              New to Dayananda Sagar University?{' '}
+              Don't have an account?{' '}
               <Link
                 to="/register"
                 className="font-semibold text-[#002B55] hover:underline"
               >
-                Create Account
+                Register
               </Link>
             </p>
-            <div className="flex items-center justify-center gap-1.5 mt-3 text-[10px] text-slate-400">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Official Institutional Authentication • Harohalli Campus</span>
+            <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] text-slate-400">
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-500" />
+              <span>Dayananda Sagar University Official Authentication</span>
             </div>
           </div>
         </div>

@@ -20,11 +20,7 @@ export const registerSchema = z.object({
   email: z
     .string()
     .min(1, 'Email address is required')
-    .email('Please enter a valid institutional email')
-    .refine(
-      (val) => val.endsWith('@dsu.edu.in') || val.endsWith('@example.test'),
-      'Must use official Dayananda Sagar University email (@dsu.edu.in)'
-    ),
+    .email('Please enter a valid email address'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -32,8 +28,12 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
   usn: z
     .string()
-    .min(1, 'University Seat Number or Roll Number is required')
-    .regex(/^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i, 'Invalid DSU Roll/USN format (e.g. ENG25CS0453, ENG24AIML012, or 1DS23CS045)'),
+    .trim()
+    .optional()
+    .refine(
+      (val) => !val || /^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i.test(val),
+      'Invalid DSU Roll/USN format (e.g. ENG25CS0453, ENG24AIML012, or 1DS23CS045)'
+    ),
   department: z
     .string()
     .min(1, 'Department / School of study is required')

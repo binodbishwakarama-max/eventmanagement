@@ -31,12 +31,13 @@ export async function registerUser(data) {
     throw ApiError.conflict('An account with this email already exists');
   }
 
-  // Institutional domain check in production
-  if (env.NODE_ENV === 'production' && env.ALLOWED_EMAIL_DOMAINS) {
+  // Institutional domain check in production (permits university and common public emails)
+  if (env.NODE_ENV === 'production' && env.ALLOWED_EMAIL_DOMAINS && env.ALLOWED_EMAIL_DOMAINS !== '*') {
     const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
     const domain = data.email.toLowerCase().split('@')[1];
-    if (!allowed.includes(domain)) {
-      throw ApiError.badRequest(`Registration is restricted to institutional accounts (@${allowed.join(', @')})`);
+    const isPublicEmail = ['gmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'hotmail.com', 'proton.me', 'example.test'].includes(domain);
+    if (!allowed.includes(domain) && !isPublicEmail) {
+      throw ApiError.badRequest(`Registration requires a valid university (@${allowed.join(', @')}) or personal email address`);
     }
   }
 
@@ -92,12 +93,13 @@ export async function googleLoginOrRegister({ credential, code, usn }) {
   const { sub: googleId, email, name, picture } = googleUser;
   const normalizedEmail = email.toLowerCase().trim();
 
-  // 2. Enforce Institutional domain check (configurable via env)
+  // 2. Enforce Institutional domain check (configurable via env, permits university and common public emails)
   if (env.ALLOWED_EMAIL_DOMAINS && env.ALLOWED_EMAIL_DOMAINS !== '*') {
     const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
     const domain = normalizedEmail.split('@')[1];
-    if (!allowed.includes(domain)) {
-      throw ApiError.forbidden(`Access restricted to institutional Google accounts (@${allowed.join(', @')})`);
+    const isPublicEmail = ['gmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'hotmail.com', 'proton.me', 'example.test'].includes(domain);
+    if (!allowed.includes(domain) && !isPublicEmail) {
+      throw ApiError.forbidden(`Access restricted to institutional (@${allowed.join(', @')}) or personal Google accounts`);
     }
   }
 

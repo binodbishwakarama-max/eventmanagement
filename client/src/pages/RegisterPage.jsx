@@ -44,6 +44,16 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
+  const getPasswordStrength = (pw) => {
+    let score = 0;
+    if (!pw) return 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    return score;
+  };
+  const pwStrength = getPasswordStrength(formData.password);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -138,7 +148,7 @@ export function RegisterPage() {
             <div className="relative flex items-center justify-center my-4">
               <div className="border-t border-slate-200 w-full" />
               <span className="bg-white px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 absolute">
-                or register with institutional email
+                or register with your email
               </span>
             </div>
           </div>
@@ -173,10 +183,10 @@ export function RegisterPage() {
               )}
             </div>
 
-            {/* University Email */}
+            {/* University or Personal Email */}
             <div>
               <label htmlFor="reg-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                Institutional Email (@dsu.edu.in) <span className="text-rose-500">*</span>
+                Email Address (University or Personal) <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -187,7 +197,7 @@ export function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="e.g. eng25cs0453@dsu.edu.in"
+                  placeholder="e.g. name@dsu.edu.in or yourname@gmail.com"
                   className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
                     fieldErrors.email ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
                   }`}
@@ -205,7 +215,7 @@ export function RegisterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="reg-usn" className="block text-xs font-semibold text-slate-700 mb-1">
-                  USN / Roll Number <span className="text-rose-500">*</span>
+                  USN / Student ID <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
                   <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -213,11 +223,10 @@ export function RegisterPage() {
                     type="text"
                     id="reg-usn"
                     name="usn"
-                    required
                     value={formData.usn}
                     onChange={handleChange}
-                    placeholder="ENG25CS0453"
-                    className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 uppercase focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
+                    placeholder="e.g. 1DS23CS045 or ENG25CS0453"
+                    className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition uppercase font-mono ${
                       fieldErrors.usn ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200'
                     }`}
                   />
@@ -281,6 +290,28 @@ export function RegisterPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+
+              {/* Real-time Password Strength Meter */}
+              {formData.password && (
+                <div className="mt-2 space-y-1.5">
+                  <div className="flex gap-1.5 h-1">
+                    <div className={`flex-1 rounded-full transition-colors ${pwStrength >= 1 ? (pwStrength === 1 ? 'bg-rose-500' : pwStrength === 2 ? 'bg-amber-500' : 'bg-emerald-500') : 'bg-slate-200'}`} />
+                    <div className={`flex-1 rounded-full transition-colors ${pwStrength >= 2 ? (pwStrength === 2 ? 'bg-amber-500' : 'bg-emerald-500') : 'bg-slate-200'}`} />
+                    <div className={`flex-1 rounded-full transition-colors ${pwStrength === 3 ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1.5">
+                      <span className={formData.password.length >= 8 ? 'text-emerald-600 font-semibold' : ''}>8+ chars</span> • 
+                      <span className={/[A-Z]/.test(formData.password) ? 'text-emerald-600 font-semibold' : ''}>1 uppercase</span> • 
+                      <span className={/[0-9]/.test(formData.password) ? 'text-emerald-600 font-semibold' : ''}>1 number</span>
+                    </span>
+                    <span className={`font-semibold capitalize ${pwStrength === 3 ? 'text-emerald-600' : pwStrength === 2 ? 'text-amber-600' : 'text-rose-500'}`}>
+                      {pwStrength === 3 ? 'Strong' : pwStrength === 2 ? 'Moderate' : 'Weak'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {fieldErrors.password && (
                 <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />

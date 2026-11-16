@@ -90,19 +90,49 @@ export async function seedIfEmpty() {
 
   console.log('[AutoSeed] Initializing Dayananda Sagar University campus baseline data...');
 
-  // PRODUCTION ISOLATION:
-  // Never seed demo students, fake credentials, or hardcoded passwords in production.
-  // Administrative accounts are provisioned exclusively via Google SSO and the CLI bootstrap tool.
+  // PRODUCTION ISOLATION & BOOTSTRAP:
+  // Ensure authoritative administrator account exists and matches environment credentials.
   if (isProduction) {
-    const existingStaff = await User.findOne({ role: { $in: ['super_admin', 'admin', 'organizer'] } });
-    const staffId = existingStaff ? existingStaff._id : null;
-
-    const events = [];
-    for (const evData of initialEvents(Date.now(), staffId, staffId)) {
-      const ev = await Event.create(evData);
-      events.push(ev);
+    if (env.ADMIN_EMAIL && env.ADMIN_PASSWORD) {
+      const adminEmail = env.ADMIN_EMAIL.toLowerCase().trim();
+      let adminUser = await User.findOne({ email: adminEmail });
+      if (!adminUser) {
+        const adminPasswordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
+        adminUser = await User.create({
+          name: 'Institutional Administrator',
+          email: adminEmail,
+          passwordHash: adminPasswordHash,
+          role: 'admin',
+          department: 'Office of Student Affairs & Campus Life',
+          isVerified: true,
+          verificationStatus: 'verified',
+          verifiedAt: new Date()
+        });
+        console.log(`[AutoSeed] Production: Initialized administrator (${adminEmail}).`);
+      } else if (adminUser.role === 'admin') {
+        const matches = await bcrypt.compare(env.ADMIN_PASSWORD, adminUser.passwordHash);
+        if (!matches) {
+          adminUser.passwordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
+          adminUser.isVerified = true;
+          adminUser.verificationStatus = 'verified';
+          await adminUser.save();
+          console.log(`[AutoSeed] Production: Synchronized administrator password with environment credentials.`);
+        }
+      }
     }
-    console.log(`[AutoSeed] Production: Initialized ${events.length} verified institutional events.`);
+
+    const eventCount = await Event.countDocuments();
+    if (eventCount === 0) {
+      const existingStaff = await User.findOne({ role: { $in: ['super_admin', 'admin', 'organizer'] } });
+      const staffId = existingStaff ? existingStaff._id : null;
+
+      const events = [];
+      for (const evData of initialEvents(Date.now(), staffId, staffId)) {
+        const ev = await Event.create(evData);
+        events.push(ev);
+      }
+      console.log(`[AutoSeed] Production: Initialized ${events.length} verified institutional events.`);
+    }
     return;
   }
 

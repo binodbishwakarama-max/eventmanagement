@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function GoogleSignInButton({ onSuccess, className = '' }) {
   const { loginWithGoogle } = useAuth();
   const buttonRef = useRef(null);
-  const [sdkLoaded, setSdkLoaded] = useState(false);
-  const [initError, setInitError] = useState(null);
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -20,7 +17,6 @@ export function GoogleSignInButton({ onSuccess, className = '' }) {
       }
 
       if (!googleClientId) {
-        setInitError('VITE_GOOGLE_CLIENT_ID is not configured in client environment.');
         return true;
       }
 
@@ -57,12 +53,9 @@ export function GoogleSignInButton({ onSuccess, className = '' }) {
           });
         }
 
-        setSdkLoaded(true);
-        setInitError(null);
         return true;
       } catch (err) {
         console.error('Google Sign-In initialization error:', err);
-        setInitError(err.message);
         return true;
       }
     }
@@ -135,12 +128,6 @@ export function GoogleSignInButton({ onSuccess, className = '' }) {
           <span>Continue with Google</span>
         </button>
       </div>
-
-      {initError && (
-        <p className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1 mt-2 text-center">
-          Notice: {initError}
-        </p>
-      )}
     </div>
   );
 }

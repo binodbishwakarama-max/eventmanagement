@@ -43,7 +43,7 @@ describe('Auth Boundary Schemas', () => {
       expect(res.success).toBe(true);
     });
 
-    it('rejects non-institutional emails', () => {
+    it('accepts general and institutional emails (e.g. @gmail.com)', () => {
       const res = registerSchema.safeParse({
         name: 'Aarav Sharma',
         email: 'aarav@gmail.com',
@@ -51,10 +51,7 @@ describe('Auth Boundary Schemas', () => {
         usn: '1DS23CS045',
         department: 'School of Engineering'
       });
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error.issues[0].message).toContain('Dayananda Sagar University email');
-      }
+      expect(res.success).toBe(true);
     });
 
     it('rejects malformed USN', () => {

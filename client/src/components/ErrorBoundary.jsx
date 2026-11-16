@@ -38,11 +38,12 @@ export class ErrorBoundary extends Component {
                 An Unexpected Error Occurred
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed">
-                The university portal encountered an unexpected display issue. Your saved passes and registration records remain secure.
+                The university portal encountered an unexpected display issue. Your saved passes and
+                registration records remain secure.
               </p>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-left overflow-auto max-h-36 text-[10px] font-mono text-rose-700">
                 {this.state.error.toString()}
               </div>
@@ -75,4 +76,3 @@ export class ErrorBoundary extends Component {
     return this.props.children;
   }
 }
-

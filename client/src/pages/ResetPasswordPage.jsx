@@ -47,7 +47,8 @@ export function ResetPasswordPage() {
       toast.success('Password reset successfully! Please sign in with your new password.');
       setTimeout(() => navigate('/login'), 2500);
     } catch (err) {
-      const msg = err.response?.data?.message || 'Password reset failed. The link may have expired.';
+      const msg =
+        err.response?.data?.message || 'Password reset failed. The link may have expired.';
       setErrorMsg(msg);
       toast.error(msg);
     } finally {
@@ -80,7 +81,8 @@ export function ResetPasswordPage() {
             </div>
             <p className="font-semibold text-sm">Missing Reset Token</p>
             <p className="text-slate-600">
-              This password reset link is invalid or incomplete. Please request a new password reset link.
+              This password reset link is invalid or incomplete. Please request a new password reset
+              link.
             </p>
             <Link
               to="/login"
@@ -96,7 +98,8 @@ export function ResetPasswordPage() {
             </div>
             <p className="font-semibold text-sm">Password Updated!</p>
             <p className="text-slate-600">
-              Your password has been reset. All prior active sessions have been invalidated. Redirecting to sign in...
+              Your password has been reset. All prior active sessions have been invalidated.
+              Redirecting to sign in...
             </p>
             <Link
               to="/login"
@@ -114,7 +117,10 @@ export function ResetPasswordPage() {
             )}
 
             <div>
-              <label htmlFor="reset-new-password" className="block font-semibold text-slate-700 mb-1.5">
+              <label
+                htmlFor="reset-new-password"
+                className="block font-semibold text-slate-700 mb-1.5"
+              >
                 New Password (min 8 characters, uppercase, number)
               </label>
               <div className="relative">
@@ -140,7 +146,10 @@ export function ResetPasswordPage() {
             </div>
 
             <div>
-              <label htmlFor="reset-confirm-password" className="block font-semibold text-slate-700 mb-1.5">
+              <label
+                htmlFor="reset-confirm-password"
+                className="block font-semibold text-slate-700 mb-1.5"
+              >
                 Confirm New Password
               </label>
               <input
@@ -164,7 +173,10 @@ export function ResetPasswordPage() {
             </button>
 
             <div className="text-center pt-2">
-              <Link to="/login" className="text-xs text-slate-500 hover:text-blue-900 font-semibold">
+              <Link
+                to="/login"
+                className="text-xs text-slate-500 hover:text-blue-900 font-semibold"
+              >
                 ← Return to Sign In
               </Link>
             </div>

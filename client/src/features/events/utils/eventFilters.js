@@ -16,8 +16,17 @@ export function formatEventDateTime(isoString) {
 
   const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
   const day = d.toLocaleDateString('en-US', { day: '2-digit' });
-  const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-  const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const timeStr = d.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  const dateStr = d.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
 
   return {
     dateStr,
@@ -64,7 +73,17 @@ export function getEventRegistrationStatus(event, now = new Date()) {
   return { isOpen: true, label: `${seatsLeft} seats open`, variant: 'success', seatsLeft };
 }
 
-export function buildEventQueryParams({ page = 1, limit = 12, search, category, school, venue, from, to, sort }) {
+export function buildEventQueryParams({
+  page = 1,
+  limit = 12,
+  search,
+  category,
+  school,
+  venue,
+  from,
+  to,
+  sort
+}) {
   const params = { page, limit };
   if (search && search.trim()) params.search = search.trim();
   if (category && category !== 'All' && category !== 'Saved') params.category = category;
@@ -75,4 +94,3 @@ export function buildEventQueryParams({ page = 1, limit = 12, search, category, 
   if (sort && sort !== 'soonest') params.sort = sort;
   return params;
 }
-

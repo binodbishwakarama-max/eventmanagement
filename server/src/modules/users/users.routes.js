@@ -37,10 +37,28 @@ const resubmitSchema = z.object({
 router.get('/me', authenticate, getMyProfile);
 router.patch('/me', authenticate, validate(updateProfileSchema), updateMyProfile);
 router.post('/me/deactivate', authenticate, deactivateMyAccount);
-router.patch('/resubmit/me', authenticate, authorize('student'), validate(resubmitSchema), resubmitVerification);
+router.patch(
+  '/resubmit/me',
+  authenticate,
+  authorize('student'),
+  validate(resubmitSchema),
+  resubmitVerification
+);
 
 // Administrative User Management
-router.get('/', authenticate, authorize('admin', 'super_admin'), validate(userListQuerySchema, 'query'), getUsers);
-router.patch('/:id/verify', authenticate, authorize('admin', 'super_admin'), validate(verifyUserSchema), verifyUser);
+router.get(
+  '/',
+  authenticate,
+  authorize('admin', 'super_admin'),
+  validate(userListQuerySchema, 'query'),
+  getUsers
+);
+router.patch(
+  '/:id/verify',
+  authenticate,
+  authorize('admin', 'super_admin'),
+  validate(verifyUserSchema),
+  verifyUser
+);
 
 export default router;

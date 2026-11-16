@@ -31,7 +31,9 @@ export async function restoreDatabaseBackup(backupFolderName, targetUri = null) 
   const manifestRaw = await fs.readFile(manifestPath, 'utf8');
   const manifest = JSON.parse(manifestRaw);
 
-  console.log(`[Restore Engine] Snapshot Created At: ${manifest.createdAt} (${manifest.environment})`);
+  console.log(
+    `[Restore Engine] Snapshot Created At: ${manifest.createdAt} (${manifest.environment})`
+  );
 
   if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(uri);
@@ -69,10 +71,14 @@ export async function restoreDatabaseBackup(backupFolderName, targetUri = null) 
 
     const verifiedCount = await model.countDocuments();
     results[colName] = { restored: docs.length, verifiedInDatabase: verifiedCount };
-    console.log(`  ✔ [Restored] ${colName}: ${verifiedCount} records verified in DB (Expected: ${meta.count})`);
+    console.log(
+      `  ✔ [Restored] ${colName}: ${verifiedCount} records verified in DB (Expected: ${meta.count})`
+    );
 
     if (verifiedCount !== meta.count) {
-      throw new Error(`Restoration record count mismatch for ${colName}: expected ${meta.count}, found ${verifiedCount}`);
+      throw new Error(
+        `Restoration record count mismatch for ${colName}: expected ${meta.count}, found ${verifiedCount}`
+      );
     }
   }
 
@@ -93,4 +99,3 @@ if (process.argv[1]?.endsWith('restore-db.js')) {
       process.exit(1);
     });
 }
-

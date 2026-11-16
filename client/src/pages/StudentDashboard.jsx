@@ -70,10 +70,14 @@ export function StudentDashboard() {
           setIsOfflineMode(true);
           toast('Loaded saved passes from offline storage', { icon: '📦' });
         } catch {
-          setLoadError(err.response?.data?.message || 'Unable to load registrations. Please try again.');
+          setLoadError(
+            err.response?.data?.message || 'Unable to load registrations. Please try again.'
+          );
         }
       } else {
-        setLoadError(err.response?.data?.message || 'Unable to load registrations. Please try again.');
+        setLoadError(
+          err.response?.data?.message || 'Unable to load registrations. Please try again.'
+        );
         toast.error('Failed to load your registrations');
       }
     } finally {
@@ -106,13 +110,11 @@ export function StudentDashboard() {
   };
 
   const upcoming = registrations.filter(
-    (r) => r.status === 'registered' && (!r.event?.startsAt || new Date(r.event.startsAt) >= new Date())
+    (r) =>
+      r.status === 'registered' && (!r.event?.startsAt || new Date(r.event.startsAt) >= new Date())
   );
   const past = registrations.filter(
-    (r) =>
-      r.status === 'registered' &&
-      r.event?.startsAt &&
-      new Date(r.event.startsAt) < new Date()
+    (r) => r.status === 'registered' && r.event?.startsAt && new Date(r.event.startsAt) < new Date()
   );
   const cancelled = registrations.filter((r) => r.status === 'cancelled');
 
@@ -127,7 +129,8 @@ export function StudentDashboard() {
           <div className="flex items-center gap-2.5">
             <WifiOff className="w-4 h-4 text-amber-700 shrink-0" />
             <span>
-              <strong>Offline Mode:</strong> Showing cached passbook records. Connect to campus network to refresh passes.
+              <strong>Offline Mode:</strong> Showing cached passbook records. Connect to campus
+              network to refresh passes.
             </span>
           </div>
           <button
@@ -148,10 +151,13 @@ export function StudentDashboard() {
             <div>
               <p className="font-bold text-sm text-rose-950">Verification Review Rejected</p>
               <p className="text-rose-800 mt-1 leading-relaxed">
-                <strong>Feedback from Desk:</strong> {user?.rejectionReason || 'Institutional USN or identity records could not be verified by registrar desk.'}
+                <strong>Feedback from Desk:</strong>{' '}
+                {user?.rejectionReason ||
+                  'Institutional USN or identity records could not be verified by registrar desk.'}
               </p>
               <p className="text-slate-500 text-[11px] mt-1">
-                Please update your Dayananda Sagar University Serial Number (USN) to match registrar records (e.g. 1DS23CS045).
+                Please update your Dayananda Sagar University Serial Number (USN) to match registrar
+                records (e.g. 1DS23CS045).
               </p>
             </div>
           </div>
@@ -196,10 +202,15 @@ export function StudentDashboard() {
                 )}
               </div>
               <p className="text-xs text-slate-500 font-mono mt-1">
-                University USN: <span className="text-slate-900 font-bold">{user?.usn || user?.rollNumber || '1DS23CS045'}</span> • {user?.email}
+                University USN:{' '}
+                <span className="text-slate-900 font-bold">
+                  {user?.usn || user?.rollNumber || '1DS23CS045'}
+                </span>{' '}
+                • {user?.email}
               </p>
               <p className="text-xs text-slate-600 mt-0.5 font-medium">
-                {user?.department || 'School of Computer Science & Engineering'} • Official Student Account
+                {user?.department || 'School of Computer Science & Engineering'} • Official Student
+                Account
               </p>
             </div>
           </div>
@@ -219,7 +230,9 @@ export function StudentDashboard() {
             <span className="text-[11px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Active Passes
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] sm:mt-1">{upcoming.length}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] sm:mt-1">
+              {upcoming.length}
+            </p>
           </div>
           <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200 flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
             <span className="text-[11px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
@@ -233,7 +246,9 @@ export function StudentDashboard() {
             <span className="text-[11px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Cancelled
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-400 sm:mt-1">{cancelled.length}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-slate-400 sm:mt-1">
+              {cancelled.length}
+            </p>
           </div>
         </div>
       </section>
@@ -426,7 +441,9 @@ export function StudentDashboard() {
                     Dayananda Sagar University Official E-Pass
                   </span>
                   <h2 className="text-lg font-extrabold tracking-tight text-white mt-0.5">
-                    {selectedPass.attended ? 'Verified Attendance Record' : 'Official Admission Ticket'}
+                    {selectedPass.attended
+                      ? 'Verified Attendance Record'
+                      : 'Official Admission Ticket'}
                   </h2>
                 </div>
                 <span className="text-[11px] bg-[#00142A] border border-[#D9A521]/60 text-[#F5C84C] px-3 py-1 rounded-full font-bold uppercase tracking-wider shadow-xs">
@@ -442,7 +459,9 @@ export function StudentDashboard() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="text-emerald-400 font-bold tracking-wider uppercase">Live Turnstile Validated</span>
+                <span className="text-emerald-400 font-bold tracking-wider uppercase">
+                  Live Turnstile Validated
+                </span>
               </div>
               <span className="text-slate-400 font-medium">
                 {liveSec.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })},{' '}
@@ -470,17 +489,23 @@ export function StudentDashboard() {
               {/* Student Credential Grid */}
               <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50/80 rounded-2xl border border-slate-200 text-xs">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">Student Name</span>
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">
+                    Student Name
+                  </span>
                   <span className="font-bold text-[#002B55] text-xs">{user?.name}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">University USN</span>
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">
+                    University USN
+                  </span>
                   <span className="font-mono font-bold text-[#002B55] text-xs">
                     {user?.usn || user?.rollNumber || '1DS23CS045'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">Schedule (IST)</span>
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">
+                    Schedule (IST)
+                  </span>
                   <span className="font-bold text-slate-800 text-xs">
                     {new Date(selectedPass.event?.startsAt).toLocaleDateString('en-IN', {
                       month: 'short',
@@ -491,7 +516,9 @@ export function StudentDashboard() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">Campus Venue</span>
+                  <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-bold font-mono">
+                    Campus Venue
+                  </span>
                   <span className="font-bold text-slate-800 truncate block text-xs">
                     {selectedPass.event?.venue}
                   </span>
@@ -515,14 +542,17 @@ export function StudentDashboard() {
                 />
 
                 <p className="text-[11px] text-slate-500 font-medium mt-3">
-                  Present this QR pass on your mobile device or printed copy at the entrance turnstile.
+                  Present this QR pass on your mobile device or printed copy at the entrance
+                  turnstile.
                 </p>
               </div>
 
               {selectedPass.attended && (
                 <div className="flex items-center gap-2.5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
                   <Award className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Official Attendance Confirmed • Credited to DSU Student Activity Portfolio.</span>
+                  <span>
+                    Official Attendance Confirmed • Credited to DSU Student Activity Portfolio.
+                  </span>
                 </div>
               )}
             </div>
@@ -579,7 +609,8 @@ export function StudentDashboard() {
               </div>
               <h3 className="text-xl font-bold text-[#002B55]">Update Verification Details</h3>
               <p className="text-xs text-slate-500 mt-1.5">
-                Resubmit your Dayananda Sagar University enrollment credentials for registrar desk review.
+                Resubmit your Dayananda Sagar University enrollment credentials for registrar desk
+                review.
               </p>
             </div>
 
@@ -623,7 +654,10 @@ export function StudentDashboard() {
               </div>
 
               <div>
-                <label htmlFor="resubmit-dept" className="block font-semibold text-slate-700 mb-1.5">
+                <label
+                  htmlFor="resubmit-dept"
+                  className="block font-semibold text-slate-700 mb-1.5"
+                >
                   School / Department
                 </label>
                 <input

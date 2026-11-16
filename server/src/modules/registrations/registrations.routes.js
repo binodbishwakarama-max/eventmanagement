@@ -11,10 +11,20 @@ const verifyPassSchema = z.object({ ticketCode: z.string().trim().min(4).max(64)
 // Student self registrations
 router.post('/events/:id/register', authenticate, authorize('student'), regController.register);
 router.delete('/events/:id/register', authenticate, authorize('student'), regController.cancel);
-router.get('/registrations/me', authenticate, authorize('student'), regController.getMyRegistrations);
+router.get(
+  '/registrations/me',
+  authenticate,
+  authorize('student'),
+  regController.getMyRegistrations
+);
 
 // Admin & Organizer attendance and list
-router.get('/events/:id/registrations', authenticate, authorize('admin', 'organizer'), regController.getEventRegistrations);
+router.get(
+  '/events/:id/registrations',
+  authenticate,
+  authorize('admin', 'organizer'),
+  regController.getEventRegistrations
+);
 router.patch(
   '/events/:id/registrations/:registrationId/attendance',
   authenticate,

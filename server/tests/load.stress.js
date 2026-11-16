@@ -4,7 +4,10 @@ import { Event } from '../src/models/Event.js';
 import { Registration } from '../src/models/Registration.js';
 import { User } from '../src/models/User.js';
 import { getPublicEvents } from '../src/modules/events/events.service.js';
-import { registerForEvent, verifyAndCheckInPass } from '../src/modules/registrations/registrations.service.js';
+import {
+  registerForEvent,
+  verifyAndCheckInPass
+} from '../src/modules/registrations/registrations.service.js';
 
 function computePercentiles(latencies) {
   if (latencies.length === 0) return { min: 0, max: 0, avg: 0, p50: 0, p90: 0, p95: 0, p99: 0 };
@@ -56,7 +59,7 @@ async function runLoadTestingSuite() {
         title: `University Event Series #${i} - Future Tech & Innovation`,
         description: `Deep-dive workshop and technical symposium number ${i} on campus.`,
         category: categories[i % categories.length],
-        venue: `Auditorium Hall ${i % 4 + 1}, Harohalli Campus`,
+        venue: `Auditorium Hall ${(i % 4) + 1}, Harohalli Campus`,
         startsAt: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000),
         endsAt: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000),
         capacity: 100,
@@ -109,8 +112,12 @@ async function runLoadTestingSuite() {
 
     console.log(`• Dispatched Requests    : ${totalDiscoveryRequests}`);
     console.log(`• Total Duration         : ${discoveryDurationMs} ms`);
-    console.log(`• Throughput             : ${Math.round((totalDiscoveryRequests / discoveryDurationMs) * 1000)} req/sec`);
-    console.log(`• Success Rate           : ${((discoverySuccess / totalDiscoveryRequests) * 100).toFixed(1)}%`);
+    console.log(
+      `• Throughput             : ${Math.round((totalDiscoveryRequests / discoveryDurationMs) * 1000)} req/sec`
+    );
+    console.log(
+      `• Success Rate           : ${((discoverySuccess / totalDiscoveryRequests) * 100).toFixed(1)}%`
+    );
     console.log(`• Min Latency            : ${discoveryStats.min} ms`);
     console.log(`• Average Latency        : ${discoveryStats.avg} ms`);
     console.log(`• P50 Latency (Median)   : ${discoveryStats.p50} ms`);
@@ -174,7 +181,10 @@ async function runLoadTestingSuite() {
     const regStats = computePercentiles(regLatencies);
 
     const finalEvent = await Event.findById(cappedEvent._id);
-    const dbRegCount = await Registration.countDocuments({ event: cappedEvent._id, status: 'registered' });
+    const dbRegCount = await Registration.countDocuments({
+      event: cappedEvent._id,
+      status: 'registered'
+    });
 
     console.log(`• Dispatched Requests    : 500`);
     console.log(`• Event Capacity         : 50`);
@@ -198,14 +208,20 @@ async function runLoadTestingSuite() {
     console.log('------------------------------------------------------------------------');
 
     // Fetch the 50 registered passes from scenario 2 plus 50 more registrations on another event
-    const registeredPasses = await Registration.find({ event: cappedEvent._id, status: 'registered' });
+    const registeredPasses = await Registration.find({
+      event: cappedEvent._id,
+      status: 'registered'
+    });
 
     // Create 50 more registrations on event 1
     const extraStudents = students.slice(50, 100);
     for (const st of extraStudents) {
       await registerForEvent(createdEvents[0]._id, st._id);
     }
-    const extraPasses = await Registration.find({ event: createdEvents[0]._id, status: 'registered' }).limit(50);
+    const extraPasses = await Registration.find({
+      event: createdEvents[0]._id,
+      status: 'registered'
+    }).limit(50);
     const combined100Passes = [
       ...registeredPasses.map((p) => ({ eventId: cappedEvent._id, code: p.ticketCode })),
       ...extraPasses.map((p) => ({ eventId: createdEvents[0]._id, code: p.ticketCode }))
@@ -234,7 +250,9 @@ async function runLoadTestingSuite() {
     console.log(`• Total Scans Dispatched : ${combined100Passes.length}`);
     console.log(`• Verified Check-ins     : ${scanSuccess}`);
     console.log(`• Total Duration         : ${scanDurationMs} ms`);
-    console.log(`• Throughput             : ${Math.round((combined100Passes.length / scanDurationMs) * 1000)} scans/sec`);
+    console.log(
+      `• Throughput             : ${Math.round((combined100Passes.length / scanDurationMs) * 1000)} scans/sec`
+    );
     console.log(`• Average Latency        : ${scanStats.avg} ms`);
     console.log(`• P50 Latency            : ${scanStats.p50} ms`);
     console.log(`• P95 Latency            : ${scanStats.p95} ms`);
@@ -253,15 +271,25 @@ async function runLoadTestingSuite() {
       })
     );
     const allRejected = duplicateOutcomes.every((d) => d.rejected && d.status === 409);
-    console.log(`• Duplicate Scans Rejected (HTTP 409): ${duplicateOutcomes.filter((d) => d.rejected).length}/100`);
-    console.log(`• Zero-Double-Check-in Guarantee: ${allRejected ? 'VERIFIED (100% BLOCKED)' : 'FAILED'}`);
+    console.log(
+      `• Duplicate Scans Rejected (HTTP 409): ${duplicateOutcomes.filter((d) => d.rejected).length}/100`
+    );
+    console.log(
+      `• Zero-Double-Check-in Guarantee: ${allRejected ? 'VERIFIED (100% BLOCKED)' : 'FAILED'}`
+    );
 
     console.log('\n========================================================================');
     console.log('                      LOAD TESTING SUMMARY RESULTS                      ');
     console.log('========================================================================');
-    console.log(`✔ Scenario 1 (1,000 Discovery Requests): ${Math.round((totalDiscoveryRequests / discoveryDurationMs) * 1000)} RPS | P95: ${discoveryStats.p95}ms | P99: ${discoveryStats.p99}ms`);
-    console.log(`✔ Scenario 2 (500 Contested Registrations): ${Math.round((500 / regDurationMs) * 1000)} RPS | 50 Granted | 450 Blocked | 0 Overbooked`);
-    console.log(`✔ Scenario 3 (100 Gate Scans): ${Math.round((combined100Passes.length / scanDurationMs) * 1000)} Scans/sec | 100% Duplicate Rejection`);
+    console.log(
+      `✔ Scenario 1 (1,000 Discovery Requests): ${Math.round((totalDiscoveryRequests / discoveryDurationMs) * 1000)} RPS | P95: ${discoveryStats.p95}ms | P99: ${discoveryStats.p99}ms`
+    );
+    console.log(
+      `✔ Scenario 2 (500 Contested Registrations): ${Math.round((500 / regDurationMs) * 1000)} RPS | 50 Granted | 450 Blocked | 0 Overbooked`
+    );
+    console.log(
+      `✔ Scenario 3 (100 Gate Scans): ${Math.round((combined100Passes.length / scanDurationMs) * 1000)} Scans/sec | 100% Duplicate Rejection`
+    );
     console.log('========================================================================\n');
   } finally {
     await mongoose.disconnect();
@@ -273,4 +301,3 @@ runLoadTestingSuite().catch((err) => {
   console.error('Fatal load test runner error:', err);
   process.exit(1);
 });
-

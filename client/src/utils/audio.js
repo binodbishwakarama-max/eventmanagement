@@ -35,7 +35,7 @@ export function playSuccessChime() {
 
     const now = ctx.currentTime;
     playTone(587.33, now, 0.18, 0.15); // D5
-    playTone(880.00, now + 0.09, 0.38, 0.22); // A5
+    playTone(880.0, now + 0.09, 0.38, 0.22); // A5
   } catch {
     // If Web Audio is blocked or not supported, fail silently
   }

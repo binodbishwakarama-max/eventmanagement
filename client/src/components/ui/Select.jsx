@@ -17,10 +17,7 @@ export function Select({
   return (
     <div className="w-full">
       {label && (
-        <label
-          htmlFor={selectId}
-          className="block text-xs font-semibold text-slate-800 mb-1.5"
-        >
+        <label htmlFor={selectId} className="block text-xs font-semibold text-slate-800 mb-1.5">
           {label} {required && <span className="text-rose-500">*</span>}
         </label>
       )}
@@ -61,4 +58,3 @@ export function Select({
     </div>
   );
 }
-

@@ -13,4 +13,3 @@ export function created(res, data, message) {
     ...(message ? { message } : {})
   });
 }
-

@@ -3,20 +3,9 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { EventArtwork } from '../components/EventArtwork';
 import { CampusMapModal } from '../components/CampusMapModal';
-import {
-  Button,
-  EventCardSkeleton,
-  EmptyState,
-  ErrorState
-} from '../components/ui';
-import {
-  buildEventQueryParams,
-  cleanEventTitle
-} from '../features/events/utils/eventFilters';
-import {
-  getSavedEventIds,
-  toggleSaveEvent
-} from '../utils/bookmarks';
+import { Button, EventCardSkeleton, EmptyState, ErrorState } from '../components/ui';
+import { buildEventQueryParams, cleanEventTitle } from '../features/events/utils/eventFilters';
+import { getSavedEventIds, toggleSaveEvent } from '../utils/bookmarks';
 import {
   Search,
   MapPin,
@@ -58,7 +47,8 @@ const DSU_OFFICIAL_VIDEOS = [
     category: 'Cultural Fest',
     organizer: 'Centre for Performing Arts (CPA)',
     duration: 'Festival Highlights',
-    description: "Dayananda Sagar University's flagship cultural extravaganza featuring music ensembles, fashion spectacles, battle of the bands, and celebrity concert nights.",
+    description:
+      "Dayananda Sagar University's flagship cultural extravaganza featuring music ensembles, fashion spectacles, battle of the bands, and celebrity concert nights.",
     thumbnail: '/thumb-taranga.jpg'
   },
   {
@@ -67,7 +57,8 @@ const DSU_OFFICIAL_VIDEOS = [
     category: 'Campus Tour',
     organizer: 'Dayananda Sagar University Official',
     duration: 'Aerial & Ground Tour',
-    description: "Experience the sprawling green Harohalli Main Campus on Kanakapura Road, advanced research centers, School of Engineering, and modern sports complexes.",
+    description:
+      'Experience the sprawling green Harohalli Main Campus on Kanakapura Road, advanced research centers, School of Engineering, and modern sports complexes.',
     thumbnail: '/thumb-campus-tour.jpg'
   },
   {
@@ -76,7 +67,8 @@ const DSU_OFFICIAL_VIDEOS = [
     category: 'Technical Symposium',
     organizer: 'School of Engineering & Technology',
     duration: 'Collegiate Sprint',
-    description: 'HackGrid maker sprint highlights, AI & autonomous systems demonstrations, student robotics exhibitions, and faculty keynote colloquiums.',
+    description:
+      'HackGrid maker sprint highlights, AI & autonomous systems demonstrations, student robotics exhibitions, and faculty keynote colloquiums.',
     thumbnail: '/thumb-engineering.jpg'
   }
 ];
@@ -87,7 +79,8 @@ const DSU_CAMPUS_VIEWS = [
     title: 'Harohalli Main Campus & Academic Blocks',
     subheading: 'Dayananda Sagar University Main Campus',
     caption: 'Official 130-Acre Harohalli Campus Architecture & Academic Blocks',
-    description: 'The sprawling official campus along Kanakapura Road, Bengaluru, housing world-class engineering, health sciences, computing laboratories, and innovation research centers.',
+    description:
+      'The sprawling official campus along Kanakapura Road, Bengaluru, housing world-class engineering, health sciences, computing laboratories, and innovation research centers.',
     image: '/dsu-main-campus-admission.jpg',
     tag: 'Flagship Campus'
   },
@@ -96,7 +89,8 @@ const DSU_CAMPUS_VIEWS = [
     title: 'School of Engineering & Main Gate',
     subheading: 'Main Entrance & Administrative Tower',
     caption: 'Iconic 8-Story Academic & Administrative Complex',
-    description: 'State-of-the-art engineering laboratories, high-performance computing centers, executive dean offices, and modern lecture theaters at Harohalli.',
+    description:
+      'State-of-the-art engineering laboratories, high-performance computing centers, executive dean offices, and modern lecture theaters at Harohalli.',
     image: '/dsu-harohalli-main.jpg',
     tag: 'Academic Landmark'
   },
@@ -105,7 +99,8 @@ const DSU_CAMPUS_VIEWS = [
     title: '130-Acre Harohalli Main Campus',
     subheading: 'Kanakapura Road, Bengaluru',
     caption: 'Panoramic Aerial Grounds & Green Terraces',
-    description: 'Vast lush green grounds housing collegiate stadiums, student residential complexes, innovation parks, and central manicured lawns.',
+    description:
+      'Vast lush green grounds housing collegiate stadiums, student residential complexes, innovation parks, and central manicured lawns.',
     image: '/dsu-campus-aerial.jpg',
     tag: 'Sprawling Campus'
   },
@@ -114,7 +109,8 @@ const DSU_CAMPUS_VIEWS = [
     title: 'Academic Quadrangle & Innovation Labs',
     subheading: 'Central Academic Plaza',
     caption: 'Student Collaboration Courtyards & Tech Corridors',
-    description: 'Home to the AIC-DSU Innovation Foundation, startup incubation cells, robotics maker studios, and open-air student amphitheater plazas.',
+    description:
+      'Home to the AIC-DSU Innovation Foundation, startup incubation cells, robotics maker studios, and open-air student amphitheater plazas.',
     image: '/dsu-campus-quad.jpg',
     tag: 'Innovation Hub'
   },
@@ -123,7 +119,8 @@ const DSU_CAMPUS_VIEWS = [
     title: 'Sir M. Visvesvaraya Auditorium & Arenas',
     subheading: 'Cultural & Athletics Complex',
     caption: 'Cultural & Collegiate Varsity Athletic Arenas',
-    description: 'Acoustically engineered 850-seat auditorium for Taranga cultural fests and FIFA-spec synthetic athletic turf for inter-varsity championships.',
+    description:
+      'Acoustically engineered 850-seat auditorium for Taranga cultural fests and FIFA-spec synthetic athletic turf for inter-varsity championships.',
     image: '/dsu-campus-auditorium.jpg',
     tag: 'Events & Athletics'
   }
@@ -258,11 +255,13 @@ export function EventsPage() {
     const cleanTitle = cleanEventTitle(event.title);
     const url = `${window.location.origin}/events/${event._id}`;
     if (navigator.share) {
-      navigator.share({
-        title: cleanTitle,
-        text: `Explore ${cleanTitle} at Dayananda Sagar University`,
-        url
-      }).catch(() => {});
+      navigator
+        .share({
+          title: cleanTitle,
+          text: `Explore ${cleanTitle} at Dayananda Sagar University`,
+          url
+        })
+        .catch(() => {});
     } else {
       navigator.clipboard.writeText(url);
       toast.success('Event link copied to clipboard');
@@ -279,14 +278,14 @@ export function EventsPage() {
     sort !== 'soonest'
   );
 
-  let displayedEvents = category === 'Saved'
-    ? events.filter((ev) => savedIds.includes(ev._id))
-    : events;
+  let displayedEvents =
+    category === 'Saved' ? events.filter((ev) => savedIds.includes(ev._id)) : events;
 
   if (schoolParam) {
-    displayedEvents = displayedEvents.filter((ev) =>
-      ev.organizerClub?.toLowerCase().includes(schoolParam.toLowerCase()) ||
-      ev.description?.toLowerCase().includes(schoolParam.toLowerCase())
+    displayedEvents = displayedEvents.filter(
+      (ev) =>
+        ev.organizerClub?.toLowerCase().includes(schoolParam.toLowerCase()) ||
+        ev.description?.toLowerCase().includes(schoolParam.toLowerCase())
     );
   }
 
@@ -296,9 +295,10 @@ export function EventsPage() {
     );
   }
 
-  const featuredEvent = displayedEvents.length > 0 && page === 1 && !hasActiveFilters && category !== 'Saved'
-    ? displayedEvents[0]
-    : null;
+  const featuredEvent =
+    displayedEvents.length > 0 && page === 1 && !hasActiveFilters && category !== 'Saved'
+      ? displayedEvents[0]
+      : null;
   const gridEvents = featuredEvent ? displayedEvents.slice(1) : displayedEvents;
 
   const groupedSchedule = gridEvents.reduce((acc, ev) => {
@@ -317,9 +317,7 @@ export function EventsPage() {
   return (
     <div className="min-h-screen pb-24 bg-[#F8FAFC] relative">
       {/* Subtle Panoramic DSU Campus Backdrop Watermark across the page body (Desktop only to prevent redundant mobile downloads) */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.06] filter grayscale-0 hidden sm:block dsu-campus-watermark"
-      />
+      <div className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.06] filter grayscale-0 hidden sm:block dsu-campus-watermark" />
 
       {/* Mobile-First Streamlined Hero Section */}
       <section className="relative overflow-hidden bg-[#000E1C] text-white pt-6 sm:pt-10 pb-8 sm:pb-16 border-b border-[#002B55] z-10">
@@ -380,7 +378,8 @@ export function EventsPage() {
                 DSU Campus Events
               </h1>
               <p className="text-slate-300 text-xs sm:text-base leading-relaxed max-w-xl font-normal">
-                Discover university hackathons, conferences, and cultural festivals across Harohalli Main Campus.
+                Discover university hackathons, conferences, and cultural festivals across Harohalli
+                Main Campus.
               </p>
             </div>
 
@@ -388,8 +387,12 @@ export function EventsPage() {
             <div className="md:col-span-4 hidden md:flex justify-end">
               <div className="w-full max-w-xs p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#F5C84C] uppercase text-[10px] tracking-wider">Harohalli Campus</span>
-                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px] font-mono border border-white/20">NAAC A+</span>
+                  <span className="font-bold text-[#F5C84C] uppercase text-[10px] tracking-wider">
+                    Harohalli Campus
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px] font-mono border border-white/20">
+                    NAAC A+
+                  </span>
                 </div>
                 <p className="text-xs text-slate-200 leading-snug">
                   130-Acre Campus • Kanakapura Road, Bengaluru
@@ -479,7 +482,10 @@ export function EventsPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div>
-                    <label htmlFor="filter-from" className="block text-slate-600 font-semibold mb-1">
+                    <label
+                      htmlFor="filter-from"
+                      className="block text-slate-600 font-semibold mb-1"
+                    >
                       From Date
                     </label>
                     <input
@@ -503,7 +509,10 @@ export function EventsPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="filter-sort" className="block text-slate-600 font-semibold mb-1">
+                    <label
+                      htmlFor="filter-sort"
+                      className="block text-slate-600 font-semibold mb-1"
+                    >
                       Sort Order
                     </label>
                     <select
@@ -545,7 +554,9 @@ export function EventsPage() {
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#F5C84C]' : 'text-slate-500'}`} />
+                    <Icon
+                      className={`w-3.5 h-3.5 ${isSelected ? 'text-[#F5C84C]' : 'text-slate-500'}`}
+                    />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -561,7 +572,9 @@ export function EventsPage() {
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
                 }`}
               >
-                <Bookmark className={`w-3.5 h-3.5 ${category === 'Saved' ? 'fill-[#F5C84C] text-[#F5C84C]' : 'text-[#D9A521]'}`} />
+                <Bookmark
+                  className={`w-3.5 h-3.5 ${category === 'Saved' ? 'fill-[#F5C84C] text-[#F5C84C]' : 'text-[#D9A521]'}`}
+                />
                 <span>Saved ({savedIds.length})</span>
               </button>
             </div>
@@ -584,7 +597,9 @@ export function EventsPage() {
                 type="button"
                 onClick={() => setViewMode('schedule')}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200 apple-press ${
-                  viewMode === 'schedule' ? 'bg-white text-[#002B55] shadow-xs' : 'hover:text-slate-900'
+                  viewMode === 'schedule'
+                    ? 'bg-white text-[#002B55] shadow-xs'
+                    : 'hover:text-slate-900'
                 }`}
                 title="Schedule View"
                 aria-label="Schedule View"
@@ -602,7 +617,11 @@ export function EventsPage() {
               {schoolParam && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#002B55] font-semibold border border-blue-200">
                   School: {schoolParam}
-                  <button type="button" onClick={() => updateFilter('school', '')} className="hover:text-rose-600">
+                  <button
+                    type="button"
+                    onClick={() => updateFilter('school', '')}
+                    className="hover:text-rose-600"
+                  >
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -610,7 +629,11 @@ export function EventsPage() {
               {venueParam && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-[#001B36] font-semibold border border-amber-200">
                   Venue: {venueParam}
-                  <button type="button" onClick={() => updateFilter('venue', '')} className="hover:text-rose-600">
+                  <button
+                    type="button"
+                    onClick={() => updateFilter('venue', '')}
+                    className="hover:text-rose-600"
+                  >
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -652,132 +675,150 @@ export function EventsPage() {
         ) : (
           <div className="space-y-8">
             {/* Featured Event Section - Editorial Showcase */}
-            {featuredEvent && (() => {
-              const starts = new Date(featuredEvent.startsAt);
-              const available = Math.max(0, featuredEvent.capacity - featuredEvent.registeredCount);
-              const fillPercent = Math.min(100, Math.round((featuredEvent.registeredCount / featuredEvent.capacity) * 100));
-              const title = cleanEventTitle(featuredEvent.title);
+            {featuredEvent &&
+              (() => {
+                const starts = new Date(featuredEvent.startsAt);
+                const available = Math.max(
+                  0,
+                  featuredEvent.capacity - featuredEvent.registeredCount
+                );
+                const title = cleanEventTitle(featuredEvent.title);
 
-              return (
-                <section className="dsu-card overflow-hidden border border-slate-200/90 shadow-card hover:shadow-card-hover transition-all duration-300">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-                    {/* Left Column (5/12): Photographic Cover */}
-                    <div className="lg:col-span-5 relative overflow-hidden bg-slate-100 min-h-[260px] sm:min-h-[300px] lg:min-h-full group">
-                      <EventArtwork
-                        category={featuredEvent.category}
-                        title={featuredEvent.title}
-                        posterUrl={featuredEvent.posterUrl}
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                        featured={true}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+                return (
+                  <section className="dsu-card overflow-hidden border border-slate-200/90 shadow-card hover:shadow-card-hover transition-all duration-300">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                      {/* Left Column (5/12): Photographic Cover */}
+                      <div className="lg:col-span-5 relative overflow-hidden bg-slate-100 min-h-[260px] sm:min-h-[300px] lg:min-h-full group">
+                        <EventArtwork
+                          category={featuredEvent.category}
+                          title={featuredEvent.title}
+                          posterUrl={featuredEvent.posterUrl}
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                          featured={true}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-                      {/* Top Badges */}
-                      <div className="absolute top-4 left-4">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/90 backdrop-blur-md text-[#F5C84C] text-xs font-bold border border-[#D9A521]/40 shadow-xs">
-                          <Sparkles className="w-3.5 h-3.5 text-[#D9A521]" />
-                          <span>Featured Gathering</span>
-                        </span>
-                      </div>
-
-                      <div className="absolute top-4 right-4 flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={(e) => handleToggleBookmark(e, featuredEvent._id)}
-                          aria-label={savedIds.includes(featuredEvent._id) ? 'Remove bookmark' : 'Save event'}
-                          className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95"
-                        >
-                          <Bookmark
-                            className={`w-4 h-4 ${
-                              savedIds.includes(featuredEvent._id) ? 'fill-[#D9A521] text-[#D9A521]' : 'text-slate-600'
-                            }`}
-                          />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => handleShare(e, featuredEvent)}
-                          aria-label="Share event"
-                          className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95"
-                        >
-                          <Share2 className="w-4 h-4 text-slate-600" />
-                        </button>
-                      </div>
-
-                      {/* Bottom Floating Pill inside Photo */}
-                      <div className="absolute bottom-4 left-4 right-4 text-white">
-                        <span className="text-[11px] font-mono tracking-wider uppercase text-slate-200 block mb-0.5">
-                          Official Campus Schedule
-                        </span>
-                        <div className="flex items-center gap-2 text-xs font-semibold">
-                          <Calendar className="w-3.5 h-3.5 text-[#F5C84C]" />
-                          <span>
-                            {starts.toLocaleDateString('en-IN', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric'
-                            })} • {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Column: Clean Metadata & Primary Action */}
-                    <div className="lg:col-span-7 p-5 sm:p-7 flex flex-col justify-between space-y-4 bg-white">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#002B55] text-white">
-                            {featuredEvent.category}
-                          </span>
-                          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                            {available > 0 ? `${available} seats remaining` : 'Full capacity'}
+                        {/* Top Badges */}
+                        <div className="absolute top-4 left-4">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00142A]/90 backdrop-blur-md text-[#F5C84C] text-xs font-bold border border-[#D9A521]/40 shadow-xs">
+                            <Sparkles className="w-3.5 h-3.5 text-[#D9A521]" />
+                            <span>Featured Gathering</span>
                           </span>
                         </div>
 
-                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug tracking-tight">
-                          <Link to={`/events/${featuredEvent._id}`} className="hover:text-[#002B55]">
-                            {title}
-                          </Link>
-                        </h2>
+                        <div className="absolute top-4 right-4 flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => handleToggleBookmark(e, featuredEvent._id)}
+                            aria-label={
+                              savedIds.includes(featuredEvent._id)
+                                ? 'Remove bookmark'
+                                : 'Save event'
+                            }
+                            className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95"
+                          >
+                            <Bookmark
+                              className={`w-4 h-4 ${
+                                savedIds.includes(featuredEvent._id)
+                                  ? 'fill-[#D9A521] text-[#D9A521]'
+                                  : 'text-slate-600'
+                              }`}
+                            />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleShare(e, featuredEvent)}
+                            aria-label="Share event"
+                            className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95"
+                          >
+                            <Share2 className="w-4 h-4 text-slate-600" />
+                          </button>
+                        </div>
 
-                        <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                          {featuredEvent.description}
-                        </p>
-
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                          <div className="flex items-center gap-1.5 font-medium text-slate-800">
-                            <Calendar className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
+                        {/* Bottom Floating Pill inside Photo */}
+                        <div className="absolute bottom-4 left-4 right-4 text-white">
+                          <span className="text-[11px] font-mono tracking-wider uppercase text-slate-200 block mb-0.5">
+                            Official Campus Schedule
+                          </span>
+                          <div className="flex items-center gap-2 text-xs font-semibold">
+                            <Calendar className="w-3.5 h-3.5 text-[#F5C84C]" />
                             <span>
                               {starts.toLocaleDateString('en-IN', {
                                 weekday: 'short',
                                 month: 'short',
                                 day: 'numeric'
-                              })}
+                              })}{' '}
+                              •{' '}
+                              {starts.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}{' '}
+                              IST
                             </span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-slate-500">
-                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="truncate">{featuredEvent.venue}</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-xs font-medium text-slate-500">
-                          {featuredEvent.organizerClub || 'DSU Student Affairs'}
-                        </span>
-                        <Link
-                          to={`/events/${featuredEvent._id}`}
-                          className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001D3A] text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-xs active:scale-95"
-                        >
-                          <span>Register for Event</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
+                      {/* Right Column: Clean Metadata & Primary Action */}
+                      <div className="lg:col-span-7 p-5 sm:p-7 flex flex-col justify-between space-y-4 bg-white">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#002B55] text-white">
+                              {featuredEvent.category}
+                            </span>
+                            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                              {available > 0 ? `${available} seats remaining` : 'Full capacity'}
+                            </span>
+                          </div>
+
+                          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug tracking-tight">
+                            <Link
+                              to={`/events/${featuredEvent._id}`}
+                              className="hover:text-[#002B55]"
+                            >
+                              {title}
+                            </Link>
+                          </h2>
+
+                          <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                            {featuredEvent.description}
+                          </p>
+
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                            <div className="flex items-center gap-1.5 font-medium text-slate-800">
+                              <Calendar className="w-3.5 h-3.5 text-[#002B55] shrink-0" />
+                              <span>
+                                {starts.toLocaleDateString('en-IN', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-slate-500">
+                              <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <span className="truncate">{featuredEvent.venue}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-xs font-medium text-slate-500">
+                            {featuredEvent.organizerClub || 'DSU Student Affairs'}
+                          </span>
+                          <Link
+                            to={`/events/${featuredEvent._id}`}
+                            className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001D3A] text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-xs active:scale-95"
+                          >
+                            <span>Register for Event</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </section>
-              );
-            })()}
+                  </section>
+                );
+              })()}
 
             {/* Event Listing Grid */}
             {viewMode === 'grid' ? (
@@ -786,7 +827,6 @@ export function EventsPage() {
                   const starts = new Date(ev.startsAt);
                   const isSaved = savedIds.includes(ev._id);
                   const available = Math.max(0, ev.capacity - ev.registeredCount);
-                  const fillPercent = Math.min(100, Math.round((ev.registeredCount / ev.capacity) * 100));
                   const cleanTitleText = cleanEventTitle(ev.title);
 
                   return (
@@ -859,7 +899,13 @@ export function EventsPage() {
                                   weekday: 'short',
                                   month: 'short',
                                   day: 'numeric'
-                                })} • {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                                })}{' '}
+                                •{' '}
+                                {starts.toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}{' '}
+                                IST
                               </span>
                             </div>
                             <div className="flex items-center gap-1.5 truncate text-slate-500">
@@ -872,11 +918,13 @@ export function EventsPage() {
 
                       {/* Card Footer: Registration Status & 1 Primary Action */}
                       <div className="px-4 sm:px-5 py-3 border-t border-slate-100 mt-auto flex items-center justify-between bg-slate-50/50">
-                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
-                          available > 0
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-600 border border-slate-200'
-                        }`}>
+                        <span
+                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                            available > 0
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          }`}
+                        >
                           {available > 0 ? `${available} seats open` : 'Full capacity'}
                         </span>
 
@@ -920,7 +968,11 @@ export function EventsPage() {
                                 </span>
                                 <span className="text-slate-300">•</span>
                                 <span className="text-slate-600 font-medium">
-                                  {new Date(ev.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                                  {new Date(ev.startsAt).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}{' '}
+                                  IST
                                 </span>
                               </div>
 
@@ -969,7 +1021,8 @@ export function EventsPage() {
                 Experience DSU in Action
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl">
-                Watch official highlights from annual collegiate festivals, robotics sprints, technical symposia, and campus life across Harohalli Main Campus.
+                Watch official highlights from annual collegiate festivals, robotics sprints,
+                technical symposia, and campus life across Harohalli Main Campus.
               </p>
             </div>
 
@@ -1080,7 +1133,8 @@ export function EventsPage() {
                 Harohalli Main Campus Landmarks
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-                Explore authentic campus architecture, academic wings, the 850-seat auditorium, and collegiate athletics complex spanning 130 acres on Kanakapura Road, Bengaluru.
+                Explore authentic campus architecture, academic wings, the 850-seat auditorium, and
+                collegiate athletics complex spanning 130 acres on Kanakapura Road, Bengaluru.
               </p>
             </div>
 
@@ -1205,10 +1259,15 @@ export function EventsPage() {
               <div className="flex items-center gap-2.5 min-w-0">
                 <Youtube className="w-5 h-5 text-red-500 shrink-0" />
                 <div className="min-w-0">
-                  <h3 id="video-modal-title" className="font-bold text-sm text-white truncate max-w-xs sm:max-w-md lg:max-w-lg">
+                  <h3
+                    id="video-modal-title"
+                    className="font-bold text-sm text-white truncate max-w-xs sm:max-w-md lg:max-w-lg"
+                  >
                     {activeVideo.title}
                   </h3>
-                  <p className="text-[11px] text-slate-400 font-mono truncate">{activeVideo.organizer}</p>
+                  <p className="text-[11px] text-slate-400 font-mono truncate">
+                    {activeVideo.organizer}
+                  </p>
                 </div>
               </div>
 
@@ -1248,9 +1307,7 @@ export function EventsPage() {
 
             {/* Fallback & Context footer */}
             <div className="px-4 py-2.5 bg-[#000E1C] border-t border-white/10 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
-              <p className="line-clamp-1 text-slate-300 max-w-xl">
-                {activeVideo.description}
-              </p>
+              <p className="line-clamp-1 text-slate-300 max-w-xl">{activeVideo.description}</p>
               <a
                 href={`https://www.youtube.com/watch?v=${activeVideo.id}`}
                 target="_blank"

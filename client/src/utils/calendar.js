@@ -7,14 +7,19 @@ export function downloadIcsFile(event) {
 
   const formatDateToICS = (dateStr) => {
     const d = new Date(dateStr);
-    return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    return d
+      .toISOString()
+      .replace(/[-:]/g, '')
+      .replace(/\.\d{3}/, '');
   };
 
   const start = formatDateToICS(event.startsAt);
   const end = formatDateToICS(event.endsAt);
   const now = formatDateToICS(new Date());
 
-  const cleanTitle = (event.title || 'DSU Campus Event').replace(/^DEMO:\s*/, '').replace(/\r?\n/g, ' ');
+  const cleanTitle = (event.title || 'DSU Campus Event')
+    .replace(/^DEMO:\s*/, '')
+    .replace(/\r?\n/g, ' ');
   const cleanDesc = (event.description || '').replace(/\r?\n/g, '\\n');
   const cleanLoc = (event.venue || 'Dayananda Sagar University').replace(/\r?\n/g, ', ');
 

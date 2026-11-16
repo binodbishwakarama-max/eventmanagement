@@ -72,4 +72,3 @@ describe('Transactional Email Service Verification', () => {
     expect(result.success).toBe(true);
   });
 });
-

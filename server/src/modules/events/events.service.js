@@ -111,7 +111,10 @@ export async function getEventById(id, currentUser) {
   if (!event) throw ApiError.notFound('Event not found');
 
   // Rule R1: Non-admins/non-organizers only see published events
-  const isPrivileged = currentUser && (currentUser.role === 'admin' || (currentUser.role === 'organizer' && event.createdBy._id.equals(currentUser._id)));
+  const isPrivileged =
+    currentUser &&
+    (currentUser.role === 'admin' ||
+      (currentUser.role === 'organizer' && event.createdBy._id.equals(currentUser._id)));
   if (event.status !== 'published' && !isPrivileged) {
     throw ApiError.notFound('Event not found');
   }
@@ -180,7 +183,11 @@ export async function getAdminEvents(query, user) {
   }
 
   const [items, total] = await Promise.all([
-    Event.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('createdBy', 'name clubName email'),
+    Event.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('createdBy', 'name clubName email'),
     Event.countDocuments(filter)
   ]);
 
@@ -213,7 +220,9 @@ export async function updateEvent(id, data, user) {
 
   // Rule R6: Capacity cannot be updated below current registeredCount
   if (data.capacity !== undefined && data.capacity < event.registeredCount) {
-    throw ApiError.badRequest(`Capacity cannot be lower than current registrations (${event.registeredCount})`);
+    throw ApiError.badRequest(
+      `Capacity cannot be lower than current registrations (${event.registeredCount})`
+    );
   }
 
   const startsAt = data.startsAt ?? event.startsAt;
@@ -224,7 +233,8 @@ export async function updateEvent(id, data, user) {
 
   const wasCancelled = event.status !== 'cancelled' && data.status === 'cancelled';
   const venueChanged = data.venue && data.venue !== event.venue;
-  const timeChanged = data.startsAt && new Date(data.startsAt).getTime() !== new Date(event.startsAt).getTime();
+  const timeChanged =
+    data.startsAt && new Date(data.startsAt).getTime() !== new Date(event.startsAt).getTime();
 
   let resultEvent = event;
   if (data.capacity !== undefined) {
@@ -237,7 +247,9 @@ export async function updateEvent(id, data, user) {
       const currentEvent = await Event.findById(id);
       if (!currentEvent) throw ApiError.notFound('Event not found');
       if (data.capacity < currentEvent.registeredCount) {
-        throw ApiError.badRequest(`Capacity cannot be lower than current registrations (${currentEvent.registeredCount})`);
+        throw ApiError.badRequest(
+          `Capacity cannot be lower than current registrations (${currentEvent.registeredCount})`
+        );
       }
       throw ApiError.conflict('Event changed while it was being updated. Reload and try again.');
     }
@@ -262,11 +274,12 @@ export async function updateEvent(id, data, user) {
                 event: resultEvent
               }).catch(() => {});
             } else if (venueChanged || timeChanged) {
-              const summary = venueChanged && timeChanged
-                ? `Venue changed to ${resultEvent.venue} and start time rescheduled to ${new Date(resultEvent.startsAt).toLocaleTimeString('en-IN')}`
-                : venueChanged
-                ? `Venue moved to ${resultEvent.venue}`
-                : `Start time rescheduled to ${new Date(resultEvent.startsAt).toLocaleTimeString('en-IN')}`;
+              const summary =
+                venueChanged && timeChanged
+                  ? `Venue changed to ${resultEvent.venue} and start time rescheduled to ${new Date(resultEvent.startsAt).toLocaleTimeString('en-IN')}`
+                  : venueChanged
+                    ? `Venue moved to ${resultEvent.venue}`
+                    : `Start time rescheduled to ${new Date(resultEvent.startsAt).toLocaleTimeString('en-IN')}`;
               sendEventUpdateEmail({
                 to: r.student.email,
                 studentName: r.student.name,

@@ -14,8 +14,15 @@ export const DEFAULT_DSU_VENUES = [
     floor: 'Ground Floor',
     venueType: 'Auditorium',
     capacity: 850,
-    description: 'Premier collegiate auditorium equipped with line-array acoustics, motorized projection, and live stream broadcast nodes.',
-    amenities: ['Audio-Visual Console', 'Stage Lighting', 'Green Rooms', 'Central Air Conditioning', 'High-Speed Wi-Fi'],
+    description:
+      'Premier collegiate auditorium equipped with line-array acoustics, motorized projection, and live stream broadcast nodes.',
+    amenities: [
+      'Audio-Visual Console',
+      'Stage Lighting',
+      'Green Rooms',
+      'Central Air Conditioning',
+      'High-Speed Wi-Fi'
+    ],
     availabilityStatus: 'available',
     verificationStatus: 'verified'
   },
@@ -27,8 +34,15 @@ export const DEFAULT_DSU_VENUES = [
     floor: '3rd Floor',
     venueType: 'Laboratory',
     capacity: 120,
-    description: 'High-density maker and hackathon space featuring redundant Gigabit LAN, dual-display workstations, and IoT prototyping kits.',
-    amenities: ['Gigabit Ethernet Drops', 'Workstations', 'Soldering Stations', 'Smart Whiteboards', 'Power Backups'],
+    description:
+      'High-density maker and hackathon space featuring redundant Gigabit LAN, dual-display workstations, and IoT prototyping kits.',
+    amenities: [
+      'Gigabit Ethernet Drops',
+      'Workstations',
+      'Soldering Stations',
+      'Smart Whiteboards',
+      'Power Backups'
+    ],
     availabilityStatus: 'available',
     verificationStatus: 'verified'
   },
@@ -40,7 +54,8 @@ export const DEFAULT_DSU_VENUES = [
     floor: '1st Floor',
     venueType: 'Seminar Hall',
     capacity: 300,
-    description: 'Executive seminar space for industry colloquiums, guest lectures, and placement orientation.',
+    description:
+      'Executive seminar space for industry colloquiums, guest lectures, and placement orientation.',
     amenities: ['Tiered Seating', 'Surround Sound', 'Podium System', 'Projector Screens', 'Wi-Fi'],
     availabilityStatus: 'available',
     verificationStatus: 'verified'
@@ -53,8 +68,15 @@ export const DEFAULT_DSU_VENUES = [
     floor: 'Ground Level',
     venueType: 'Sports Ground',
     capacity: 1500,
-    description: 'FIFA-standard synthetic turf sports arena with floodlights, covered spectator pavilions, and athletic track.',
-    amenities: ['Floodlighting', 'Pavilion Seating', 'First-Aid Bay', 'Locker Rooms', 'Equipment Vault'],
+    description:
+      'FIFA-standard synthetic turf sports arena with floodlights, covered spectator pavilions, and athletic track.',
+    amenities: [
+      'Floodlighting',
+      'Pavilion Seating',
+      'First-Aid Bay',
+      'Locker Rooms',
+      'Equipment Vault'
+    ],
     availabilityStatus: 'available',
     verificationStatus: 'verified'
   },
@@ -66,8 +88,14 @@ export const DEFAULT_DSU_VENUES = [
     floor: '2nd Floor',
     venueType: 'Smart Classroom',
     capacity: 80,
-    description: 'Collaborative workshop space for UI/UX sprints, design critique, and generative media prototyping.',
-    amenities: ['Drawing Easels', 'Large-Format Displays', 'Modular Tables', 'Color-Accurate Lighting'],
+    description:
+      'Collaborative workshop space for UI/UX sprints, design critique, and generative media prototyping.',
+    amenities: [
+      'Drawing Easels',
+      'Large-Format Displays',
+      'Modular Tables',
+      'Color-Accurate Lighting'
+    ],
     availabilityStatus: 'available',
     verificationStatus: 'verified'
   },
@@ -79,8 +107,14 @@ export const DEFAULT_DSU_VENUES = [
     floor: 'Open Air',
     venueType: 'Amphitheater',
     capacity: 500,
-    description: 'Acoustically sheltered open-air forum for cultural fests, theatre productions, and university music ensembles.',
-    amenities: ['Acoustic Shell', 'Performance Stage', 'Ambient Illumination', 'Tiered Stone Seating'],
+    description:
+      'Acoustically sheltered open-air forum for cultural fests, theatre productions, and university music ensembles.',
+    amenities: [
+      'Acoustic Shell',
+      'Performance Stage',
+      'Ambient Illumination',
+      'Tiered Stone Seating'
+    ],
     availabilityStatus: 'available',
     verificationStatus: 'verified'
   }
@@ -89,7 +123,9 @@ export const DEFAULT_DSU_VENUES = [
 router.get(
   '/',
   asyncHandler(async (req, res) => {
-    let venues = await Venue.find({ availabilityStatus: 'available' }).sort({ campus: 1, name: 1 }).lean();
+    let venues = await Venue.find({ availabilityStatus: 'available' })
+      .sort({ campus: 1, name: 1 })
+      .lean();
     if (venues.length === 0) {
       venues = DEFAULT_DSU_VENUES;
     }
@@ -98,4 +134,3 @@ router.get(
 );
 
 export default router;
-

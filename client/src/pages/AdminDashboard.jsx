@@ -53,7 +53,9 @@ export const AdminDashboard = () => {
       setEvents(eventsRes.data.data.items);
       setAccounts(usersRes?.data?.data?.items || []);
     } catch (err) {
-      setLoadError(err.response?.data?.message || 'Management data could not be loaded. Please try again.');
+      setLoadError(
+        err.response?.data?.message || 'Management data could not be loaded. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,9 @@ export const AdminDashboard = () => {
 
   const handleDeleteClick = (event) => {
     if (event.registeredCount > 0) {
-      toast.error(`Cannot delete event with ${event.registeredCount} active registrations. Set status to cancelled instead.`);
+      toast.error(
+        `Cannot delete event with ${event.registeredCount} active registrations. Set status to cancelled instead.`
+      );
       return;
     }
     setDeleteTargetEvent(event);
@@ -168,7 +172,8 @@ export const AdminDashboard = () => {
             University Operations Console
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage campus events, review student verification rosters, and audit institutional attendance.
+            Manage campus events, review student verification rosters, and audit institutional
+            attendance.
           </p>
         </div>
 
@@ -186,7 +191,11 @@ export const AdminDashboard = () => {
           role="alert"
         >
           <span>{loadError}</span>
-          <button type="button" className="font-semibold underline text-rose-900" onClick={() => fetchData(filters)}>
+          <button
+            type="button"
+            className="font-semibold underline text-rose-900"
+            onClick={() => fetchData(filters)}
+          >
             Retry
           </button>
         </div>
@@ -199,31 +208,41 @@ export const AdminDashboard = () => {
             <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Total Gatherings
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] mt-1">{stats.totalEvents}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] mt-1">
+              {stats.totalEvents}
+            </p>
           </div>
           <div className="dsu-card p-3.5 sm:p-5">
             <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Published Live
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1">{stats.publishedEvents}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1">
+              {stats.publishedEvents}
+            </p>
           </div>
           <div className="dsu-card p-3.5 sm:p-5">
             <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Upcoming
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600 mt-1">{stats.upcomingEvents}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600 mt-1">
+              {stats.upcomingEvents}
+            </p>
           </div>
           <div className="dsu-card p-3.5 sm:p-5">
             <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Student Passes
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-1">{stats.totalRegistrations}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-1">
+              {stats.totalRegistrations}
+            </p>
           </div>
           <div className="dsu-card p-3.5 sm:p-5 col-span-2 sm:col-span-1 lg:col-span-1">
             <span className="text-[10px] sm:text-xs font-semibold uppercase text-slate-500 tracking-wider block">
               Verified Attendance
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">{stats.attendanceRate}%</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">
+              {stats.attendanceRate}%
+            </p>
           </div>
         </div>
       )}
@@ -284,7 +303,10 @@ export const AdminDashboard = () => {
           <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-base font-bold text-[#002B55]">University Events Catalog</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Manage published university events, configure venues, and monitor real-time attendee registrations.</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Manage published university events, configure venues, and monitor real-time attendee
+                registrations.
+              </p>
             </div>
 
             <form onSubmit={submitSearch} className="flex flex-wrap items-center gap-2">
@@ -327,11 +349,21 @@ export const AdminDashboard = () => {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                  <th className="py-3 px-6 font-semibold uppercase tracking-wider text-xs">Event Title & Venue</th>
-                  <th className="py-3 px-4 font-semibold uppercase tracking-wider text-xs">Category</th>
-                  <th className="py-3 px-4 font-semibold uppercase tracking-wider text-xs">Capacity</th>
-                  <th className="py-3 px-4 font-semibold uppercase tracking-wider text-xs">Status</th>
-                  <th className="py-3 px-6 font-semibold uppercase tracking-wider text-xs text-right">Actions</th>
+                  <th className="py-3 px-6 font-semibold uppercase tracking-wider text-xs">
+                    Event Title & Venue
+                  </th>
+                  <th className="py-3 px-4 font-semibold uppercase tracking-wider text-xs">
+                    Category
+                  </th>
+                  <th className="py-3 px-4 font-semibold uppercase tracking-wider text-xs">
+                    Capacity
+                  </th>
+                  <th className="py-3 px-4 font-semibold uppercase tracking-wider text-xs">
+                    Status
+                  </th>
+                  <th className="py-3 px-6 font-semibold uppercase tracking-wider text-xs text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -342,7 +374,11 @@ export const AdminDashboard = () => {
                         <Link to={`/events/${ev._id}`}>{ev.title.replace(/^DEMO:\s*/, '')}</Link>
                       </p>
                       <p className="text-slate-500 text-xs mt-0.5">
-                        {ev.venue} • {new Date(ev.startsAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                        {ev.venue} •{' '}
+                        {new Date(ev.startsAt).toLocaleDateString('en-IN', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
                       </p>
                     </td>
                     <td className="py-3.5 px-4">
@@ -351,7 +387,8 @@ export const AdminDashboard = () => {
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-slate-600">
-                      <span className="font-bold text-[#002B55]">{ev.registeredCount}</span> / {ev.capacity}
+                      <span className="font-bold text-[#002B55]">{ev.registeredCount}</span> /{' '}
+                      {ev.capacity}
                     </td>
                     <td className="py-3.5 px-4">
                       <button
@@ -362,8 +399,8 @@ export const AdminDashboard = () => {
                           ev.status === 'published'
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
                             : ev.status === 'draft'
-                            ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                              ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
+                              : 'bg-rose-50 text-rose-700 border border-rose-200'
                         }`}
                       >
                         {ev.status}
@@ -420,7 +457,8 @@ export const AdminDashboard = () => {
                 )}
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Verify submitted student credentials and USN against official Dayananda Sagar University enrollment records.
+                Verify submitted student credentials and USN against official Dayananda Sagar
+                University enrollment records.
               </p>
             </div>
           </div>
@@ -429,12 +467,24 @@ export const AdminDashboard = () => {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs">Student Name</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">University USN</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Email</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Department / School</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Profile Status</th>
-                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs text-right">Verification Action</th>
+                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Student Name
+                  </th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    University USN
+                  </th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Department / School
+                  </th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Profile Status
+                  </th>
+                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs text-right">
+                    Verification Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -497,12 +547,22 @@ export const AdminDashboard = () => {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs">User Name</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Email</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">University USN</th>
+                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs">
+                    User Name
+                  </th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    University USN
+                  </th>
                   <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Role</th>
-                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Verification Status</th>
-                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs">Department / School</th>
+                  <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Verification Status
+                  </th>
+                  <th className="px-6 py-3 font-semibold uppercase tracking-wider text-xs">
+                    Department / School
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -510,7 +570,9 @@ export const AdminDashboard = () => {
                   <tr key={acc._id} className="hover:bg-slate-50/80 transition">
                     <td className="px-6 py-3.5 font-bold text-slate-900">{acc.name}</td>
                     <td className="px-4 py-3.5 text-slate-500 font-medium">{acc.email}</td>
-                    <td className="px-4 py-3.5 font-mono text-slate-700">{acc.usn || acc.rollNumber || '—'}</td>
+                    <td className="px-4 py-3.5 font-mono text-slate-700">
+                      {acc.usn || acc.rollNumber || '—'}
+                    </td>
                     <td className="px-4 py-3.5">
                       <span className="capitalize px-2.5 py-0.5 rounded-full bg-[#002B55]/5 text-xs font-semibold text-[#002B55] border border-[#002B55]/10">
                         {acc.role}
@@ -565,12 +627,15 @@ export const AdminDashboard = () => {
             </div>
             <div className="p-6 space-y-4 text-xs text-slate-800">
               <p>
-                Please specify the reason for rejecting <strong>{rejectModalUser.name}</strong> (USN:{' '}
-                <span className="font-mono">{rejectModalUser.usn}</span>). This feedback will be presented to the student for resubmission.
+                Please specify the reason for rejecting <strong>{rejectModalUser.name}</strong>{' '}
+                (USN: <span className="font-mono">{rejectModalUser.usn}</span>). This feedback will
+                be presented to the student for resubmission.
               </p>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Rejection Reason</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Rejection Reason
+                </label>
                 <textarea
                   rows={3}
                   value={rejectionReason}
@@ -594,7 +659,8 @@ export const AdminDashboard = () => {
                     handleVerifyStudent(
                       rejectModalUser._id,
                       'rejected',
-                      rejectionReason || 'Please verify and resubmit with your official Dayananda Sagar University credentials.'
+                      rejectionReason ||
+                        'Please verify and resubmit with your official Dayananda Sagar University credentials.'
                     )
                   }
                   className="px-4 py-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 transition"

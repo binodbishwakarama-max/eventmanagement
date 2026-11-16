@@ -185,7 +185,10 @@ export function RegisterPage() {
 
             {/* University or Personal Email */}
             <div>
-              <label htmlFor="reg-email" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label
+                htmlFor="reg-email"
+                className="block text-xs font-semibold text-slate-700 mb-1"
+              >
                 Email Address (University or Personal) <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
@@ -214,7 +217,10 @@ export function RegisterPage() {
             {/* USN / Roll Number & Department in 2 columns on tablet, 1 on mobile */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label htmlFor="reg-usn" className="block text-xs font-semibold text-slate-700 mb-1">
+                <label
+                  htmlFor="reg-usn"
+                  className="block text-xs font-semibold text-slate-700 mb-1"
+                >
                   USN / Student ID <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
@@ -240,7 +246,10 @@ export function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="reg-department" className="block text-xs font-semibold text-slate-700 mb-1">
+                <label
+                  htmlFor="reg-department"
+                  className="block text-xs font-semibold text-slate-700 mb-1"
+                >
                   School / Faculty <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -264,7 +273,10 @@ export function RegisterPage() {
 
             {/* Password */}
             <div>
-              <label htmlFor="reg-password" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label
+                htmlFor="reg-password"
+                className="block text-xs font-semibold text-slate-700 mb-1"
+              >
                 Password <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
@@ -295,17 +307,45 @@ export function RegisterPage() {
               {formData.password && (
                 <div className="mt-2 space-y-1.5">
                   <div className="flex gap-1.5 h-1">
-                    <div className={`flex-1 rounded-full transition-colors ${pwStrength >= 1 ? (pwStrength === 1 ? 'bg-rose-500' : pwStrength === 2 ? 'bg-amber-500' : 'bg-emerald-500') : 'bg-slate-200'}`} />
-                    <div className={`flex-1 rounded-full transition-colors ${pwStrength >= 2 ? (pwStrength === 2 ? 'bg-amber-500' : 'bg-emerald-500') : 'bg-slate-200'}`} />
-                    <div className={`flex-1 rounded-full transition-colors ${pwStrength === 3 ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+                    <div
+                      className={`flex-1 rounded-full transition-colors ${pwStrength >= 1 ? (pwStrength === 1 ? 'bg-rose-500' : pwStrength === 2 ? 'bg-amber-500' : 'bg-emerald-500') : 'bg-slate-200'}`}
+                    />
+                    <div
+                      className={`flex-1 rounded-full transition-colors ${pwStrength >= 2 ? (pwStrength === 2 ? 'bg-amber-500' : 'bg-emerald-500') : 'bg-slate-200'}`}
+                    />
+                    <div
+                      className={`flex-1 rounded-full transition-colors ${pwStrength === 3 ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                    />
                   </div>
                   <div className="flex items-center justify-between text-[10px] text-slate-400">
                     <span className="flex items-center gap-1.5">
-                      <span className={formData.password.length >= 8 ? 'text-emerald-600 font-semibold' : ''}>8+ chars</span> • 
-                      <span className={/[A-Z]/.test(formData.password) ? 'text-emerald-600 font-semibold' : ''}>1 uppercase</span> • 
-                      <span className={/[0-9]/.test(formData.password) ? 'text-emerald-600 font-semibold' : ''}>1 number</span>
+                      <span
+                        className={
+                          formData.password.length >= 8 ? 'text-emerald-600 font-semibold' : ''
+                        }
+                      >
+                        8+ chars
+                      </span>{' '}
+                      •
+                      <span
+                        className={
+                          /[A-Z]/.test(formData.password) ? 'text-emerald-600 font-semibold' : ''
+                        }
+                      >
+                        1 uppercase
+                      </span>{' '}
+                      •
+                      <span
+                        className={
+                          /[0-9]/.test(formData.password) ? 'text-emerald-600 font-semibold' : ''
+                        }
+                      >
+                        1 number
+                      </span>
                     </span>
-                    <span className={`font-semibold capitalize ${pwStrength === 3 ? 'text-emerald-600' : pwStrength === 2 ? 'text-amber-600' : 'text-rose-500'}`}>
+                    <span
+                      className={`font-semibold capitalize ${pwStrength === 3 ? 'text-emerald-600' : pwStrength === 2 ? 'text-amber-600' : 'text-rose-500'}`}
+                    >
                       {pwStrength === 3 ? 'Strong' : pwStrength === 2 ? 'Moderate' : 'Weak'}
                     </span>
                   </div>

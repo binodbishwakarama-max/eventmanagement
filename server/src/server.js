@@ -26,7 +26,7 @@ async function startServer() {
         await connectDB();
         console.log('[DSU Server] Database successfully connected in background.');
         clearInterval(reconnectTimer);
-      } catch (retryErr) {
+      } catch {
         // Will retry on next interval tick
       }
     }, 15000);
@@ -44,7 +44,9 @@ async function startServer() {
   // 3. Start HTTP listener
   const server = app.listen(env.PORT, () => {
     console.log(`DSU Campus Events server listening on port ${env.PORT}`);
-    console.log(`[Status] Database State: ReadyState ${mongoose.connection.readyState} (${mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected / Pending'})`);
+    console.log(
+      `[Status] Database State: ReadyState ${mongoose.connection.readyState} (${mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected / Pending'})`
+    );
   });
 
   // 4. Graceful shutdown handlers

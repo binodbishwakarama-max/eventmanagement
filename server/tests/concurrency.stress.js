@@ -98,14 +98,18 @@ async function runConcurrencyStressTest() {
     console.log(`• Total Requests Dispatched    : ${totalContenders}`);
     console.log(`• Configured Event Capacity    : ${eventCapacity}`);
     console.log(`• Total Duration               : ${durationMs} ms`);
-    console.log(`• Throughput                   : ${Math.round((totalContenders / durationMs) * 1000)} requests/sec`);
+    console.log(
+      `• Throughput                   : ${Math.round((totalContenders / durationMs) * 1000)} requests/sec`
+    );
     console.log(`• Successful Registrations (HTTP 201) : ${successful.length}`);
     console.log(`• Rejected Registrations (HTTP 409)   : ${rejected.length}`);
     console.log(`• Rejection Breakdown          :`, rejectionReasons);
     console.log(`• Database registeredCount     : ${refreshedEvent.registeredCount}`);
     console.log(`• Total DB Registration Records: ${totalDbRegistrations}`);
     console.log(`• Unique Students Registered   : ${uniqueStudentIds.size}`);
-    console.log(`• Overbookings Observed        : ${Math.max(0, refreshedEvent.registeredCount - eventCapacity)}`);
+    console.log(
+      `• Overbookings Observed        : ${Math.max(0, refreshedEvent.registeredCount - eventCapacity)}`
+    );
     console.log(`• Duplicate Student Passes     : ${totalDbRegistrations - uniqueStudentIds.size}`);
     console.log('===============================================================\n');
 
@@ -114,17 +118,25 @@ async function runConcurrencyStressTest() {
     if (successful.length !== eventCapacity) {
       errors.push(`FAIL: Expected exactly ${eventCapacity} successes, got ${successful.length}`);
     }
-    if (rejected.length !== (totalContenders - eventCapacity)) {
-      errors.push(`FAIL: Expected exactly ${totalContenders - eventCapacity} rejections, got ${rejected.length}`);
+    if (rejected.length !== totalContenders - eventCapacity) {
+      errors.push(
+        `FAIL: Expected exactly ${totalContenders - eventCapacity} rejections, got ${rejected.length}`
+      );
     }
     if (refreshedEvent.registeredCount !== eventCapacity) {
-      errors.push(`FAIL: Event.registeredCount is ${refreshedEvent.registeredCount}, expected ${eventCapacity}`);
+      errors.push(
+        `FAIL: Event.registeredCount is ${refreshedEvent.registeredCount}, expected ${eventCapacity}`
+      );
     }
     if (totalDbRegistrations !== eventCapacity) {
-      errors.push(`FAIL: Total DB registrations is ${totalDbRegistrations}, expected ${eventCapacity}`);
+      errors.push(
+        `FAIL: Total DB registrations is ${totalDbRegistrations}, expected ${eventCapacity}`
+      );
     }
     if (uniqueStudentIds.size !== eventCapacity) {
-      errors.push(`FAIL: Unique student IDs is ${uniqueStudentIds.size}, expected ${eventCapacity}`);
+      errors.push(
+        `FAIL: Unique student IDs is ${uniqueStudentIds.size}, expected ${eventCapacity}`
+      );
     }
 
     if (errors.length > 0) {
@@ -151,4 +163,3 @@ runConcurrencyStressTest().catch((err) => {
   console.error('Fatal concurrency runner error:', err);
   process.exit(1);
 });
-

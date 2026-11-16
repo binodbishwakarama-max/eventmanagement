@@ -24,12 +24,7 @@ export function validateMagicBytes(buffer, mimeType) {
     return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
   }
   if (mimeType === 'image/png') {
-    return (
-      buffer[0] === 0x89 &&
-      buffer[1] === 0x50 &&
-      buffer[2] === 0x4e &&
-      buffer[3] === 0x47
-    );
+    return buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47;
   }
   if (mimeType === 'image/webp') {
     const riff = buffer.toString('utf8', 0, 4);
@@ -45,12 +40,14 @@ export function validateMagicBytes(buffer, mimeType) {
 async function uploadToCloudinary(buffer, filename, mimeType) {
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = env;
   if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-    throw ApiError.internal('Cloudinary storage is configured but API credentials are missing from environment.');
+    throw ApiError.internal(
+      'Cloudinary storage is configured but API credentials are missing from environment.'
+    );
   }
 
   const timestamp = Math.round(Date.now() / 1000);
   const folder = 'dsu_events/posters';
-  
+
   // Create Cloudinary signature: folder=...&timestamp=...<secret>
   const signatureString = `folder=${folder}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
   const signature = crypto.createHash('sha1').update(signatureString).digest('hex');
@@ -139,14 +136,18 @@ export async function storePosterImage(file) {
   // 4. Provider Selection & Environment Separation
   // In production, prioritize Cloudinary if credentials are present, else fallback safely to local
   const provider = env.STORAGE_PROVIDER;
-  const hasCloudinary = env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET;
+  const hasCloudinary =
+    env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET;
 
   if (provider === 'cloudinary' || (env.NODE_ENV === 'production' && hasCloudinary)) {
     try {
       console.log('[Storage] Routing poster upload to Cloudinary CDN...');
       return await uploadToCloudinary(buffer, file.name || 'poster', file.type);
     } catch (err) {
-      console.error('[Storage Warning] Cloudinary upload failed, falling back to durable local storage:', err.message);
+      console.error(
+        '[Storage Warning] Cloudinary upload failed, falling back to durable local storage:',
+        err.message
+      );
       return await uploadToLocal(buffer, file.type);
     }
   }
@@ -154,4 +155,3 @@ export async function storePosterImage(file) {
   // Default for development & test
   return await uploadToLocal(buffer, file.type);
 }
-

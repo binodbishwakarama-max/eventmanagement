@@ -60,7 +60,8 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
       }
     } catch (err) {
       console.warn('Camera stream error:', err);
-      let message = 'Unable to access camera. Please allow camera permissions or enter code manually.';
+      let message =
+        'Unable to access camera. Please allow camera permissions or enter code manually.';
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
         message = 'Camera permission denied. Please grant permission in your browser settings.';
       } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
@@ -140,7 +141,9 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
     if (!file) return;
 
     if (!('BarcodeDetector' in window)) {
-      toast.error('Image QR scanning requires Chrome or Edge browser. Please enter ticket code manually.');
+      toast.error(
+        'Image QR scanning requires Chrome or Edge browser. Please enter ticket code manually.'
+      );
       return;
     }
 
@@ -186,7 +189,9 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
             <Camera className="w-5 h-5 text-[#D9A521]" />
             <div>
               <h3 className="font-bold text-sm tracking-wide">DSU Turnstile QR Scanner</h3>
-              <p className="text-[11px] text-slate-300">Scan official student admission voucher for gate check-in</p>
+              <p className="text-[11px] text-slate-300">
+                Scan official student admission voucher for gate check-in
+              </p>
             </div>
           </div>
           <button
@@ -204,7 +209,9 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
           {cameraError ? (
             <div className="p-8 text-center text-white max-w-sm">
               <AlertCircle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-              <p className="text-xs font-medium text-slate-200 leading-relaxed mb-4">{cameraError}</p>
+              <p className="text-xs font-medium text-slate-200 leading-relaxed mb-4">
+                {cameraError}
+              </p>
               <button
                 type="button"
                 onClick={startCamera}
@@ -241,7 +248,9 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
               {isProcessing && (
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex flex-col items-center justify-center text-white gap-2">
                   <div className="w-8 h-8 border-3 border-[#D9A521] border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-semibold tracking-wider font-mono">Verifying Hall Pass...</span>
+                  <span className="text-xs font-semibold tracking-wider font-mono">
+                    Verifying Hall Pass...
+                  </span>
                 </div>
               )}
             </>
@@ -264,12 +273,7 @@ export function QrCameraScannerModal({ isOpen, onClose, onScan, isProcessing }) 
             <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium transition shadow-xs cursor-pointer">
               <Upload className="w-3.5 h-3.5 text-slate-600" />
               <span>Upload Pass Photo</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
             </label>
           </div>
 

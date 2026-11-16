@@ -14,13 +14,7 @@ const SIZES = {
   md: 'px-2.5 py-1 text-xs rounded-lg'
 };
 
-export function Badge({
-  children,
-  variant = 'neutral',
-  size = 'md',
-  dot = false,
-  className = ''
-}) {
+export function Badge({ children, variant = 'neutral', size = 'md', dot = false, className = '' }) {
   const variantClass = VARIANTS[variant] || VARIANTS.neutral;
   const sizeClass = SIZES[size] || SIZES.md;
 
@@ -34,12 +28,12 @@ export function Badge({
             variant === 'success'
               ? 'bg-emerald-500'
               : variant === 'warning'
-              ? 'bg-amber-500'
-              : variant === 'danger'
-              ? 'bg-rose-500'
-              : variant === 'accent'
-              ? 'bg-[#D9A521]'
-              : 'bg-slate-400'
+                ? 'bg-amber-500'
+                : variant === 'danger'
+                  ? 'bg-rose-500'
+                  : variant === 'accent'
+                    ? 'bg-[#D9A521]'
+                    : 'bg-slate-400'
           }`}
         />
       )}
@@ -47,4 +41,3 @@ export function Badge({
     </span>
   );
 }
-

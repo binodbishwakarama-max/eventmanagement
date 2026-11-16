@@ -7,15 +7,12 @@ import {
   Sparkles,
   ArrowRight,
   ArrowLeft,
-  CheckCircle2,
   Trophy,
   Flame,
-  Zap,
   Code2,
   Music,
   Compass,
   Rocket,
-  ShieldCheck,
   Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -29,7 +26,9 @@ export function OnboardingPage() {
 
   // Selected Preferences
   const [selectedInterests, setSelectedInterests] = useState(['hackathons', 'cultural']);
-  const [selectedBranch, setSelectedBranch] = useState(user?.department || 'Computer Science & Engineering');
+  const [selectedBranch, setSelectedBranch] = useState(
+    user?.department || 'Computer Science & Engineering'
+  );
   const [selectedYear, setSelectedYear] = useState('2nd Year (Sophomore)');
   const [selectedGoal, setSelectedGoal] = useState('competitor');
   const [confettiActive, setConfettiActive] = useState(false);
@@ -64,8 +63,8 @@ export function OnboardingPage() {
   const mascotSpeech = [
     '', // 0
     "Hey! I'm Dexter, your DSU Campus Companion! What gets your adrenaline pumping on campus?",
-    "Awesome choices! Now tell me, which academic squad do you roll with at Harohalli?",
-    "Love the ambition! What is your main campus mission for this semester?",
+    'Awesome choices! Now tell me, which academic squad do you roll with at Harohalli?',
+    'Love the ambition! What is your main campus mission for this semester?',
     `BOOM! 🚀 Your Official DSU Digital Admission Passbook has been minted, ${user?.name || 'Scholar'}!`
   ];
 
@@ -397,7 +396,8 @@ export function OnboardingPage() {
                 You're officially on the DSU Grid!
               </h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Your customized event feed, digital admission tickets, and real-time campus scanner are all synced to your profile.
+                Your customized event feed, digital admission tickets, and real-time campus scanner
+                are all synced to your profile.
               </p>
             </div>
           </div>
@@ -427,4 +427,3 @@ export function OnboardingPage() {
     </div>
   );
 }
-

@@ -9,6 +9,7 @@ This guide details the production architecture, Docker deployment, configuration
 The platform supports two deployment topologies:
 
 ### Topology A: Monolithic Single-Port Deployment (Recommended for Docker / Containers)
+
 ```
 [ Reverse Proxy / Ingress (Caddy / Nginx / Cloudflare) ]
                        │ (TLS Termination)
@@ -23,6 +24,7 @@ The platform supports two deployment topologies:
 ```
 
 ### Topology B: Decoupled Multi-Host Deployment
+
 - **Frontend SPA**: Hosted on Cloudflare Pages, Vercel, or Netlify from `client/dist`.
 - **Backend API**: Hosted on AWS ECS, Render, Railway, or VPS.
 - **Database**: MongoDB Atlas M10+ replica set.
@@ -35,6 +37,7 @@ The platform supports two deployment topologies:
 A complete production multi-stage `Dockerfile` and `docker-compose.yml` are included in the repository.
 
 ### Step 1: Clone and Configure Environment
+
 ```bash
 git clone <repo-url> eventmanagement
 cd eventmanagement
@@ -44,6 +47,7 @@ openssl rand -hex 32
 ```
 
 Configure your environment variables in `.env` (or pass via secrets manager):
+
 ```env
 NODE_ENV=production
 PORT=5001
@@ -66,11 +70,13 @@ SMTP_FROM=DSU Campus Events <no-reply@dsu.edu.in>
 ```
 
 ### Step 2: Build and Run Container Stack
+
 ```bash
 docker compose up -d --build
 ```
 
 ### Step 3: Verify Health Checks
+
 ```bash
 # Check container status
 docker compose ps
@@ -86,22 +92,22 @@ curl -f http://localhost:5001/api/health/ready
 
 ## 3. Production Environment Variables Reference
 
-| Variable | Type | Default | Description |
-|---|---|---|---|
-| `NODE_ENV` | `string` | `development` | Set to `production` in production. Disables memory-server fallbacks. |
-| `PORT` | `number` | `5001` | Port on which the HTTP server listens. |
-| `MONGODB_URI` | `string` | — | Connection string to MongoDB (supports Atlas `mongodb+srv://`). |
-| `DEMO_MODE` | `boolean` | `false` | When `false`, removes test-prefill buttons and demo disclaimers. |
-| `ALLOW_LOCAL_FALLBACK` | `boolean` | `false` | Strictly rejected in production to prevent split-brain state. |
-| `TRUST_PROXY` | `boolean` | `true` | Set to `true` when behind Nginx, Caddy, Cloudflare, or AWS ALB. |
-| `ALLOWED_EMAIL_DOMAINS` | `string` | `dsu.edu.in` | Restricts student/faculty registrations to university emails. |
-| `JWT_SECRET` | `string` | — | Min 32 characters; cryptographic signing key for tokens. |
-| `JWT_EXPIRES_IN` | `string` | `1d` | Token lifetime (e.g., `1d`, `7d`, `12h`). |
-| `CLIENT_ORIGIN` | `string` | `*` | Comma-separated CORS allowed origins. |
-| `ADMIN_EMAIL` | `string` | — | Initial administrator login email. |
-| `ADMIN_PASSWORD` | `string` | — | Administrator password (minimum 12 characters in production). |
-| `STORAGE_PROVIDER` | `string` | `local` | `local` (filesystem) or `cloudinary`. |
-| `EMAIL_PROVIDER` | `string` | `mock` | `smtp` (Nodemailer), `sendgrid`, or `mock` (console). |
+| Variable                | Type      | Default       | Description                                                          |
+| ----------------------- | --------- | ------------- | -------------------------------------------------------------------- |
+| `NODE_ENV`              | `string`  | `development` | Set to `production` in production. Disables memory-server fallbacks. |
+| `PORT`                  | `number`  | `5001`        | Port on which the HTTP server listens.                               |
+| `MONGODB_URI`           | `string`  | —             | Connection string to MongoDB (supports Atlas `mongodb+srv://`).      |
+| `DEMO_MODE`             | `boolean` | `false`       | When `false`, removes test-prefill buttons and demo disclaimers.     |
+| `ALLOW_LOCAL_FALLBACK`  | `boolean` | `false`       | Strictly rejected in production to prevent split-brain state.        |
+| `TRUST_PROXY`           | `boolean` | `true`        | Set to `true` when behind Nginx, Caddy, Cloudflare, or AWS ALB.      |
+| `ALLOWED_EMAIL_DOMAINS` | `string`  | `dsu.edu.in`  | Restricts student/faculty registrations to university emails.        |
+| `JWT_SECRET`            | `string`  | —             | Min 32 characters; cryptographic signing key for tokens.             |
+| `JWT_EXPIRES_IN`        | `string`  | `1d`          | Token lifetime (e.g., `1d`, `7d`, `12h`).                            |
+| `CLIENT_ORIGIN`         | `string`  | `*`           | Comma-separated CORS allowed origins.                                |
+| `ADMIN_EMAIL`           | `string`  | —             | Initial administrator login email.                                   |
+| `ADMIN_PASSWORD`        | `string`  | —             | Administrator password (minimum 12 characters in production).        |
+| `STORAGE_PROVIDER`      | `string`  | `local`       | `local` (filesystem) or `cloudinary`.                                |
+| `EMAIL_PROVIDER`        | `string`  | `mock`        | `smtp` (Nodemailer), `sendgrid`, or `mock` (console).                |
 
 ---
 

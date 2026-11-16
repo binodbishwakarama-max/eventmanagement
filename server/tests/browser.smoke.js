@@ -154,30 +154,51 @@ async function runBrowserSmoke() {
     const title = await session.evaluate('document.title');
     console.log('  Page Title:', title);
     const hasDsuBranding = title.includes('Dayananda Sagar University');
-    console.log(hasDsuBranding ? '  ✔ [PASS] Document title reflects official DSU branding' : '  ❌ [FAIL] Title missing DSU');
+    console.log(
+      hasDsuBranding
+        ? '  ✔ [PASS] Document title reflects official DSU branding'
+        : '  ❌ [FAIL] Title missing DSU'
+    );
 
     const heroHeadline = await session.evaluate(`document.querySelector('h1')?.innerText || ''`);
     console.log('  Hero Headline:', heroHeadline.replace(/\\n/g, ' '));
     const hasHero = heroHeadline.includes('Campus Life') || heroHeadline.includes('Amplified');
-    console.log(hasHero ? '  ✔ [PASS] Hero headline rendered successfully' : '  ❌ [FAIL] Missing hero headline');
+    console.log(
+      hasHero
+        ? '  ✔ [PASS] Hero headline rendered successfully'
+        : '  ❌ [FAIL] Missing hero headline'
+    );
 
     const campusCardText = await session.evaluate(`document.querySelector('h2')?.innerText || ''`);
     console.log('  Campus Card Heading:', campusCardText);
-    const hasCampusCard = campusCardText.includes('130-Acre') || campusCardText.includes('Architecture');
-    console.log(hasCampusCard ? '  ✔ [PASS] Harohalli Campus Information Card present & visible' : '  ❌ [FAIL] Missing campus card');
+    const hasCampusCard =
+      campusCardText.includes('130-Acre') || campusCardText.includes('Architecture');
+    console.log(
+      hasCampusCard
+        ? '  ✔ [PASS] Harohalli Campus Information Card present & visible'
+        : '  ❌ [FAIL] Missing campus card'
+    );
 
-    const eventCount = await session.evaluate(`document.querySelectorAll('article, [data-event-id], .group').length`);
+    const eventCount = await session.evaluate(
+      `document.querySelectorAll('article, [data-event-id], .group').length`
+    );
     console.log('  Rendered Event Elements:', eventCount);
-    console.log(eventCount > 0 ? '  ✔ [PASS] Events catalog rendered from live API' : '  ❌ [FAIL] Events catalog empty');
+    console.log(
+      eventCount > 0
+        ? '  ✔ [PASS] Events catalog rendered from live API'
+        : '  ❌ [FAIL] Events catalog empty'
+    );
 
     const ss1 = await session.captureScreenshot(path.join(screenshotsDir, '1-landing-page.png'));
-    console.log(`  📸 Screenshot captured: smoke/1-landing-page.png (${Math.round(ss1 / 1024)} KB)`);
+    console.log(
+      `  📸 Screenshot captured: smoke/1-landing-page.png (${Math.round(ss1 / 1024)} KB)`
+    );
 
     // -------------------------------------------------------------------------
     // JOURNEY 2: Event Search & Filtering Interaction
     // -------------------------------------------------------------------------
     console.log('\n--- JOURNEY 2: EVENT DISCOVERY, FILTERING & DETAIL VIEW ---');
-    
+
     // Type in search box
     await session.evaluate(`
       const input = document.querySelector('input[type="text"], input[placeholder*="Search"]');
@@ -199,14 +220,24 @@ async function runBrowserSmoke() {
       console.log('  Navigating to Event Detail:', firstEventUrl);
       await session.navigate(firstEventUrl);
 
-      const eventDetailTitle = await session.evaluate(`document.querySelector('h1')?.innerText || ''`);
-      const venueInfo = await session.evaluate(`document.body.innerText.includes('Harohalli') || document.body.innerText.includes('Campus')`);
+      const eventDetailTitle = await session.evaluate(
+        `document.querySelector('h1')?.innerText || ''`
+      );
+      const venueInfo = await session.evaluate(
+        `document.body.innerText.includes('Harohalli') || document.body.innerText.includes('Campus')`
+      );
       console.log('  Event Detail Title:', eventDetailTitle);
       console.log('  Harohalli Venue Verified:', venueInfo);
-      console.log(eventDetailTitle ? '  ✔ [PASS] Event Detail page loaded with full metadata' : '  ❌ [FAIL] Event detail title missing');
+      console.log(
+        eventDetailTitle
+          ? '  ✔ [PASS] Event Detail page loaded with full metadata'
+          : '  ❌ [FAIL] Event detail title missing'
+      );
 
       const ss2 = await session.captureScreenshot(path.join(screenshotsDir, '2-event-detail.png'));
-      console.log(`  📸 Screenshot captured: smoke/2-event-detail.png (${Math.round(ss2 / 1024)} KB)`);
+      console.log(
+        `  📸 Screenshot captured: smoke/2-event-detail.png (${Math.round(ss2 / 1024)} KB)`
+      );
     } else {
       console.log('  ⚠ Warning: No direct event link found in search results');
     }
@@ -217,17 +248,33 @@ async function runBrowserSmoke() {
     console.log('\n--- JOURNEY 3: STUDENT REGISTRATION INTERFACE ---');
     await session.navigate(`${BASE_URL}/register`);
 
-    const registerTitle = await session.evaluate(`document.querySelector('h1, h2')?.innerText || ''`);
+    const registerTitle = await session.evaluate(
+      `document.querySelector('h1, h2')?.innerText || ''`
+    );
     console.log('  Registration Heading:', registerTitle);
     const hasRegisterForm = await session.evaluate(`!!document.querySelector('form')`);
-    console.log(hasRegisterForm ? '  ✔ [PASS] Student Registration form rendered' : '  ❌ [FAIL] Missing registration form');
+    console.log(
+      hasRegisterForm
+        ? '  ✔ [PASS] Student Registration form rendered'
+        : '  ❌ [FAIL] Missing registration form'
+    );
 
-    const emailInput = await session.evaluate(`!!document.querySelector('input[name="email"], input[type="email"]')`);
+    const emailInput = await session.evaluate(
+      `!!document.querySelector('input[name="email"], input[type="email"]')`
+    );
     const usnInput = await session.evaluate(`!!document.querySelector('input[name="usn"]')`);
-    console.log(emailInput && usnInput ? '  ✔ [PASS] Institutional email and USN fields present' : '  ❌ [FAIL] Missing input fields');
+    console.log(
+      emailInput && usnInput
+        ? '  ✔ [PASS] Institutional email and USN fields present'
+        : '  ❌ [FAIL] Missing input fields'
+    );
 
-    const ss3 = await session.captureScreenshot(path.join(screenshotsDir, '3-student-registration.png'));
-    console.log(`  📸 Screenshot captured: smoke/3-student-registration.png (${Math.round(ss3 / 1024)} KB)`);
+    const ss3 = await session.captureScreenshot(
+      path.join(screenshotsDir, '3-student-registration.png')
+    );
+    console.log(
+      `  📸 Screenshot captured: smoke/3-student-registration.png (${Math.round(ss3 / 1024)} KB)`
+    );
 
     // -------------------------------------------------------------------------
     // JOURNEY 4: Administrator Sign In & Operations Console
@@ -261,17 +308,29 @@ async function runBrowserSmoke() {
     // Navigate directly to /admin
     await session.navigate(`${BASE_URL}/admin`);
 
-    const adminHeading = await session.evaluate(`document.body.innerText.includes('Operations') || document.body.innerText.includes('Admin') || document.body.innerText.includes('Overview')`);
-    console.log(adminHeading ? '  ✔ [PASS] Admin Operations Console loaded with authorized session' : '  ❌ [FAIL] Admin console not loaded');
+    const adminHeading = await session.evaluate(
+      `document.body.innerText.includes('Operations') || document.body.innerText.includes('Admin') || document.body.innerText.includes('Overview')`
+    );
+    console.log(
+      adminHeading
+        ? '  ✔ [PASS] Admin Operations Console loaded with authorized session'
+        : '  ❌ [FAIL] Admin console not loaded'
+    );
 
     const statsPresent = await session.evaluate(`
       document.body.innerText.includes('Events') && 
       document.body.innerText.includes('Registrations')
     `);
-    console.log(statsPresent ? '  ✔ [PASS] Platform analytics metrics rendered' : '  ❌ [FAIL] Analytics missing');
+    console.log(
+      statsPresent
+        ? '  ✔ [PASS] Platform analytics metrics rendered'
+        : '  ❌ [FAIL] Analytics missing'
+    );
 
     const ss4 = await session.captureScreenshot(path.join(screenshotsDir, '4-admin-dashboard.png'));
-    console.log(`  📸 Screenshot captured: smoke/4-admin-dashboard.png (${Math.round(ss4 / 1024)} KB)`);
+    console.log(
+      `  📸 Screenshot captured: smoke/4-admin-dashboard.png (${Math.round(ss4 / 1024)} KB)`
+    );
 
     // -------------------------------------------------------------------------
     // JOURNEY 5: Gate Attendance & Check-in Desk
@@ -292,10 +351,18 @@ async function runBrowserSmoke() {
         document.body.innerText.includes('Scan') ||
         document.body.innerText.includes('Check-in')
       `);
-      console.log(attendanceView ? '  ✔ [PASS] Turnstile Gate Attendance desk loaded' : '  ❌ [FAIL] Attendance view failed');
+      console.log(
+        attendanceView
+          ? '  ✔ [PASS] Turnstile Gate Attendance desk loaded'
+          : '  ❌ [FAIL] Attendance view failed'
+      );
 
-      const ss5 = await session.captureScreenshot(path.join(screenshotsDir, '5-gate-attendance.png'));
-      console.log(`  📸 Screenshot captured: smoke/5-gate-attendance.png (${Math.round(ss5 / 1024)} KB)`);
+      const ss5 = await session.captureScreenshot(
+        path.join(screenshotsDir, '5-gate-attendance.png')
+      );
+      console.log(
+        `  📸 Screenshot captured: smoke/5-gate-attendance.png (${Math.round(ss5 / 1024)} KB)`
+      );
     } else {
       console.log('  Gate attendance desk checked via direct route availability');
     }
@@ -305,7 +372,9 @@ async function runBrowserSmoke() {
     // -------------------------------------------------------------------------
     console.log('\n--- BROWSER CONSOLE HEALTH CHECK ---');
     if (consoleErrors.length === 0) {
-      console.log('  ✔ [PASS] 0 JavaScript unhandled console errors detected across all user journeys');
+      console.log(
+        '  ✔ [PASS] 0 JavaScript unhandled console errors detected across all user journeys'
+      );
     } else {
       console.log(`  ⚠ Notice: ${consoleErrors.length} console error(s) logged:`);
       for (const err of consoleErrors.slice(0, 3)) console.log('    •', err);
@@ -324,4 +393,3 @@ runBrowserSmoke().catch((err) => {
   console.error('[Smoke Test Error]', err);
   process.exit(1);
 });
-

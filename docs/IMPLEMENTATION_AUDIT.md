@@ -13,18 +13,18 @@ Historical review of the repository as it existed on 2026-10-29. It is not a des
 
 ## Brief mapping
 
-| Requirement area | Starting state | Work needed / boundary |
-|---|---|---|
+| Requirement area            | Starting state                                                         | Work needed / boundary                                                                                                                                                    |
+| --------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Accurate DSU campus context | Existing UI is an independent demo; Main Campus address was not stored | Official contact page confirms the Harohalli Main Campus address and separately lists City Innovation Campus. Any campus records should retain source/retrieval metadata. |
-| Facilities and venues | Events accept free-text venue; no venue records | Facility types are not currently treated as verified bookable venues. Candidate records must remain unverified and unavailable until authorized verification. |
-| Clubs | Event has a free-text organizer label | The supplied clubs page did not return machine-readable club-list content during this review; do not seed its names until content can be checked. |
-| Branding | Independent Campus Events identity; no DSU logo | Keep neutral identity; no official asset or palette is used and no endorsement is implied. |
-| OIDC/SSO | No provider integration | No tenant/provider is assumed; credentials and identity claims require DSU authorization. |
-| Secure sessions | JWT in `localStorage`; bearer middleware | Replace with server-managed cookie sessions, CSRF defenses, logout invalidation, and topology-configured cookie settings. |
-| Faculty approval | No faculty role or approval state | Add server-side lifecycle transitions and reviewer authorization; approval policy and authorized reviewers require institutional configuration. |
-| Event lifecycle | Draft/published/cancelled; direct publish update | Enforce proposal/review/publish transitions and record review history. |
-| Venue conflicts | No venue IDs or conflict checks | Require verified active venue and server-side interval conflict validation before publication. |
-| Other event features | Basic registration, attendance, CSV, search | Waitlists, QR scanning, notifications, attachments, announcements, and certificates are not implemented and need prioritization/integration decisions. |
+| Facilities and venues       | Events accept free-text venue; no venue records                        | Facility types are not currently treated as verified bookable venues. Candidate records must remain unverified and unavailable until authorized verification.             |
+| Clubs                       | Event has a free-text organizer label                                  | The supplied clubs page did not return machine-readable club-list content during this review; do not seed its names until content can be checked.                         |
+| Branding                    | Independent Campus Events identity; no DSU logo                        | Keep neutral identity; no official asset or palette is used and no endorsement is implied.                                                                                |
+| OIDC/SSO                    | No provider integration                                                | No tenant/provider is assumed; credentials and identity claims require DSU authorization.                                                                                 |
+| Secure sessions             | JWT in `localStorage`; bearer middleware                               | Replace with server-managed cookie sessions, CSRF defenses, logout invalidation, and topology-configured cookie settings.                                                 |
+| Faculty approval            | No faculty role or approval state                                      | Add server-side lifecycle transitions and reviewer authorization; approval policy and authorized reviewers require institutional configuration.                           |
+| Event lifecycle             | Draft/published/cancelled; direct publish update                       | Enforce proposal/review/publish transitions and record review history.                                                                                                    |
+| Venue conflicts             | No venue IDs or conflict checks                                        | Require verified active venue and server-side interval conflict validation before publication.                                                                            |
+| Other event features        | Basic registration, attendance, CSV, search                            | Waitlists, QR scanning, notifications, attachments, announcements, and certificates are not implemented and need prioritization/integration decisions.                    |
 
 ## Public-source check
 

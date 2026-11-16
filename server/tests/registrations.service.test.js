@@ -141,9 +141,9 @@ describe('registration business rules', () => {
   });
 
   it('rejects attendance before the event starts', async () => {
-    await expect(
-      updateAttendance('event-1', 'registration-1', true, admin)
-    ).rejects.toMatchObject({ statusCode: 400 });
+    await expect(updateAttendance('event-1', 'registration-1', true, admin)).rejects.toMatchObject({
+      statusCode: 400
+    });
     expect(Registration.findOneAndUpdate).not.toHaveBeenCalled();
   });
 });

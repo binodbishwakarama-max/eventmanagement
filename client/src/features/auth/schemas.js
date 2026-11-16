@@ -1,10 +1,7 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email address is required')
-    .email('Please enter a valid email address'),
+  email: z.string().min(1, 'Email address is required').email('Please enter a valid email address'),
   password: z
     .string()
     .min(1, 'Password is required')
@@ -17,10 +14,7 @@ export const registerSchema = z.object({
     .min(1, 'Full name is required')
     .min(2, 'Full name must be at least 2 characters')
     .max(80, 'Full name must not exceed 80 characters'),
-  email: z
-    .string()
-    .min(1, 'Email address is required')
-    .email('Please enter a valid email address'),
+  email: z.string().min(1, 'Email address is required').email('Please enter a valid email address'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -31,12 +25,14 @@ export const registerSchema = z.object({
     .trim()
     .optional()
     .refine(
-      (val) => !val || /^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i.test(val),
+      (val) =>
+        !val ||
+        /^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i.test(
+          val
+        ),
       'Invalid DSU Roll/USN format (e.g. ENG25CS0453, ENG24AIML012, or 1DS23CS045)'
     ),
-  department: z
-    .string()
-    .min(1, 'Department / School of study is required')
+  department: z.string().min(1, 'Department / School of study is required')
 });
 
 export const forgotPasswordSchema = z.object({
@@ -46,15 +42,16 @@ export const forgotPasswordSchema = z.object({
     .email('Please enter a valid institutional email')
 });
 
-export const resetPasswordSchema = z.object({
-  newPassword: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Must contain at least one number'),
-  confirmPassword: z.string().min(1, 'Please confirm your password')
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword']
-});
-
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
+      .regex(/[0-9]/, 'Must contain at least one number'),
+    confirmPassword: z.string().min(1, 'Please confirm your password')
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword']
+  });

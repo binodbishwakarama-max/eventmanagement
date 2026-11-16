@@ -31,4 +31,3 @@ export const deleteEvent = asyncHandler(async (req, res) => {
   const result = await eventsService.deleteEvent(req.params.id, req.user);
   return ok(res, result);
 });
-

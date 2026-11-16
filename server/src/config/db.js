@@ -22,7 +22,10 @@ export async function connectDB(uri = env.MONGODB_URI) {
 
   // Extract or default database name to 'dsu_events'
   const targetDbMatch = uri.match(/\/([^/?]+)(\?|$)/);
-  const targetDb = (targetDbMatch && targetDbMatch[1] && targetDbMatch[1] !== 'test') ? targetDbMatch[1] : 'dsu_events';
+  const targetDb =
+    targetDbMatch && targetDbMatch[1] && targetDbMatch[1] !== 'test'
+      ? targetDbMatch[1]
+      : 'dsu_events';
 
   // 1. Primary Authoritative Database Connection
   try {
@@ -36,8 +39,10 @@ export async function connectDB(uri = env.MONGODB_URI) {
       autoIndex: !isProduction
     });
 
-    console.log(`[Database] Authoritative database connected at ${sanitizeUri(uri)} (Pool: ${isProduction ? 100 : 30})`);
-    
+    console.log(
+      `[Database] Authoritative database connected at ${sanitizeUri(uri)} (Pool: ${isProduction ? 100 : 30})`
+    );
+
     // Auto-seed baseline institutional data only if empty
     const { seedIfEmpty } = await import('../scripts/autoSeed.js');
     await seedIfEmpty();
@@ -51,15 +56,23 @@ export async function connectDB(uri = env.MONGODB_URI) {
     const allowFallback = env.ALLOW_LOCAL_FALLBACK || env.NODE_ENV !== 'production';
 
     if (allowFallback) {
-      console.warn(`[Database Warning] Operating in resilient fallback mode. Initializing isolated local engine...`);
+      console.warn(
+        `[Database Warning] Operating in resilient fallback mode. Initializing isolated local engine...`
+      );
       try {
         let systemBinary = process.env.MONGOMS_SYSTEM_BINARY;
         if (!systemBinary) {
           const fs = await import('fs');
           const path = await import('path');
           const candidatePaths = [
-            path.resolve(process.cwd(), 'node_modules/.cache/mongodb-memory-server/mongod-arm64-darwin-8.2.6'),
-            path.resolve(process.cwd(), '../node_modules/.cache/mongodb-memory-server/mongod-arm64-darwin-8.2.6'),
+            path.resolve(
+              process.cwd(),
+              'node_modules/.cache/mongodb-memory-server/mongod-arm64-darwin-8.2.6'
+            ),
+            path.resolve(
+              process.cwd(),
+              '../node_modules/.cache/mongodb-memory-server/mongod-arm64-darwin-8.2.6'
+            )
           ];
           for (const cPath of candidatePaths) {
             if (fs.existsSync(cPath)) {

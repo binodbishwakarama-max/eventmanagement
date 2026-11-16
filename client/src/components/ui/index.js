@@ -6,4 +6,3 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 export { Skeleton, EventCardSkeleton, TableRowSkeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
-

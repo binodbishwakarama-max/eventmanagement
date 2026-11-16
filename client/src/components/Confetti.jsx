@@ -87,10 +87,6 @@ export function Confetti({ active = true, duration = 3500 }) {
   if (!active) return null;
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-50 w-full h-full"
-    />
+    <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-50 w-full h-full" />
   );
 }
-

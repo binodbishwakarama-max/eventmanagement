@@ -45,4 +45,3 @@ export async function checkInPass(ticketCode) {
     throw AppApiError.fromAxiosError(err);
   }
 }
-

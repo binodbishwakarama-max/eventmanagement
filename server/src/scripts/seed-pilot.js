@@ -22,7 +22,7 @@ export async function seedPilotEnvironment(customUri = null) {
   }
 
   console.log('[Pilot Seeder] Checking existing records...');
-  
+
   // 1. Ensure Master Admin
   let admin = await User.findOne({ role: 'admin' });
   if (!admin) {
@@ -84,7 +84,8 @@ export async function seedPilotEnvironment(customUri = null) {
   const pilotEvents = [
     {
       title: 'HackForge 2026: Campus IoT & AI Sprint',
-      description: 'An intensive 24-hour hardware and software maker sprint for DSU engineering scholars. Teams prototype smart energy monitors, automated campus transport trackers, and computer vision safety nodes.',
+      description:
+        'An intensive 24-hour hardware and software maker sprint for DSU engineering scholars. Teams prototype smart energy monitors, automated campus transport trackers, and computer vision safety nodes.',
       category: 'Technical',
       venue: 'CSE Innovation Lab, Block 3, Harohalli Campus',
       startsAt: new Date(now + 4 * day),
@@ -96,7 +97,8 @@ export async function seedPilotEnvironment(customUri = null) {
     },
     {
       title: 'Design Systems & Interaction Lab',
-      description: 'Master typography hierarchies, spatial scales, and iOS HIG design tokens. Learn hands-on component structuring in Figma and React component parity.',
+      description:
+        'Master typography hierarchies, spatial scales, and iOS HIG design tokens. Learn hands-on component structuring in Figma and React component parity.',
       category: 'Workshop',
       venue: 'School of Design Studio, 4th Floor, Academic Block',
       startsAt: new Date(now + 6 * day),
@@ -108,7 +110,8 @@ export async function seedPilotEnvironment(customUri = null) {
     },
     {
       title: 'Colloquium: Next-Gen Autonomous Systems',
-      description: 'Distinguished university research seminar exploring autonomous robotics, edge perception models, and real-time sensor fusion.',
+      description:
+        'Distinguished university research seminar exploring autonomous robotics, edge perception models, and real-time sensor fusion.',
       category: 'Seminar',
       venue: 'Sir M. Visvesvaraya Auditorium, Harohalli',
       startsAt: new Date(now + 9 * day),
@@ -124,7 +127,9 @@ export async function seedPilotEnvironment(customUri = null) {
     const existing = await Event.findOne({ title: evData.title });
     if (!existing) {
       const created = await Event.create(evData);
-      console.log(`  ✔ Created Pilot Event: "${created.title}" (Capacity: ${created.capacity}, Venue: ${created.venue})`);
+      console.log(
+        `  ✔ Created Pilot Event: "${created.title}" (Capacity: ${created.capacity}, Venue: ${created.venue})`
+      );
     } else {
       console.log(`  ℹ Existing Pilot Event: "${existing.title}"`);
     }
@@ -133,11 +138,36 @@ export async function seedPilotEnvironment(customUri = null) {
   // 4. Provision 5 Initial Verified Pilot Students
   const studentPasswordHash = await bcrypt.hash('Student@Pilot2026!', 12);
   const pilotStudents = [
-    { name: 'Kavya S. Gowda', usn: '1DS23CS045', email: 'kavya.gowda@dsu.edu.in', dept: 'School of Computer Science & Engineering' },
-    { name: 'Aditya R. Nair', usn: '1DS23CS012', email: 'aditya.nair@dsu.edu.in', dept: 'School of Computer Science & Engineering' },
-    { name: 'Meera P. Rao', usn: '1DS23AI018', email: 'meera.rao@dsu.edu.in', dept: 'Department of AI & Data Science' },
-    { name: 'Rohan V. Kulkarni', usn: '1DS23EC089', email: 'rohan.kulkarni@dsu.edu.in', dept: 'School of Electronics & Communication' },
-    { name: 'Sneha B. Deshpande', usn: '1DS23ME034', email: 'sneha.deshpande@dsu.edu.in', dept: 'School of Mechanical Engineering' }
+    {
+      name: 'Kavya S. Gowda',
+      usn: '1DS23CS045',
+      email: 'kavya.gowda@dsu.edu.in',
+      dept: 'School of Computer Science & Engineering'
+    },
+    {
+      name: 'Aditya R. Nair',
+      usn: '1DS23CS012',
+      email: 'aditya.nair@dsu.edu.in',
+      dept: 'School of Computer Science & Engineering'
+    },
+    {
+      name: 'Meera P. Rao',
+      usn: '1DS23AI018',
+      email: 'meera.rao@dsu.edu.in',
+      dept: 'Department of AI & Data Science'
+    },
+    {
+      name: 'Rohan V. Kulkarni',
+      usn: '1DS23EC089',
+      email: 'rohan.kulkarni@dsu.edu.in',
+      dept: 'School of Electronics & Communication'
+    },
+    {
+      name: 'Sneha B. Deshpande',
+      usn: '1DS23ME034',
+      email: 'sneha.deshpande@dsu.edu.in',
+      dept: 'School of Mechanical Engineering'
+    }
   ];
 
   for (const stu of pilotStudents) {
@@ -174,4 +204,3 @@ if (process.argv[1]?.endsWith('seed-pilot.js')) {
       process.exit(1);
     });
 }
-

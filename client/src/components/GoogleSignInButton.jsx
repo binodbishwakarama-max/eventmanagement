@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { env } from '../config/env.js';
 import toast from 'react-hot-toast';
 
 export function GoogleSignInButton({ onSuccess, className = '' }) {
   const { loginWithGoogle } = useAuth();
   const buttonRef = useRef(null);
 
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const googleClientId = env.googleClientId || import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   useEffect(() => {
     let interval = null;
@@ -75,20 +76,27 @@ export function GoogleSignInButton({ onSuccess, className = '' }) {
 
   const handleManualClick = () => {
     if (!googleClientId) {
-      toast((t) => (
-        <div className="text-xs">
-          <p className="font-bold text-slate-900 mb-1">Google OAuth Configuration Needed</p>
-          <p className="text-slate-600 mb-2">
-            Please set <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">VITE_GOOGLE_CLIENT_ID</code> in Render/Client environment.
-          </p>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="px-2.5 py-1 bg-[#002B55] text-white text-[11px] rounded font-semibold"
-          >
-            Dismiss
-          </button>
-        </div>
-      ), { duration: 6000 });
+      toast(
+        (t) => (
+          <div className="text-xs">
+            <p className="font-bold text-slate-900 mb-1">Google OAuth Configuration Needed</p>
+            <p className="text-slate-600 mb-2">
+              Please set{' '}
+              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">
+                VITE_GOOGLE_CLIENT_ID
+              </code>{' '}
+              in Render/Client environment.
+            </p>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-2.5 py-1 bg-[#002B55] text-white text-[11px] rounded font-semibold"
+            >
+              Dismiss
+            </button>
+          </div>
+        ),
+        { duration: 6000 }
+      );
       return;
     }
 
@@ -131,4 +139,3 @@ export function GoogleSignInButton({ onSuccess, className = '' }) {
     </div>
   );
 }
-

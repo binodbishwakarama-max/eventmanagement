@@ -18,7 +18,11 @@ export const getStats = asyncHandler(async (req, res) => {
   const now = new Date();
   const totalEvents = await Event.countDocuments(filter);
   const publishedEvents = await Event.countDocuments({ ...filter, status: 'published' });
-  const upcomingEvents = await Event.countDocuments({ ...filter, status: 'published', startsAt: { $gt: now } });
+  const upcomingEvents = await Event.countDocuments({
+    ...filter,
+    status: 'published',
+    startsAt: { $gt: now }
+  });
 
   // Get matching event IDs
   const userEvents = await Event.find(filter).select('_id');
@@ -35,9 +39,8 @@ export const getStats = asyncHandler(async (req, res) => {
     attended: true
   });
 
-  const attendanceRate = totalRegistrations > 0
-    ? Math.round((attendedRegistrations / totalRegistrations) * 100)
-    : 0;
+  const attendanceRate =
+    totalRegistrations > 0 ? Math.round((attendedRegistrations / totalRegistrations) * 100) : 0;
 
   const upcoming = await Event.find({ ...filter, status: 'published', startsAt: { $gt: now } })
     .sort({ startsAt: 1 })
@@ -53,4 +56,3 @@ export const getStats = asyncHandler(async (req, res) => {
     upcoming
   });
 });
-

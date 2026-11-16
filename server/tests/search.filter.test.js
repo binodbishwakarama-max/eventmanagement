@@ -19,7 +19,9 @@ describe('Public Events Advanced Search and Filtering Engine', () => {
     const mockQuery = {
       sort: vi.fn().mockReturnThis(),
       skip: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue([{ title: 'Invento 2026', venue: 'Sir M. Visvesvaraya Auditorium' }])
+      limit: vi
+        .fn()
+        .mockResolvedValue([{ title: 'Invento 2026', venue: 'Sir M. Visvesvaraya Auditorium' }])
     };
     Event.find.mockReturnValue(mockQuery);
     Event.countDocuments.mockResolvedValue(1);

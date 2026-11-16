@@ -21,7 +21,7 @@ export function AppleGlassCard({ children, className = '', ...props }) {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     const rotateX = ((y - centerY) / centerY) * -9; // Max 9 deg vertical tilt
-    const rotateY = ((x - centerX) / centerX) * 9;  // Max 9 deg horizontal tilt
+    const rotateY = ((x - centerX) / centerX) * 9; // Max 9 deg horizontal tilt
 
     setCoords({ x, y });
     setRotate({ x: rotateX, y: rotateY });
@@ -52,7 +52,7 @@ export function AppleGlassCard({ children, className = '', ...props }) {
           ? 'transform 0.08s ease-out, border-color 0.3s ease'
           : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease',
         borderColor: isHovered ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.25)',
-        backgroundColor: isHovered ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
+        backgroundColor: isHovered ? 'rgba(255, 255, 255, 0.03)' : 'transparent'
       }}
       {...props}
     >
@@ -61,7 +61,7 @@ export function AppleGlassCard({ children, className = '', ...props }) {
         className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300 overflow-hidden"
         style={{
           opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(420px circle at ${coords.x}px ${coords.y}px, rgba(255, 255, 255, 0.18), transparent 75%)`,
+          background: `radial-gradient(420px circle at ${coords.x}px ${coords.y}px, rgba(255, 255, 255, 0.18), transparent 75%)`
         }}
       />
 
@@ -70,7 +70,7 @@ export function AppleGlassCard({ children, className = '', ...props }) {
         className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300 overflow-hidden"
         style={{
           opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(280px circle at ${coords.x}px ${coords.y}px, rgba(245, 200, 76, 0.22), transparent 70%)`,
+          background: `radial-gradient(280px circle at ${coords.x}px ${coords.y}px, rgba(245, 200, 76, 0.22), transparent 70%)`
         }}
       />
 
@@ -79,7 +79,7 @@ export function AppleGlassCard({ children, className = '', ...props }) {
         className="relative z-10 space-y-3.5"
         style={{
           transform: isHovered ? 'translateZ(18px)' : 'translateZ(0px)',
-          transition: 'transform 0.15s ease-out',
+          transition: 'transform 0.15s ease-out'
         }}
       >
         {children}
@@ -87,4 +87,3 @@ export function AppleGlassCard({ children, className = '', ...props }) {
     </div>
   );
 }
-

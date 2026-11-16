@@ -48,11 +48,13 @@ async function sendMail({ to, subject, html, text }) {
   try {
     const transport = getTransporter();
     const result = await transport.sendMail(mailOptions);
-    
+
     if (!isProduction) {
       console.log(`[Email:Dev] Sent "${subject}" to ${to}`);
     } else {
-      console.log(`[Email:Prod] Dispatched email to ${to} (MessageID: ${result.messageId || 'sent'})`);
+      console.log(
+        `[Email:Prod] Dispatched email to ${to} (MessageID: ${result.messageId || 'sent'})`
+      );
     }
 
     return { success: true, messageId: result.messageId };
@@ -83,7 +85,9 @@ export async function sendPasswordResetEmail({ to, studentName = 'Student', rese
     : 'Reset Your DSU Campus Events Password';
 
   const portalTitle = isDemo ? 'Campus Events Demo' : 'Dayananda Sagar University';
-  const portalSubtitle = isDemo ? 'Independent student project' : 'DSU Campus Events • Security Verification';
+  const portalSubtitle = isDemo
+    ? 'Independent student project'
+    : 'DSU Campus Events • Security Verification';
   const disclaimerText = isDemo
     ? 'This is an automated student project demo message. It is not sent by or on behalf of DSU.'
     : 'Dayananda Sagar University • Main Campus (Harohalli) • Office of Student Affairs';
@@ -192,7 +196,12 @@ export async function sendRegistrationConfirmationEmail({ to, studentName, event
 /**
  * 3. Event Cancellation Notification
  */
-export async function sendEventCancellationEmail({ to, studentName, event, reason = 'Administrative cancellation' }) {
+export async function sendEventCancellationEmail({
+  to,
+  studentName,
+  event,
+  reason = 'Administrative cancellation'
+}) {
   const isDemo = env.DEMO_MODE;
   const subject = isDemo
     ? `Demo event cancelled: ${event.title} | Campus Events`

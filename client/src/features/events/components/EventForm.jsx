@@ -2,14 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../../api/client';
 import { EventArtwork } from '../../../components/EventArtwork';
 import { EVENT_CATEGORIES, DEFAULT_VENUE_PRESETS } from '../constants';
-import {
-  MapPin,
-  Users,
-  Sparkles,
-  ArrowRight,
-  Eye,
-  Info
-} from 'lucide-react';
+import { MapPin, Users, Sparkles, ArrowRight, Eye, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function EventForm({
@@ -129,7 +122,10 @@ export function EventForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
-            <label htmlFor="event-title" className="block text-sm font-semibold text-slate-900 mb-1">
+            <label
+              htmlFor="event-title"
+              className="block text-sm font-semibold text-slate-900 mb-1"
+            >
               Event Title <span className="text-rose-500">*</span>
             </label>
             <input
@@ -147,7 +143,10 @@ export function EventForm({
           {/* Category & Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="event-category" className="block text-sm font-semibold text-slate-900 mb-1">
+              <label
+                htmlFor="event-category"
+                className="block text-sm font-semibold text-slate-900 mb-1"
+              >
                 Category <span className="text-rose-500">*</span>
               </label>
               <select
@@ -167,7 +166,10 @@ export function EventForm({
 
             {isEdit ? (
               <div>
-                <label htmlFor="event-status" className="block text-sm font-semibold text-slate-900 mb-1">
+                <label
+                  htmlFor="event-status"
+                  className="block text-sm font-semibold text-slate-900 mb-1"
+                >
                   Lifecycle Status <span className="text-rose-500">*</span>
                 </label>
                 <select
@@ -185,7 +187,10 @@ export function EventForm({
               </div>
             ) : (
               <div>
-                <label htmlFor="event-organizer-club" className="block text-sm font-semibold text-slate-900 mb-1">
+                <label
+                  htmlFor="event-organizer-club"
+                  className="block text-sm font-semibold text-slate-900 mb-1"
+                >
                   Organizing Club / Dept
                 </label>
                 <input
@@ -209,7 +214,10 @@ export function EventForm({
 
           {isEdit && (
             <div>
-              <label htmlFor="event-organizer-club-edit" className="block text-sm font-semibold text-slate-900 mb-1">
+              <label
+                htmlFor="event-organizer-club-edit"
+                className="block text-sm font-semibold text-slate-900 mb-1"
+              >
                 Organizing Club / Department
               </label>
               <input
@@ -233,7 +241,10 @@ export function EventForm({
           {/* Venue & Capacity */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
-              <label htmlFor="event-venue" className="block text-sm font-semibold text-slate-900 mb-1">
+              <label
+                htmlFor="event-venue"
+                className="block text-sm font-semibold text-slate-900 mb-1"
+              >
                 Campus Venue <span className="text-rose-500">*</span>
               </label>
               <input
@@ -255,7 +266,10 @@ export function EventForm({
             </div>
 
             <div>
-              <label htmlFor="event-capacity" className="block text-sm font-semibold text-slate-900 mb-1">
+              <label
+                htmlFor="event-capacity"
+                className="block text-sm font-semibold text-slate-900 mb-1"
+              >
                 Capacity <span className="text-rose-500">*</span>
               </label>
               <input
@@ -298,7 +312,10 @@ export function EventForm({
           {/* Schedule */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="event-starts-at" className="block text-sm font-semibold text-slate-900 mb-1">
+              <label
+                htmlFor="event-starts-at"
+                className="block text-sm font-semibold text-slate-900 mb-1"
+              >
                 Starts At <span className="text-rose-500">*</span>
               </label>
               <input
@@ -313,7 +330,10 @@ export function EventForm({
             </div>
 
             <div>
-              <label htmlFor="event-ends-at" className="block text-sm font-semibold text-slate-900 mb-1">
+              <label
+                htmlFor="event-ends-at"
+                className="block text-sm font-semibold text-slate-900 mb-1"
+              >
                 Ends At <span className="text-rose-500">*</span>
               </label>
               <input
@@ -330,7 +350,10 @@ export function EventForm({
 
           {/* Description */}
           <div>
-            <label htmlFor="event-description" className="block text-sm font-semibold text-slate-900 mb-1">
+            <label
+              htmlFor="event-description"
+              className="block text-sm font-semibold text-slate-900 mb-1"
+            >
               Event Description & Guidelines <span className="text-rose-500">*</span>
             </label>
             <textarea
@@ -429,14 +452,10 @@ export function EventForm({
 
           <div className="mt-4 p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-blue-950 flex items-start gap-2">
             <Info className="w-4 h-4 text-blue-900 shrink-0 mt-0.5" />
-            <p>
-              Changes are immediately reflected in the public campus calendar upon publishing.
-            </p>
+            <p>Changes are immediately reflected in the public campus calendar upon publishing.</p>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-

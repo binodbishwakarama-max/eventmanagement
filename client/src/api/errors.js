@@ -27,4 +27,3 @@ export class AppApiError extends Error {
     return new AppApiError(error.message || 'An unexpected error occurred.', 500, 'CLIENT_ERROR');
   }
 }
-

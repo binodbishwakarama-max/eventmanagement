@@ -1,12 +1,7 @@
 import React from 'react';
 
 export function Skeleton({ className = '', ...props }) {
-  return (
-    <div
-      className={`animate-pulse rounded-lg bg-slate-200/80 ${className}`}
-      {...props}
-    />
-  );
+  return <div className={`animate-pulse rounded-lg bg-slate-200/80 ${className}`} {...props} />;
 }
 
 export function EventCardSkeleton() {
@@ -37,4 +32,3 @@ export function TableRowSkeleton({ columns = 5 }) {
     </tr>
   );
 }
-

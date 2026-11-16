@@ -96,7 +96,11 @@ export function TicketQrCode({ ticketCode, size = 180 }) {
           title="Copy pass code"
           className="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition apple-press"
         >
-          {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+          {copied ? (
+            <Check className="w-3.5 h-3.5 text-emerald-600" />
+          ) : (
+            <Copy className="w-3.5 h-3.5" />
+          )}
         </button>
       </div>
     </div>

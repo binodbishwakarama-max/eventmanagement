@@ -44,4 +44,3 @@ describe('Secure Administrator Account Provisioning', () => {
     }
   });
 });
-

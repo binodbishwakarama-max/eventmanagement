@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export const DSU_USN_REGEX = /^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i;
+export const DSU_USN_REGEX =
+  /^((1DS|ENG|DSU|DES|SOM|PHAR)\d{2}[A-Za-z]{2,4}\d{3,4}|1DS\d{2}[A-Za-z]{2,3}\d{3})$/i;
 
 export const registerSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -33,10 +34,12 @@ export const resetPasswordSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number')
 });
 
-export const googleAuthSchema = z.object({
-  credential: z.string().min(1, 'Google credential token is required').optional(),
-  code: z.string().optional(),
-  usn: z.string().optional()
-}).refine((data) => data.credential || data.code, {
-  message: 'Either Google ID credential token or OAuth authorization code is required'
-});
+export const googleAuthSchema = z
+  .object({
+    credential: z.string().min(1, 'Google credential token is required').optional(),
+    code: z.string().optional(),
+    usn: z.string().optional()
+  })
+  .refine((data) => data.credential || data.code, {
+    message: 'Either Google ID credential token or OAuth authorization code is required'
+  });

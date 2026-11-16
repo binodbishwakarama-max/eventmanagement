@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { User } from '../src/models/User.js';
-import {
-  registerUser
-} from '../src/modules/auth/auth.service.js';
+import { registerUser } from '../src/modules/auth/auth.service.js';
 import {
   listUsers,
   updateUserVerification,
@@ -45,7 +43,7 @@ describe('Student Account Review, Approval, Rejection & Resubmission Lifecycle',
 
       // 3. Admin reviews verification queue (filter by pending)
       const pendingList = await listUsers({ verificationStatus: 'pending' });
-      expect(pendingList.items.some(u => u._id.toString() === studentId.toString())).toBe(true);
+      expect(pendingList.items.some((u) => u._id.toString() === studentId.toString())).toBe(true);
 
       // 4. Admin rejects student verification with reason
       const rejectedUser = await updateUserVerification(
@@ -59,28 +57,23 @@ describe('Student Account Review, Approval, Rejection & Resubmission Lifecycle',
 
       expect(rejectedUser.isVerified).toBe(false);
       expect(rejectedUser.verificationStatus).toBe('rejected');
-      expect(rejectedUser.rejectionReason).toBe('USN does not match registrar enrollment sheet for CSE 2023-27 batch.');
+      expect(rejectedUser.rejectionReason).toBe(
+        'USN does not match registrar enrollment sheet for CSE 2023-27 batch.'
+      );
       expect(rejectedUser.verifiedBy.toString()).toBe(admin._id.toString());
 
       // 5. Student resubmits corrected credentials
-      const resubmittedUser = await resubmitStudentVerification(
-        studentId,
-        {
-          usn: '1DS23CS078',
-          department: 'School of Computer Science & Engineering'
-        }
-      );
+      const resubmittedUser = await resubmitStudentVerification(studentId, {
+        usn: '1DS23CS078',
+        department: 'School of Computer Science & Engineering'
+      });
 
       expect(resubmittedUser.usn).toBe('1DS23CS078');
       expect(resubmittedUser.verificationStatus).toBe('pending');
       expect(resubmittedUser.rejectionReason).toBe('');
 
       // 6. Admin approves verification
-      const approvedUser = await updateUserVerification(
-        studentId,
-        { status: 'verified' },
-        admin
-      );
+      const approvedUser = await updateUserVerification(studentId, { status: 'verified' }, admin);
 
       expect(approvedUser.isVerified).toBe(true);
       expect(approvedUser.verificationStatus).toBe('verified');
@@ -92,4 +85,3 @@ describe('Student Account Review, Approval, Rejection & Resubmission Lifecycle',
     }
   });
 });
-

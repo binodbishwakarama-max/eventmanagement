@@ -43,7 +43,11 @@ describe('Storage Service & Poster Upload Verification', () => {
       size: validJpegBuffer.length,
       type: 'image/jpeg',
       name: 'campus-poster.jpg',
-      arrayBuffer: async () => validJpegBuffer.buffer.slice(validJpegBuffer.byteOffset, validJpegBuffer.byteOffset + validJpegBuffer.byteLength)
+      arrayBuffer: async () =>
+        validJpegBuffer.buffer.slice(
+          validJpegBuffer.byteOffset,
+          validJpegBuffer.byteOffset + validJpegBuffer.byteLength
+        )
     };
 
     const result = await storePosterImage(validFile);
@@ -53,4 +57,3 @@ describe('Storage Service & Poster Upload Verification', () => {
     expect(result.mimeType).toBe('image/jpeg');
   });
 });
-

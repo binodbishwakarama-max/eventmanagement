@@ -1,6 +1,6 @@
 /**
  * DSU CAMPUS EVENTS — FINAL STAGING VALIDATION & REAL-WORLD USER ACCEPTANCE TESTING SUITE
- * 
+ *
  * Executes full end-to-end user journeys (Student, Organizer, Administrator),
  * security attack vectors, data consistency verifications, and concurrency checks
  * against the live backend server.
@@ -23,7 +23,7 @@ function request(method, path, data = null, token = null, extraHeaders = {}) {
   return new Promise((resolve, reject) => {
     const url = new URL(path.startsWith('http') ? path : `${API_BASE}${path}`);
     const isMultipart = extraHeaders['content-type']?.includes('multipart');
-    
+
     let body = null;
     let headers = { ...extraHeaders };
 
@@ -51,7 +51,9 @@ function request(method, path, data = null, token = null, extraHeaders = {}) {
     const req = http.request(options, (res) => {
       let rawData = '';
       res.setEncoding('utf8');
-      res.on('data', (chunk) => { rawData += chunk; });
+      res.on('data', (chunk) => {
+        rawData += chunk;
+      });
       res.on('end', () => {
         let json = null;
         try {
@@ -83,11 +85,11 @@ function createMultipartFormData(fieldName, fileName, mimeType, fileBuffer) {
   const boundary = `----WebKitFormBoundary${Date.now().toString(16)}`;
   const header = `--${boundary}\r\nContent-Disposition: form-data; name="${fieldName}"; filename="${fileName}"\r\nContent-Type: ${mimeType}\r\n\r\n`;
   const footer = `\r\n--${boundary}--\r\n`;
-  
+
   const headerBuffer = Buffer.from(header, 'utf8');
   const footerBuffer = Buffer.from(footer, 'utf8');
   const totalBuffer = Buffer.concat([headerBuffer, fileBuffer, footerBuffer]);
-  
+
   return {
     buffer: totalBuffer,
     contentType: `multipart/form-data; boundary=${boundary}`
@@ -138,7 +140,7 @@ async function runStagingUAT() {
 
   // --- 1. STUDENT REAL USER JOURNEY ---
   console.log('\n--- PHASE 1: STUDENT REAL USER JOURNEY ---');
-  
+
   const testStudentEmail = `uat_student_${Date.now()}@dsu.edu.in`;
   const testStudentUSN = `1DS23CS${Math.floor(100 + Math.random() * 899)}`;
   const testStudentPassword = 'StudentPass@123';
@@ -176,19 +178,27 @@ async function runStagingUAT() {
   const browseRes = await request('GET', '/events?limit=10');
   assert(
     'Browse Events: Public events list returns published items (HTTP 200)',
-    browseRes.status === 200 && Array.isArray(browseRes.data?.data?.items) && browseRes.data.data.items.length > 0,
+    browseRes.status === 200 &&
+      Array.isArray(browseRes.data?.data?.items) &&
+      browseRes.data.data.items.length > 0,
     `Returned ${browseRes.data?.data?.items?.length} published events`
   );
 
-  const targetEvent = browseRes.data.data.items.find(e => new Date(e.startsAt) > new Date() && e.status === 'published') || browseRes.data.data.items[0];
+  const targetEvent =
+    browseRes.data.data.items.find(
+      (e) => new Date(e.startsAt) > new Date() && e.status === 'published'
+    ) || browseRes.data.data.items[0];
   const targetEventId = targetEvent._id;
   const initialRegisteredCount = targetEvent.registeredCount;
 
   // 1.4 Search and Filter Events
-  const searchRes = await request('GET', `/events?search=${encodeURIComponent(targetEvent.title.slice(0, 8))}`);
+  const searchRes = await request(
+    'GET',
+    `/events?search=${encodeURIComponent(targetEvent.title.slice(0, 8))}`
+  );
   assert(
     'Search & Filter: Event search by title keyword matches correctly',
-    searchRes.status === 200 && searchRes.data?.data?.items?.some(e => e._id === targetEventId),
+    searchRes.status === 200 && searchRes.data?.data?.items?.some((e) => e._id === targetEventId),
     `Query matches event: ${targetEvent.title}`
   );
 
@@ -201,7 +211,12 @@ async function runStagingUAT() {
   );
 
   // 1.6 Register for Event
-  const registerEventRes = await request('POST', `/events/${targetEventId}/register`, {}, studentToken);
+  const registerEventRes = await request(
+    'POST',
+    `/events/${targetEventId}/register`,
+    {},
+    studentToken
+  );
   assert(
     'Register for Event: Atomic seat reservation succeeds (HTTP 201)',
     registerEventRes.status === 201 && registerEventRes.data?.data?.status === 'registered',
@@ -218,7 +233,7 @@ async function runStagingUAT() {
 
   // 1.8 View Registered Events in My Passes
   const myPassesRes = await request('GET', '/registrations/me', null, studentToken);
-  const activePass = myPassesRes.data?.data?.find(r => r.event?._id === targetEventId);
+  const activePass = myPassesRes.data?.data?.find((r) => r.event?._id === targetEventId);
   assert(
     'My Passes: Returns active registrations with student details and pass codes',
     myPassesRes.status === 200 && !!activePass && activePass.ticketCode === studentTicketCode,
@@ -234,10 +249,16 @@ async function runStagingUAT() {
   );
 
   // 1.10 Cancel Registration
-  const cancelRes = await request('DELETE', `/events/${targetEventId}/register`, null, studentToken);
+  const cancelRes = await request(
+    'DELETE',
+    `/events/${targetEventId}/register`,
+    null,
+    studentToken
+  );
   assert(
     'Cancel Registration: Student successfully cancels registration (HTTP 200)',
-    cancelRes.status === 200 && cancelRes.data?.data?.message === 'Registration cancelled successfully',
+    cancelRes.status === 200 &&
+      cancelRes.data?.data?.message === 'Registration cancelled successfully',
     `Status: ${cancelRes.status}, Message: ${cancelRes.data?.data?.message}`
   );
 
@@ -250,7 +271,12 @@ async function runStagingUAT() {
   );
 
   // 1.12 Re-register to hold pass for subsequent testing
-  const reRegisterRes = await request('POST', `/events/${targetEventId}/register`, {}, studentToken);
+  const reRegisterRes = await request(
+    'POST',
+    `/events/${targetEventId}/register`,
+    {},
+    studentToken
+  );
   assert(
     'Re-registration: Student successfully re-registers for event (HTTP 201)',
     reRegisterRes.status === 201,
@@ -281,13 +307,14 @@ async function runStagingUAT() {
   });
   const newStudentToken = reloginRes.data?.data?.token;
   const reloadedPassesRes = await request('GET', '/registrations/me', null, newStudentToken);
-  const reloadedPass = reloadedPassesRes.data?.data?.find(r => r.event?._id === targetEventId);
+  const reloadedPass = reloadedPassesRes.data?.data?.find((r) => r.event?._id === targetEventId);
   assert(
     'Persistence: Registration history persists across login sessions',
-    reloadedPassesRes.status === 200 && !!reloadedPass && reloadedPass.ticketCode === persistentTicketCode,
+    reloadedPassesRes.status === 200 &&
+      !!reloadedPass &&
+      reloadedPass.ticketCode === persistentTicketCode,
     `Persisted Ticket: ${reloadedPass?.ticketCode}`
   );
-
 
   // --- 2. ORGANIZER REAL USER JOURNEY ---
   console.log('\n--- PHASE 2: ORGANIZER REAL USER JOURNEY ---');
@@ -309,7 +336,8 @@ async function runStagingUAT() {
   const endsDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000);
   const newEventPayload = {
     title: `UAT Campus Tech Colloquium ${Date.now()}`,
-    description: 'An intensive research and developer colloquium organized for DSU engineering students.',
+    description:
+      'An intensive research and developer colloquium organized for DSU engineering students.',
     category: 'Technical',
     venue: 'Sir M. Visvesvaraya Auditorium',
     startsAt: startsDate.toISOString(),
@@ -340,7 +368,12 @@ async function runStagingUAT() {
     title: `${newEventPayload.title} (Updated)`,
     capacity: 45
   };
-  const editEventRes = await request('PUT', `/events/${createdEventId}`, editPayload, organizerToken);
+  const editEventRes = await request(
+    'PUT',
+    `/events/${createdEventId}`,
+    editPayload,
+    organizerToken
+  );
   assert(
     'Edit Event: Organizer updates title and capacity (HTTP 200)',
     editEventRes.status === 200 && editEventRes.data?.data?.capacity === 45,
@@ -350,22 +383,24 @@ async function runStagingUAT() {
   // 2.4 Upload Event Poster
   // Generate a valid 1x1 JPEG with magic bytes: FF D8 FF E0 00 10 4A 46 49 46 ...
   const validJpegBuffer = Buffer.from([
-    0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01,
-    0x01, 0x01, 0x00, 0x60, 0x00, 0x60, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43,
-    0x00, 0x08, 0x06, 0x06, 0x07, 0x06, 0x05, 0x08, 0x07, 0x07, 0x07, 0x09,
-    0x09, 0x08, 0x0a, 0x0c, 0x14, 0x0d, 0x0c, 0x0b, 0x0b, 0x0c, 0x19, 0x12,
-    0x13, 0x0f, 0x14, 0x1d, 0x1a, 0x1f, 0x1e, 0x1d, 0x1a, 0x1c, 0x1c, 0x20,
-    0x24, 0x2e, 0x27, 0x20, 0x22, 0x2c, 0x23, 0x1c, 0x1c, 0x28, 0x37, 0x29,
-    0x2c, 0x30, 0x31, 0x34, 0x34, 0x34, 0x1f, 0x27, 0x39, 0x3d, 0x38, 0x32,
-    0x3c, 0x2e, 0x33, 0x34, 0x32, 0xff, 0xc0, 0x00, 0x0b, 0x08, 0x00, 0x01,
-    0x00, 0x01, 0x01, 0x01, 0x11, 0x00, 0xff, 0xc4, 0x00, 0x1f, 0x00, 0x00,
-    0x01, 0x05, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-    0x09, 0x0a, 0x0b, 0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00, 0x3f,
+    0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x60,
+    0x00, 0x60, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43, 0x00, 0x08, 0x06, 0x06, 0x07, 0x06, 0x05, 0x08,
+    0x07, 0x07, 0x07, 0x09, 0x09, 0x08, 0x0a, 0x0c, 0x14, 0x0d, 0x0c, 0x0b, 0x0b, 0x0c, 0x19, 0x12,
+    0x13, 0x0f, 0x14, 0x1d, 0x1a, 0x1f, 0x1e, 0x1d, 0x1a, 0x1c, 0x1c, 0x20, 0x24, 0x2e, 0x27, 0x20,
+    0x22, 0x2c, 0x23, 0x1c, 0x1c, 0x28, 0x37, 0x29, 0x2c, 0x30, 0x31, 0x34, 0x34, 0x34, 0x1f, 0x27,
+    0x39, 0x3d, 0x38, 0x32, 0x3c, 0x2e, 0x33, 0x34, 0x32, 0xff, 0xc0, 0x00, 0x0b, 0x08, 0x00, 0x01,
+    0x00, 0x01, 0x01, 0x01, 0x11, 0x00, 0xff, 0xc4, 0x00, 0x1f, 0x00, 0x00, 0x01, 0x05, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04,
+    0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00, 0x3f,
     0x00, 0xbf, 0x80, 0xff, 0xd9
   ]);
 
-  const multipart = createMultipartFormData('file', 'test-poster.jpg', 'image/jpeg', validJpegBuffer);
+  const multipart = createMultipartFormData(
+    'file',
+    'test-poster.jpg',
+    'image/jpeg',
+    validJpegBuffer
+  );
   const uploadRes = await request('POST', '/upload/poster', multipart.buffer, organizerToken, {
     'content-type': multipart.contentType
   });
@@ -376,7 +411,12 @@ async function runStagingUAT() {
   );
 
   // 2.5 Publish Event
-  const publishRes = await request('PUT', `/events/${createdEventId}`, { status: 'published' }, organizerToken);
+  const publishRes = await request(
+    'PUT',
+    `/events/${createdEventId}`,
+    { status: 'published' },
+    organizerToken
+  );
   assert(
     'Publish Event: Event status changed to published (HTTP 200)',
     publishRes.status === 200 && publishRes.data?.data?.status === 'published',
@@ -387,17 +427,28 @@ async function runStagingUAT() {
   const studentSeePublished = await request('GET', `/events/${createdEventId}`);
   assert(
     'Public Discovery: Published event is visible to campus students',
-    studentSeePublished.status === 200 && studentSeePublished.data?.data?.title === editPayload.title,
+    studentSeePublished.status === 200 &&
+      studentSeePublished.data?.data?.title === editPayload.title,
     `Title: ${studentSeePublished.data?.data?.title}`
   );
 
   // 2.6 Student registers for newly published event
-  const studentNewRegRes = await request('POST', `/events/${createdEventId}/register`, {}, newStudentToken);
+  const studentNewRegRes = await request(
+    'POST',
+    `/events/${createdEventId}/register`,
+    {},
+    newStudentToken
+  );
   const eventTicketCode = studentNewRegRes.data?.data?.ticketCode;
   const eventRegId = studentNewRegRes.data?.data?._id;
 
   // 2.7 Organizer views event registrations
-  const orgRegistrationsRes = await request('GET', `/events/${createdEventId}/registrations`, null, organizerToken);
+  const orgRegistrationsRes = await request(
+    'GET',
+    `/events/${createdEventId}/registrations`,
+    null,
+    organizerToken
+  );
   assert(
     'View Registrations: Organizer retrieves attendee roster (HTTP 200)',
     orgRegistrationsRes.status === 200 && Array.isArray(orgRegistrationsRes.data?.data),
@@ -405,17 +456,24 @@ async function runStagingUAT() {
   );
 
   // 2.8 Check attendee information
-  const foundAttendee = orgRegistrationsRes.data?.data?.find(r => r._id === eventRegId);
+  const foundAttendee = orgRegistrationsRes.data?.data?.find((r) => r._id === eventRegId);
   assert(
     'Attendee Information: Roster contains student name, USN, email, and ticket code',
-    !!foundAttendee && foundAttendee.student?.name === 'Kavya S. Gowda' && foundAttendee.ticketCode === eventTicketCode,
+    !!foundAttendee &&
+      foundAttendee.student?.name === 'Kavya S. Gowda' &&
+      foundAttendee.ticketCode === eventTicketCode,
     `Student: ${foundAttendee?.student?.name}, USN: ${foundAttendee?.student?.usn}`
   );
 
   // 2.9 Scan and verify QR pass at the gate
-  const scanRes = await request('POST', `/events/${createdEventId}/verify-pass`, {
-    ticketCode: eventTicketCode
-  }, organizerToken);
+  const scanRes = await request(
+    'POST',
+    `/events/${createdEventId}/verify-pass`,
+    {
+      ticketCode: eventTicketCode
+    },
+    organizerToken
+  );
   assert(
     'Gate Scan & Verify: Valid QR pass verifies and records attendance (HTTP 200)',
     scanRes.status === 200 && scanRes.data?.data?.attended === true,
@@ -423,8 +481,13 @@ async function runStagingUAT() {
   );
 
   // 2.10 Verify attendance records updated
-  const attendanceVerifyRes = await request('GET', `/events/${createdEventId}/registrations`, null, organizerToken);
-  const checkedInAttendee = attendanceVerifyRes.data?.data?.find(r => r._id === eventRegId);
+  const attendanceVerifyRes = await request(
+    'GET',
+    `/events/${createdEventId}/registrations`,
+    null,
+    organizerToken
+  );
+  const checkedInAttendee = attendanceVerifyRes.data?.data?.find((r) => r._id === eventRegId);
   assert(
     'Attendance Records: Attendee status marked attended: true with timestamp',
     checkedInAttendee?.attended === true && !!checkedInAttendee?.attendedAt,
@@ -432,13 +495,17 @@ async function runStagingUAT() {
   );
 
   // 2.11 Cancel Event
-  const cancelEventRes = await request('PUT', `/events/${createdEventId}`, { status: 'cancelled' }, organizerToken);
+  const cancelEventRes = await request(
+    'PUT',
+    `/events/${createdEventId}`,
+    { status: 'cancelled' },
+    organizerToken
+  );
   assert(
     'Cancel Event: Organizer transitions event status to cancelled (HTTP 200)',
     cancelEventRes.status === 200 && cancelEventRes.data?.data?.status === 'cancelled',
     `Status: ${cancelEventRes.data?.data?.status}`
   );
-
 
   // --- 3. ADMINISTRATOR REAL USER JOURNEY ---
   console.log('\n--- PHASE 3: ADMINISTRATOR REAL USER JOURNEY ---');
@@ -474,9 +541,14 @@ async function runStagingUAT() {
   );
 
   // Approve student verification status
-  const verifyUserRes = await request('PATCH', `/admin/users/${studentUser._id}/verify`, {
-    status: 'verified'
-  }, adminToken);
+  const verifyUserRes = await request(
+    'PATCH',
+    `/admin/users/${studentUser._id}/verify`,
+    {
+      status: 'verified'
+    },
+    adminToken
+  );
   assert(
     'Identity Verification: Admin approves student institutional verification status (HTTP 200)',
     verifyUserRes.status === 200 && verifyUserRes.data?.data?.isVerified === true,
@@ -490,7 +562,6 @@ async function runStagingUAT() {
     adminEventsRes.status === 200 && adminEventsRes.data?.data?.items?.length >= 6,
     `Admin visible events: ${adminEventsRes.data?.data?.items?.length}`
   );
-
 
   // --- 4. SECURITY & EXPLOIT DEFENSE TESTING ---
   console.log('\n--- PHASE 4: SECURITY & ACCESS CONTROL TESTING ---');
@@ -513,18 +584,28 @@ async function runStagingUAT() {
 
   // 4.3 Organizer accessing another organizer's event
   // Let's create an event by Admin and attempt to update it with Organizer
-  const adminCreatedEventRes = await request('POST', '/events', {
-    title: `Admin Only Governance Event ${Date.now()}`,
-    description: 'High-level academic governance summit strictly managed by Registrar.',
-    category: 'Seminar',
-    venue: 'Academic Senate Hall',
-    startsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
-    endsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(),
-    capacity: 20
-  }, adminToken);
+  const adminCreatedEventRes = await request(
+    'POST',
+    '/events',
+    {
+      title: `Admin Only Governance Event ${Date.now()}`,
+      description: 'High-level academic governance summit strictly managed by Registrar.',
+      category: 'Seminar',
+      venue: 'Academic Senate Hall',
+      startsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+      endsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(),
+      capacity: 20
+    },
+    adminToken
+  );
   const adminEventId = adminCreatedEventRes.data?.data?._id;
 
-  const exploit3 = await request('PUT', `/events/${adminEventId}`, { title: 'Tampered Title' }, organizerToken);
+  const exploit3 = await request(
+    'PUT',
+    `/events/${adminEventId}`,
+    { title: 'Tampered Title' },
+    organizerToken
+  );
   assert(
     'Security S3: Organizer modifying another organizer/admin event is BLOCKED (HTTP 403 Forbidden)',
     exploit3.status === 403,
@@ -549,9 +630,14 @@ async function runStagingUAT() {
   );
 
   // 4.6 Duplicate QR Scan
-  const exploit6 = await request('POST', `/events/${createdEventId}/verify-pass`, {
-    ticketCode: eventTicketCode
-  }, organizerToken);
+  const exploit6 = await request(
+    'POST',
+    `/events/${createdEventId}/verify-pass`,
+    {
+      ticketCode: eventTicketCode
+    },
+    organizerToken
+  );
   assert(
     'Security S6: Duplicate QR pass scan is BLOCKED (HTTP 409 Conflict)',
     exploit6.status === 409,
@@ -615,7 +701,6 @@ async function runStagingUAT() {
     `Status: ${forgotRes.status}`
   );
 
-
   // --- SUMMARY ---
   console.log('\n========================================================================');
   console.log('                   FINAL STAGING UAT SUMMARY RESULTS                    ');
@@ -623,7 +708,9 @@ async function runStagingUAT() {
   console.log(`• Total Validation Scenarios Executed : ${report.totalTests}`);
   console.log(`• Passed Assertions                   : ${report.passed}`);
   console.log(`• Failed Assertions                   : ${report.failed}`);
-  console.log(`• Success Rate                        : ${((report.passed / report.totalTests) * 100).toFixed(1)}%`);
+  console.log(
+    `• Success Rate                        : ${((report.passed / report.totalTests) * 100).toFixed(1)}%`
+  );
   console.log('========================================================================\n');
 
   if (report.failed > 0) {

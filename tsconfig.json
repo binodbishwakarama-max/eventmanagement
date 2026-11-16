@@ -16,14 +16,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": [
-    "client/src/**/*",
-    "server/src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "client/dist",
-    "server/uploads",
-    "server/backups"
-  ]
+  "include": ["client/src/**/*", "server/src/**/*"],
+  "exclude": ["node_modules", "client/dist", "server/uploads", "server/backups"]
 }

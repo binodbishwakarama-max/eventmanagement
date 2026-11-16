@@ -1,6 +1,5 @@
 import { User } from '../../models/User.js';
 import { ApiError } from '../../utils/ApiError.js';
-import { env } from '../../config/env.js';
 import { DSU_USN_REGEX } from '../auth/auth.schemas.js';
 
 function escapeRegex(text) {
@@ -16,12 +15,20 @@ export async function listUsers(query) {
   if (query.verificationStatus) filter.verificationStatus = query.verificationStatus;
   if (query.search) {
     const search = { $regex: escapeRegex(query.search), $options: 'i' };
-    filter.$or = [{ name: search }, { email: search }, { department: search }, { clubName: search }, { usn: search }];
+    filter.$or = [
+      { name: search },
+      { email: search },
+      { department: search },
+      { clubName: search },
+      { usn: search }
+    ];
   }
 
   const [items, total] = await Promise.all([
     User.find(filter)
-      .select('name email role department clubName usn rollNumber isVerified verificationStatus rejectionReason verifiedAt verifiedBy createdAt')
+      .select(
+        'name email role department clubName usn rollNumber isVerified verificationStatus rejectionReason verifiedAt verifiedBy createdAt'
+      )
       .populate('verifiedBy', 'name email role')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -47,7 +54,9 @@ export async function updateUserVerification(userId, { status, role, rejectionRe
       user.isVerified = false;
       user.verifiedAt = null;
       user.verifiedBy = adminUser._id;
-      user.rejectionReason = rejectionReason || 'Institutional USN or identity records could not be verified by registrar desk';
+      user.rejectionReason =
+        rejectionReason ||
+        'Institutional USN or identity records could not be verified by registrar desk';
     } else if (status === 'pending') {
       user.isVerified = false;
       user.verifiedAt = null;
@@ -57,7 +66,11 @@ export async function updateUserVerification(userId, { status, role, rejectionRe
 
   if (role && ['student', 'faculty', 'organizer', 'admin', 'super_admin'].includes(role)) {
     // Only super_admin can assign or demote admin / super_admin roles
-    if (['admin', 'super_admin'].includes(role) && adminUser.role !== 'super_admin' && adminUser.role !== 'admin') {
+    if (
+      ['admin', 'super_admin'].includes(role) &&
+      adminUser.role !== 'super_admin' &&
+      adminUser.role !== 'admin'
+    ) {
       throw ApiError.forbidden('Only an authorized administrator can assign elevated privileges.');
     }
     // Protect super_admin from alteration by regular admin
@@ -81,7 +94,8 @@ export async function updateProfile(userId, { name, department, rollNumber, club
 
   if (name && typeof name === 'string' && name.trim().length >= 2) user.name = name.trim();
   if (department && typeof department === 'string') user.department = department.trim();
-  if (rollNumber && typeof rollNumber === 'string') user.rollNumber = rollNumber.trim().toUpperCase();
+  if (rollNumber && typeof rollNumber === 'string')
+    user.rollNumber = rollNumber.trim().toUpperCase();
   if (clubName && typeof clubName === 'string') user.clubName = clubName.trim();
 
   await user.save();
@@ -93,7 +107,9 @@ export async function deactivateAccount(userId) {
   if (!user) throw ApiError.notFound('User not found');
 
   if (user.role === 'super_admin') {
-    throw ApiError.badRequest('Super Administrator accounts cannot be deactivated via self-service.');
+    throw ApiError.badRequest(
+      'Super Administrator accounts cannot be deactivated via self-service.'
+    );
   }
 
   user.accountStatus = 'deactivated';

@@ -34,4 +34,3 @@ export function toggleSaveEvent(eventId) {
   window.dispatchEvent(new Event('dsu-bookmarks-updated'));
   return !exists; // returns true if now saved, false if removed
 }
-

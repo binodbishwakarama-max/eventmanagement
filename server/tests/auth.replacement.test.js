@@ -24,11 +24,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
   let adminToken = null;
 
   it('Test Case 1: creates a new real database user on first Google login', async () => {
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_001:eng25cs0999@dsu.edu.in:Anand Verma:true'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_001:eng25cs0999@dsu.edu.in:Anand Verma:true'
+    });
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -49,11 +47,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
   });
 
   it('Test Case 2: authenticates existing Google account without duplicating user record', async () => {
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_001:eng25cs0999@dsu.edu.in:Anand Verma:true'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_001:eng25cs0999@dsu.edu.in:Anand Verma:true'
+    });
 
     expect(res.status).toBe(200);
     expect(res.body.data.isNew).toBe(false);
@@ -74,11 +70,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
       tokenVersion: 1
     });
 
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_org_01:coordinator@dsu.edu.in:Prof. Rao:true'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_org_01:coordinator@dsu.edu.in:Prof. Rao:true'
+    });
 
     expect(res.status).toBe(200);
     expect(res.body.data.user.role).toBe('organizer'); // Retains existing role
@@ -87,22 +81,19 @@ describe('Production Authentication & Identity Replacement Suite', () => {
   });
 
   it('Test Case 4: rejects Google token with unverified email', async () => {
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_unv:fake@dsu.edu.in:Bad Actor:false'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_unv:fake@dsu.edu.in:Bad Actor:false'
+    });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
   });
 
   it('Test Case 5: rejects domain violation when non-institutional domain is submitted', async () => {
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_ext:attacker@gmail.com:External User:true'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential:
+        'test-google-token:google_sub_ext:attacker@unauthorized-malicious-domain.xyz:External User:true'
+    });
 
     expect(res.status).toBe(403);
     expect(res.body.message).toContain('restricted to institutional');
@@ -155,11 +146,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
     expect(superAdmin.isVerified).toBe(true);
 
     // Login via Google with provisioned superadmin identity
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_sa:superadmin@dsu.edu.in:Vice Chancellor:true'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_sa:superadmin@dsu.edu.in:Vice Chancellor:true'
+    });
 
     expect(res.status).toBe(200);
     expect(res.body.data.user.role).toBe('super_admin');
@@ -177,7 +166,7 @@ describe('Production Authentication & Identity Replacement Suite', () => {
 
   it('Test Case 11: blocks unauthorized role promotion by normal admin against super_admin', async () => {
     // Create regular admin
-    const regularAdmin = await User.create({
+    await User.create({
       name: 'Campus Admin',
       email: 'admin_regular@dsu.edu.in',
       role: 'admin',
@@ -185,11 +174,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
       tokenVersion: 1
     });
 
-    const regularAdminRes = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_ra:admin_regular@dsu.edu.in:Campus Admin:true'
-      });
+    const regularAdminRes = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_ra:admin_regular@dsu.edu.in:Campus Admin:true'
+    });
 
     const regToken = regularAdminRes.body.data.token;
 
@@ -233,11 +220,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
     await User.findByIdAndUpdate(userId, { accountStatus: 'suspended' });
 
     // Generate fresh token
-    const loginRes = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_001:eng25cs0999@dsu.edu.in:Anand Verma:true'
-      });
+    const loginRes = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_001:eng25cs0999@dsu.edu.in:Anand Verma:true'
+    });
 
     expect(loginRes.status).toBe(403);
     expect(loginRes.body.message).toContain('suspended');
@@ -245,11 +230,9 @@ describe('Production Authentication & Identity Replacement Suite', () => {
 
   it('Test Case 14: self-service account deactivation revokes all sessions', async () => {
     // Create new student
-    const res = await request(app)
-      .post('/api/auth/google')
-      .send({
-        credential: 'test-google-token:google_sub_deact:eng25cs0101@dsu.edu.in:Student Deact:true'
-      });
+    const res = await request(app).post('/api/auth/google').send({
+      credential: 'test-google-token:google_sub_deact:eng25cs0101@dsu.edu.in:Student Deact:true'
+    });
     const deactToken = res.body.data.token;
 
     // Deactivate account

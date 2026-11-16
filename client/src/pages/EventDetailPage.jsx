@@ -48,7 +48,10 @@ export function EventDetailPage() {
       setEvent(ev);
       setSaved(isEventSaved(ev._id));
     } catch (err) {
-      setLoadError(err.response?.data?.message || 'Unable to load event details. Please verify your connection.');
+      setLoadError(
+        err.response?.data?.message ||
+          'Unable to load event details. Please verify your connection.'
+      );
       toast.error('Failed to load event details');
     } finally {
       setLoading(false);
@@ -110,11 +113,13 @@ export function EventDetailPage() {
     const url = window.location.href;
     const title = event.title.replace(/^DEMO:\s*/i, '').trim();
     if (navigator.share) {
-      navigator.share({
-        title,
-        text: `Explore ${title} at Dayananda Sagar University`,
-        url
-      }).catch(() => {});
+      navigator
+        .share({
+          title,
+          text: `Explore ${title} at Dayananda Sagar University`,
+          url
+        })
+        .catch(() => {});
     } else {
       navigator.clipboard.writeText(url);
       toast.success('Event link copied to clipboard!');
@@ -205,7 +210,9 @@ export function EventDetailPage() {
             aria-label={saved ? 'Remove bookmark' : 'Save event'}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs transition"
           >
-            <Bookmark className={`w-3.5 h-3.5 ${saved ? 'fill-[#D9A521] text-[#D9A521]' : 'text-slate-500'}`} />
+            <Bookmark
+              className={`w-3.5 h-3.5 ${saved ? 'fill-[#D9A521] text-[#D9A521]' : 'text-slate-500'}`}
+            />
             <span className="hidden sm:inline">{saved ? 'Saved' : 'Save'}</span>
           </button>
 
@@ -312,7 +319,8 @@ export function EventDetailPage() {
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center gap-3">
               <Info className="w-4 h-4 text-blue-600 shrink-0" />
               <span>
-                Please arrive at the venue 15 minutes prior to the scheduled start time with your official digital ticket pass ready for turnstile entry.
+                Please arrive at the venue 15 minutes prior to the scheduled start time with your
+                official digital ticket pass ready for turnstile entry.
               </span>
             </div>
           </div>
@@ -342,7 +350,9 @@ export function EventDetailPage() {
             </div>
 
             <div className="text-right">
-              <span className={`text-xs font-bold ${available <= 10 ? 'text-amber-700' : 'text-[#002B55]'}`}>
+              <span
+                className={`text-xs font-bold ${available <= 10 ? 'text-amber-700' : 'text-[#002B55]'}`}
+              >
                 {available > 0 ? `${available} seats remaining` : 'Full Capacity'}
               </span>
             </div>
@@ -358,16 +368,20 @@ export function EventDetailPage() {
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#D9A521]">
                   {starts.toLocaleDateString('en-US', { month: 'short' })}
                 </span>
-                <span className="text-xl font-extrabold leading-none">
-                  {starts.getDate()}
-                </span>
+                <span className="text-xl font-extrabold leading-none">{starts.getDate()}</span>
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-slate-900">
-                  {starts.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  {starts.toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
                 </p>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} – {ends.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
+                  {starts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} –{' '}
+                  {ends.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST
                 </p>
 
                 {/* Calendar Dropdown */}
@@ -426,13 +440,19 @@ export function EventDetailPage() {
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span>{event.registeredCount} of {event.capacity} registered</span>
+                <span>
+                  {event.registeredCount} of {event.capacity} registered
+                </span>
                 <span className="font-semibold text-slate-700">{available} remaining</span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200/60">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${
-                    isFull ? 'bg-rose-500' : percentFull >= 80 ? 'bg-[#D9A521]' : 'bg-gradient-to-r from-emerald-500 to-[#002B55]'
+                    isFull
+                      ? 'bg-rose-500'
+                      : percentFull >= 80
+                        ? 'bg-[#D9A521]'
+                        : 'bg-gradient-to-r from-emerald-500 to-[#002B55]'
                   }`}
                   style={{ width: `${percentFull}%` }}
                 />
@@ -449,7 +469,9 @@ export function EventDetailPage() {
                     <span>Registration Confirmed</span>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-emerald-100 text-center">
-                    <p className="text-xs uppercase text-slate-400 font-medium tracking-wide">Official Admission Passcode</p>
+                    <p className="text-xs uppercase text-slate-400 font-medium tracking-wide">
+                      Official Admission Passcode
+                    </p>
                     <p className="text-sm font-mono font-bold text-[#002B55] mt-0.5 tracking-wider">
                       {event.myRegistration.ticketCode}
                     </p>
@@ -459,7 +481,8 @@ export function EventDetailPage() {
                       to="/dashboard"
                       className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#002B55] hover:bg-[#001B36] text-white text-xs font-bold transition shadow-xs"
                     >
-                      <Ticket className="w-3.5 h-3.5 text-[#D9A521]" /> View E-Pass in Student Passbook
+                      <Ticket className="w-3.5 h-3.5 text-[#D9A521]" /> View E-Pass in Student
+                      Passbook
                     </Link>
                     {!isStarted && (
                       <button
@@ -478,7 +501,8 @@ export function EventDetailPage() {
                 <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-3">
                   <p className="text-xs font-bold text-[#002B55]">Event Management & Gates</p>
                   <p className="text-[11px] text-slate-500">
-                    You have authorized access to manage attendees, scan gate credentials, or edit event specifications.
+                    You have authorized access to manage attendees, scan gate credentials, or edit
+                    event specifications.
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <Link
@@ -498,7 +522,8 @@ export function EventDetailPage() {
               ) : user && user.role !== 'student' ? (
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                   <p className="text-xs text-slate-600">
-                    Registration is reserved for student accounts. Sign in with a student account to book a pass.
+                    Registration is reserved for student accounts. Sign in with a student account to
+                    book a pass.
                   </p>
                 </div>
               ) : event.status !== 'published' ? (

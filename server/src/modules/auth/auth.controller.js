@@ -28,7 +28,11 @@ export const login = asyncHandler(async (req, res) => {
 export const googleAuth = asyncHandler(async (req, res) => {
   const result = await authService.googleLoginOrRegister(req.body);
   setAuthCookie(res, result.token);
-  return ok(res, result, result.isNew ? 'Account created and logged in via Google SSO' : 'Logged in via Google SSO');
+  return ok(
+    res,
+    result,
+    result.isNew ? 'Account created and logged in via Google SSO' : 'Logged in via Google SSO'
+  );
 });
 
 export const getMe = asyncHandler(async (req, res) => {

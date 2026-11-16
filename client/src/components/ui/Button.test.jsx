@@ -36,4 +36,3 @@ describe('Design System Primitives', () => {
     });
   });
 });
-

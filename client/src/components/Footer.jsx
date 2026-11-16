@@ -14,8 +14,8 @@ export function Footer() {
               <DsuLogo variant="white" size="md" />
             </div>
             <p className="text-xs text-slate-300 leading-relaxed max-w-lg">
-              The official centralized platform for technical symposiums, hackathons, cultural festivals,
-              club gatherings, and varsity athletics across DSU Harohalli Main Campus.
+              The official centralized platform for technical symposiums, hackathons, cultural
+              festivals, club gatherings, and varsity athletics across DSU Harohalli Main Campus.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-2 text-xs text-slate-400">
               <span className="flex items-center gap-1.5">
@@ -37,19 +37,29 @@ export function Footer() {
             </span>
             <ul className="space-y-2 text-xs text-slate-300">
               <li>
-                <Link to="/events" className="inline-block py-1 hover:text-white transition">Explore Gatherings</Link>
+                <Link to="/events" className="inline-block py-1 hover:text-white transition">
+                  Explore Gatherings
+                </Link>
               </li>
               <li>
-                <Link to="/dashboard" className="inline-block py-1 hover:text-white transition">Student E-Passbook</Link>
+                <Link to="/dashboard" className="inline-block py-1 hover:text-white transition">
+                  Student E-Passbook
+                </Link>
               </li>
               <li>
-                <Link to="/admin" className="inline-block py-1 hover:text-white transition">Operations Console</Link>
+                <Link to="/admin" className="inline-block py-1 hover:text-white transition">
+                  Operations Console
+                </Link>
               </li>
               <li>
-                <Link to="/login" className="inline-block py-1 hover:text-white transition">Institutional Sign In</Link>
+                <Link to="/login" className="inline-block py-1 hover:text-white transition">
+                  Institutional Sign In
+                </Link>
               </li>
               <li>
-                <Link to="/register" className="inline-block py-1 hover:text-white transition">Student Registration</Link>
+                <Link to="/register" className="inline-block py-1 hover:text-white transition">
+                  Student Registration
+                </Link>
               </li>
             </ul>
           </div>
@@ -62,7 +72,9 @@ export function Footer() {
             <div className="text-xs text-slate-300 space-y-2">
               <div>
                 <p className="font-semibold text-white">Harohalli Main Campus (130 Acres)</p>
-                <p className="text-[11px] text-slate-400">Kanakapura Road, Bengaluru South - 562112</p>
+                <p className="text-[11px] text-slate-400">
+                  Kanakapura Road, Bengaluru South - 562112
+                </p>
               </div>
               <div className="pt-1 text-[11px] text-slate-400 space-y-1">
                 <p>• NAAC A+ Accredited University</p>
@@ -73,8 +85,13 @@ export function Footer() {
         </div>
 
         <div className="mt-8 border-t border-blue-900/50 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} Dayananda Sagar University. All rights reserved. Office of Student Affairs & Campus Life.</p>
-          <p className="text-[11px] text-slate-400 font-mono">Platform Version 2.0 • Institutional Deployment</p>
+          <p>
+            © {new Date().getFullYear()} Dayananda Sagar University. All rights reserved. Office of
+            Student Affairs & Campus Life.
+          </p>
+          <p className="text-[11px] text-slate-400 font-mono">
+            Platform Version 2.0 • Institutional Deployment
+          </p>
         </div>
       </div>
     </footer>

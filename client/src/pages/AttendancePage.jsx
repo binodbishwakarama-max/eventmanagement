@@ -77,7 +77,15 @@ export const AttendancePage = () => {
       const safeText = /^[\s]*[=+\-@]/.test(text) ? `'${text}` : text;
       return `"${safeText.replace(/"/g, '""')}"`;
     };
-    const headers = ['Student Name', 'University USN', 'Email', 'Department', 'Ticket Pass Code', 'Checked In', 'Check-in Time']
+    const headers = [
+      'Student Name',
+      'University USN',
+      'Email',
+      'Department',
+      'Ticket Pass Code',
+      'Checked In',
+      'Check-in Time'
+    ]
       .map(csvCell)
       .join(',');
     const rows = registrations
@@ -89,7 +97,9 @@ export const AttendancePage = () => {
           registration.student?.department,
           registration.ticketCode,
           registration.attended ? 'Yes' : 'No',
-          registration.attendedAt ? new Date(registration.attendedAt).toLocaleString('en-IN') : 'N/A'
+          registration.attendedAt
+            ? new Date(registration.attendedAt).toLocaleString('en-IN')
+            : 'N/A'
         ]
           .map(csvCell)
           .join(',')
@@ -117,9 +127,12 @@ export const AttendancePage = () => {
       playSuccessChime();
       const verified = res.data?.data;
       setLastVerifiedStudent(verified);
-      toast.success(`Check-in verified: ${verified.student?.name || 'Student'} (${verified.student?.usn || code})`, {
-        duration: 4000
-      });
+      toast.success(
+        `Check-in verified: ${verified.student?.name || 'Student'} (${verified.student?.usn || code})`,
+        {
+          duration: 4000
+        }
+      );
       setTicketInput('');
       fetchRegistrations();
     } catch (err) {
@@ -139,7 +152,8 @@ export const AttendancePage = () => {
 
   const attendedCount = registrations.filter((r) => r.attended).length;
   const pendingCount = Math.max(0, registrations.length - attendedCount);
-  const turnoutRate = registrations.length > 0 ? Math.round((attendedCount / registrations.length) * 100) : 0;
+  const turnoutRate =
+    registrations.length > 0 ? Math.round((attendedCount / registrations.length) * 100) : 0;
 
   const filteredRegistrations = registrations.filter((r) => {
     if (tabFilter === 'attended' && !r.attended) return false;
@@ -244,21 +258,27 @@ export const AttendancePage = () => {
             <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-widest block">
               Registered
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] font-mono mt-1">{registrations.length}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#002B55] font-mono mt-1">
+              {registrations.length}
+            </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-widest block">
               Checked In
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-mono mt-1">{attendedCount}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-mono mt-1">
+              {attendedCount}
+            </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <span className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-widest block">
               Pending
             </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-amber-600 font-mono mt-1">{pendingCount}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-amber-600 font-mono mt-1">
+              {pendingCount}
+            </p>
           </div>
 
           {/* Circular Turnout Ring */}
@@ -350,8 +370,11 @@ export const AttendancePage = () => {
                   </span>
                 </div>
                 <p className="text-[11px] text-emerald-800 mt-0.5">
-                  {lastVerifiedStudent.student?.department || 'Dayananda Sagar University'} • Check-in recorded at{' '}
-                  {new Date(lastVerifiedStudent.attendedAt || Date.now()).toLocaleTimeString('en-IN')}
+                  {lastVerifiedStudent.student?.department || 'Dayananda Sagar University'} •
+                  Check-in recorded at{' '}
+                  {new Date(lastVerifiedStudent.attendedAt || Date.now()).toLocaleTimeString(
+                    'en-IN'
+                  )}
                 </p>
               </div>
             </div>
@@ -400,11 +423,21 @@ export const AttendancePage = () => {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 text-slate-500 border-b border-slate-200/80">
-                <th className="py-3 px-6 font-mono font-semibold uppercase tracking-wider text-[10px]">Student Name</th>
-                <th className="py-3 px-4 font-mono font-semibold uppercase tracking-wider text-[10px]">University USN</th>
-                <th className="py-3 px-4 font-mono font-semibold uppercase tracking-wider text-[10px]">Department</th>
-                <th className="py-3 px-4 font-mono font-semibold uppercase tracking-wider text-[10px]">Pass Code</th>
-                <th className="py-3 px-6 font-mono font-semibold uppercase tracking-wider text-[10px] text-center">Attended</th>
+                <th className="py-3 px-6 font-mono font-semibold uppercase tracking-wider text-[10px]">
+                  Student Name
+                </th>
+                <th className="py-3 px-4 font-mono font-semibold uppercase tracking-wider text-[10px]">
+                  University USN
+                </th>
+                <th className="py-3 px-4 font-mono font-semibold uppercase tracking-wider text-[10px]">
+                  Department
+                </th>
+                <th className="py-3 px-4 font-mono font-semibold uppercase tracking-wider text-[10px]">
+                  Pass Code
+                </th>
+                <th className="py-3 px-6 font-mono font-semibold uppercase tracking-wider text-[10px] text-center">
+                  Attended
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -421,7 +454,9 @@ export const AttendancePage = () => {
                     <td className="py-3.5 px-4 font-mono text-slate-600">
                       {reg.student?.usn || reg.student?.rollNumber || '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600">{reg.student?.department || 'DSU Student'}</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      {reg.student?.department || 'DSU Student'}
+                    </td>
                     <td className="py-3.5 px-4">
                       <span className="font-mono font-bold text-[#002B55] bg-blue-50/80 px-2 py-0.5 rounded border border-blue-200/60">
                         {reg.ticketCode}

@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  MapPin,
-  CheckCircle2,
-  Building2,
-  ArrowRight
-} from 'lucide-react';
+import { X, MapPin, CheckCircle2, Building2, ArrowRight } from 'lucide-react';
 import { apiClient } from '../api/client';
 
 export const DSU_CAMPUS_VENUES = [
@@ -16,7 +10,12 @@ export const DSU_CAMPUS_VENUES = [
     campus: 'Harohalli Main Campus',
     capacity: 850,
     type: 'Auditorium',
-    features: ['Line-array acoustics', 'Stage lighting & green rooms', 'Central air conditioning', '850 seated capacity'],
+    features: [
+      'Line-array acoustics',
+      'Stage lighting & green rooms',
+      'Central air conditioning',
+      '850 seated capacity'
+    ],
     coords: { x: 43, y: 35 },
     shuttleDist: 'Central Academic Block'
   },
@@ -27,7 +26,12 @@ export const DSU_CAMPUS_VENUES = [
     campus: 'Harohalli Main Campus',
     capacity: 120,
     type: 'Laboratory',
-    features: ['Gigabit LAN drops', 'Dual-screen workstations', 'IoT prototyping benches', 'UPS battery backup'],
+    features: [
+      'Gigabit LAN drops',
+      'Dual-screen workstations',
+      'IoT prototyping benches',
+      'UPS battery backup'
+    ],
     coords: { x: 72, y: 53 },
     shuttleDist: 'Tech Corridor - 3 min walk'
   },
@@ -38,7 +42,12 @@ export const DSU_CAMPUS_VENUES = [
     campus: 'Harohalli Main Campus',
     capacity: 300,
     type: 'Seminar Hall',
-    features: ['Tiered executive seating', 'Surround sound system', 'Dual 4K projection', 'High-speed campus Wi-Fi'],
+    features: [
+      'Tiered executive seating',
+      'Surround sound system',
+      'Dual 4K projection',
+      'High-speed campus Wi-Fi'
+    ],
     coords: { x: 61, y: 32 },
     shuttleDist: 'Academic Block 1 - 1st Floor'
   },
@@ -49,7 +58,12 @@ export const DSU_CAMPUS_VENUES = [
     campus: 'Harohalli Main Campus',
     capacity: 1500,
     type: 'Sports Arena',
-    features: ['FIFA-grade synthetic turf', 'Night match floodlighting', 'Covered spectator pavilion', 'Athletic track'],
+    features: [
+      'FIFA-grade synthetic turf',
+      'Night match floodlighting',
+      'Covered spectator pavilion',
+      'Athletic track'
+    ],
     coords: { x: 85, y: 72 },
     shuttleDist: 'East Gate Athletic Pavilion'
   },
@@ -60,7 +74,12 @@ export const DSU_CAMPUS_VENUES = [
     campus: 'Harohalli Main Campus',
     capacity: 80,
     type: 'Creative Studio',
-    features: ['Modular critique tables', 'Large-format presentation displays', 'Wacom drafting stations', 'Natural daylighting'],
+    features: [
+      'Modular critique tables',
+      'Large-format presentation displays',
+      'Wacom drafting stations',
+      'Natural daylighting'
+    ],
     coords: { x: 20, y: 48 },
     shuttleDist: 'West Wing Design Center'
   },
@@ -71,7 +90,12 @@ export const DSU_CAMPUS_VENUES = [
     campus: 'Harohalli Main Campus',
     capacity: 500,
     type: 'Amphitheater',
-    features: ['Acoustic performance shell', 'Tiered stone seating', 'Ambient stage lighting', 'Open-air venue'],
+    features: [
+      'Acoustic performance shell',
+      'Tiered stone seating',
+      'Ambient stage lighting',
+      'Open-air venue'
+    ],
     coords: { x: 35, y: 65 },
     shuttleDist: 'Central Quadrangle'
   }
@@ -92,9 +116,10 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
         if (isMounted && Array.isArray(apiVenues) && apiVenues.length > 0) {
           // Merge API venues with spatial coordinates
           const mapped = apiVenues.map((v, idx) => {
-            const fallback = DSU_CAMPUS_VENUES.find(
-              (f) => f.name.toLowerCase() === v.name.toLowerCase() || f.id === v.slug
-            ) || DSU_CAMPUS_VENUES[idx % DSU_CAMPUS_VENUES.length];
+            const fallback =
+              DSU_CAMPUS_VENUES.find(
+                (f) => f.name.toLowerCase() === v.name.toLowerCase() || f.id === v.slug
+              ) || DSU_CAMPUS_VENUES[idx % DSU_CAMPUS_VENUES.length];
 
             return {
               id: v.slug || v._id || `venue-${idx}`,
@@ -137,9 +162,10 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
   if (!isOpen) return null;
 
   // Find events scheduled at the selected venue
-  const scheduledEvents = currentEvents.filter((ev) =>
-    ev.venue?.toLowerCase().includes(selectedVenue.name.toLowerCase()) ||
-    selectedVenue.name.toLowerCase().includes(ev.venue?.toLowerCase())
+  const scheduledEvents = currentEvents.filter(
+    (ev) =>
+      ev.venue?.toLowerCase().includes(selectedVenue.name.toLowerCase()) ||
+      selectedVenue.name.toLowerCase().includes(ev.venue?.toLowerCase())
   );
 
   return (
@@ -165,7 +191,8 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
                 <span>DSU Campus Venue Explorer</span>
               </h2>
               <p className="text-[11px] text-slate-300">
-                Harohalli Main Campus (130-Acre Campus) venue locator with live scheduled gatherings.
+                Harohalli Main Campus (130-Acre Campus) venue locator with live scheduled
+                gatherings.
               </p>
             </div>
           </div>
@@ -191,7 +218,12 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
                 {/* Background Grid Pattern */}
                 <defs>
                   <pattern id="campus-grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
+                    <path
+                      d="M 10 0 L 0 0 0 10"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.04)"
+                      strokeWidth="0.5"
+                    />
                   </pattern>
                 </defs>
                 <rect width="100" height="100" fill="url(#campus-grid)" />
@@ -199,30 +231,157 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
                 {/* Illustrative paths */}
                 <path d="M 0 50 Q 50 48 100 50" stroke="#1E3A8A" strokeWidth="4" opacity="0.6" />
                 <path d="M 50 0 L 50 100" stroke="#1E3A8A" strokeWidth="4" opacity="0.6" />
-                <circle cx="50" cy="50" r="14" stroke="#D9A521" strokeWidth="1" strokeDasharray="2 2" opacity="0.5" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="14"
+                  stroke="#D9A521"
+                  strokeWidth="1"
+                  strokeDasharray="2 2"
+                  opacity="0.5"
+                />
 
                 {/* Zones Outline */}
-                <rect x="34" y="26" width="18" height="18" rx="3" fill="#002B55" stroke="#3B82F6" strokeWidth="0.8" opacity="0.8" />
-                <text x="43" y="36" fill="#93C5FD" fontSize="3" fontWeight="bold" textAnchor="middle">MAIN AUDITORIUM</text>
+                <rect
+                  x="34"
+                  y="26"
+                  width="18"
+                  height="18"
+                  rx="3"
+                  fill="#002B55"
+                  stroke="#3B82F6"
+                  strokeWidth="0.8"
+                  opacity="0.8"
+                />
+                <text
+                  x="43"
+                  y="36"
+                  fill="#93C5FD"
+                  fontSize="3"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  MAIN AUDITORIUM
+                </text>
 
-                <rect x="52" y="24" width="18" height="16" rx="3" fill="#002B55" stroke="#3B82F6" strokeWidth="0.8" opacity="0.8" />
-                <text x="61" y="33" fill="#93C5FD" fontSize="3" fontWeight="bold" textAnchor="middle">SEMINAR HALL</text>
+                <rect
+                  x="52"
+                  y="24"
+                  width="18"
+                  height="16"
+                  rx="3"
+                  fill="#002B55"
+                  stroke="#3B82F6"
+                  strokeWidth="0.8"
+                  opacity="0.8"
+                />
+                <text
+                  x="61"
+                  y="33"
+                  fill="#93C5FD"
+                  fontSize="3"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  SEMINAR HALL
+                </text>
 
-                <rect x="62" y="44" width="20" height="18" rx="3" fill="#002B55" stroke="#3B82F6" strokeWidth="0.8" opacity="0.8" />
-                <text x="72" y="54" fill="#93C5FD" fontSize="3" fontWeight="bold" textAnchor="middle">TECH BLOCK</text>
+                <rect
+                  x="62"
+                  y="44"
+                  width="20"
+                  height="18"
+                  rx="3"
+                  fill="#002B55"
+                  stroke="#3B82F6"
+                  strokeWidth="0.8"
+                  opacity="0.8"
+                />
+                <text
+                  x="72"
+                  y="54"
+                  fill="#93C5FD"
+                  fontSize="3"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  TECH BLOCK
+                </text>
 
-                <circle cx="35" cy="65" r="10" fill="#064E3B" stroke="#10B981" strokeWidth="0.8" opacity="0.7" />
-                <text x="35" y="66" fill="#A7F3D0" fontSize="2.5" fontWeight="bold" textAnchor="middle">AMPHITHEATER</text>
+                <circle
+                  cx="35"
+                  cy="65"
+                  r="10"
+                  fill="#064E3B"
+                  stroke="#10B981"
+                  strokeWidth="0.8"
+                  opacity="0.7"
+                />
+                <text
+                  x="35"
+                  y="66"
+                  fill="#A7F3D0"
+                  fontSize="2.5"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  AMPHITHEATER
+                </text>
 
-                <rect x="74" y="64" width="22" height="16" rx="3" fill="#78350F" stroke="#F59E0B" strokeWidth="0.8" opacity="0.7" />
-                <text x="85" y="73" fill="#FDE68A" fontSize="2.8" fontWeight="bold" textAnchor="middle">SPORTS TURF</text>
+                <rect
+                  x="74"
+                  y="64"
+                  width="22"
+                  height="16"
+                  rx="3"
+                  fill="#78350F"
+                  stroke="#F59E0B"
+                  strokeWidth="0.8"
+                  opacity="0.7"
+                />
+                <text
+                  x="85"
+                  y="73"
+                  fill="#FDE68A"
+                  fontSize="2.8"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  SPORTS TURF
+                </text>
 
-                <circle cx="20" cy="48" r="8" fill="#581C87" stroke="#A855F7" strokeWidth="0.8" opacity="0.7" />
-                <text x="20" y="49" fill="#E9D5FF" fontSize="2.5" fontWeight="bold" textAnchor="middle">DESIGN STUDIO</text>
+                <circle
+                  cx="20"
+                  cy="48"
+                  r="8"
+                  fill="#581C87"
+                  stroke="#A855F7"
+                  strokeWidth="0.8"
+                  opacity="0.7"
+                />
+                <text
+                  x="20"
+                  y="49"
+                  fill="#E9D5FF"
+                  fontSize="2.5"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  DESIGN STUDIO
+                </text>
 
                 {/* Entry marker */}
                 <rect x="0" y="45" width="8" height="10" fill="#002B55" rx="1" />
-                <text x="4" y="58" fill="#FFFFFF" fontSize="2" fontWeight="bold" textAnchor="middle">MAIN GATE</text>
+                <text
+                  x="4"
+                  y="58"
+                  fill="#FFFFFF"
+                  fontSize="2"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  MAIN GATE
+                </text>
               </svg>
 
               {/* Interactive Venue Pins */}
@@ -285,20 +444,26 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
                 </h3>
                 <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>{selectedVenue.block} ({selectedVenue.campus})</span>
+                  <span>
+                    {selectedVenue.block} ({selectedVenue.campus})
+                  </span>
                 </p>
               </div>
 
               {/* Specs Grid */}
               <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
                 <div>
-                  <span className="text-[10px] font-mono uppercase text-slate-400 block">Auditorium / Lab Capacity</span>
+                  <span className="text-[10px] font-mono uppercase text-slate-400 block">
+                    Auditorium / Lab Capacity
+                  </span>
                   <span className="text-base font-extrabold font-mono text-[#002B55]">
                     {selectedVenue.capacity} Seats
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono uppercase text-slate-400 block">Campus Location</span>
+                  <span className="text-[10px] font-mono uppercase text-slate-400 block">
+                    Campus Location
+                  </span>
                   <span className="text-xs font-semibold text-slate-700 block mt-0.5">
                     {selectedVenue.shuttleDist}
                   </span>
@@ -336,7 +501,9 @@ export function CampusMapModal({ isOpen, onClose, onSelectVenue, currentEvents =
                         key={ev._id}
                         className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-xs"
                       >
-                        <p className="font-bold text-[#002B55]">{ev.title.replace(/^DEMO:\s*/, '')}</p>
+                        <p className="font-bold text-[#002B55]">
+                          {ev.title.replace(/^DEMO:\s*/, '')}
+                        </p>
                         <p className="text-[11px] text-slate-500 font-mono mt-0.5">
                           {new Date(ev.startsAt).toLocaleDateString('en-IN', {
                             weekday: 'short',

@@ -13,7 +13,9 @@ export async function provisionAdmin() {
     const existing = await User.findOne({ email: env.ADMIN_EMAIL.toLowerCase() });
     if (existing) {
       if (existing.role !== 'admin') {
-        throw new Error('The configured administrator email already belongs to a non-admin account');
+        throw new Error(
+          'The configured administrator email already belongs to a non-admin account'
+        );
       }
       console.log(`Administrator already provisioned: ${existing.email}`);
       return;

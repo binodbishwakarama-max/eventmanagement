@@ -6,11 +6,7 @@ import { Event } from '../src/models/Event.js';
 import { Registration } from '../src/models/Registration.js';
 import { User } from '../src/models/User.js';
 import { loginUser, registerUser } from '../src/modules/auth/auth.service.js';
-import {
-  createEvent,
-  deleteEvent,
-  updateEvent
-} from '../src/modules/events/events.service.js';
+import { createEvent, deleteEvent, updateEvent } from '../src/modules/events/events.service.js';
 import {
   cancelRegistration,
   registerForEvent,
@@ -218,9 +214,9 @@ describe('Phase 5: Registration Lifecycle, Atomic Quota & Cancellation', () => {
   });
 
   it('blocks duplicate registration by Student A with HTTP 409 conflict', async () => {
-    await expect(
-      registerForEvent(cappedEvent._id, studentA._id)
-    ).rejects.toMatchObject({ statusCode: 409 });
+    await expect(registerForEvent(cappedEvent._id, studentA._id)).rejects.toMatchObject({
+      statusCode: 409
+    });
   });
 
   it('allows Student B to take the final available seat', async () => {
@@ -239,24 +235,25 @@ describe('Phase 5: Registration Lifecycle, Atomic Quota & Cancellation', () => {
       role: 'student'
     });
 
-    await expect(
-      registerForEvent(cappedEvent._id, extraStudent._id)
-    ).rejects.toMatchObject({ statusCode: 409, message: 'Event is full' });
+    await expect(registerForEvent(cappedEvent._id, extraStudent._id)).rejects.toMatchObject({
+      statusCode: 409,
+      message: 'Event is full'
+    });
 
     const refEvent = await Event.findById(cappedEvent._id);
     expect(refEvent.registeredCount).toBe(2); // strictly no overbooking
   });
 
   it('enforces Rule R6: prevents organizer from lowering capacity below registeredCount', async () => {
-    await expect(
-      updateEvent(cappedEvent._id, { capacity: 1 }, organizerA)
-    ).rejects.toMatchObject({ statusCode: 400 });
+    await expect(updateEvent(cappedEvent._id, { capacity: 1 }, organizerA)).rejects.toMatchObject({
+      statusCode: 400
+    });
   });
 
   it('enforces Rule R7: prevents organizer from deleting event with active registrations', async () => {
-    await expect(
-      deleteEvent(cappedEvent._id, organizerA)
-    ).rejects.toMatchObject({ statusCode: 409 });
+    await expect(deleteEvent(cappedEvent._id, organizerA)).rejects.toMatchObject({
+      statusCode: 409
+    });
   });
 
   it('allows student to cancel registration and decrements registeredCount', async () => {
@@ -327,4 +324,3 @@ describe('Phase 6: Dedicated QR Pass Verification & Check-in Desk', () => {
     ).rejects.toMatchObject({ statusCode: 409 });
   });
 });
-

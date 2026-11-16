@@ -10,7 +10,8 @@ const day = 24 * 60 * 60 * 1000;
 const demoEvents = (now, organizerId, adminId) => [
   {
     title: 'DEMO: Maker Sprint — Build for a Better Campus',
-    description: 'Fictional local-only event data for testing registration, capacity limits and organizer workflows.',
+    description:
+      'Fictional local-only event data for testing registration, capacity limits and organizer workflows.',
     category: 'Technical',
     startsAt: new Date(now + 3 * day),
     endsAt: new Date(now + 3 * day + 12 * 60 * 60 * 1000),
@@ -21,7 +22,8 @@ const demoEvents = (now, organizerId, adminId) => [
   },
   {
     title: 'DEMO: Shape, Type & Interface Workshop',
-    description: 'Fictional workshop entry. Confirm the venue, eligibility and all event details before any real use.',
+    description:
+      'Fictional workshop entry. Confirm the venue, eligibility and all event details before any real use.',
     category: 'Workshop',
     startsAt: new Date(now + 7 * day),
     endsAt: new Date(now + 7 * day + 4 * 60 * 60 * 1000),
@@ -32,7 +34,8 @@ const demoEvents = (now, organizerId, adminId) => [
   },
   {
     title: 'DEMO: Open Stage Sessions',
-    description: 'Sample cultural gathering for local walkthroughs. This is not a real or scheduled university event.',
+    description:
+      'Sample cultural gathering for local walkthroughs. This is not a real or scheduled university event.',
     category: 'Cultural',
     startsAt: new Date(now + 14 * day),
     endsAt: new Date(now + 14 * day + 5 * 60 * 60 * 1000),
@@ -54,7 +57,8 @@ const demoEvents = (now, organizerId, adminId) => [
   },
   {
     title: 'DEMO: Notes on Emerging Ideas',
-    description: 'Fictional seminar entry for testing past-event registration status and analytics.',
+    description:
+      'Fictional seminar entry for testing past-event registration status and analytics.',
     category: 'Seminar',
     startsAt: new Date(now - 12 * day),
     endsAt: new Date(now - 12 * day + 2 * 60 * 60 * 1000),
@@ -76,7 +80,8 @@ const demoEvents = (now, organizerId, adminId) => [
   },
   {
     title: 'DEMO: A Day for Small Ideas',
-    description: 'Cancelled sample event for exercising cancellation banners and organizer controls.',
+    description:
+      'Cancelled sample event for exercising cancellation banners and organizer controls.',
     category: 'Other',
     startsAt: new Date(now + 22 * day),
     endsAt: new Date(now + 22 * day + 4 * 60 * 60 * 1000),
@@ -87,7 +92,8 @@ const demoEvents = (now, organizerId, adminId) => [
   },
   {
     title: 'DEMO: The Open Studio',
-    description: 'Fictional event currently in progress in the demo data. Do not treat this location as real.',
+    description:
+      'Fictional event currently in progress in the demo data. Do not treat this location as real.',
     category: 'Cultural',
     startsAt: new Date(now - 60 * 60 * 1000),
     endsAt: new Date(now + 2 * 60 * 60 * 1000),
@@ -149,11 +155,7 @@ export async function seed() {
   await mongoose.connect(env.MONGODB_URI);
   try {
     if (reset) {
-      await Promise.all([
-        User.deleteMany({}),
-        Event.deleteMany({}),
-        Registration.deleteMany({})
-      ]);
+      await Promise.all([User.deleteMany({}), Event.deleteMany({}), Registration.deleteMany({})]);
     }
 
     const adminPasswordHash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);

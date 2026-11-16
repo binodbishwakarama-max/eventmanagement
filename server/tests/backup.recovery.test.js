@@ -28,7 +28,8 @@ describe('Database Disaster Recovery & Backup Integrity Suite', () => {
 
       const event1 = await Event.create({
         title: 'Disaster Recovery Drill Summit',
-        description: 'Simulated institutional business continuity and backup verification workshop.',
+        description:
+          'Simulated institutional business continuity and backup verification workshop.',
         category: 'Technical',
         venue: 'Sir M. Visvesvaraya Auditorium',
         startsAt: new Date(Date.now() + 86400000),
@@ -91,4 +92,3 @@ describe('Database Disaster Recovery & Backup Integrity Suite', () => {
     }
   });
 });
-

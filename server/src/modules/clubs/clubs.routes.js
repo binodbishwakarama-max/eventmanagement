@@ -11,7 +11,8 @@ export const DEFAULT_DSU_CLUBS = [
     slug: 'dsu-developer-student-club',
     category: 'Technical',
     campus: 'Harohalli Main Campus',
-    description: 'Technical community dedicated to software architecture, open source contribution, mobile dev, and annual hackathons.',
+    description:
+      'Technical community dedicated to software architecture, open source contribution, mobile dev, and annual hackathons.',
     facultyAdvisorName: 'Dr. Ramesh K.',
     studentCoordinatorName: 'Rahul Sharma',
     membershipStatus: 'open',
@@ -23,7 +24,8 @@ export const DEFAULT_DSU_CLUBS = [
     slug: 'dsu-robotics-society',
     category: 'Technical',
     campus: 'Harohalli Main Campus',
-    description: 'Hardware, autonomous navigation, drone telemetry, and embedded systems makerspace.',
+    description:
+      'Hardware, autonomous navigation, drone telemetry, and embedded systems makerspace.',
     facultyAdvisorName: 'Prof. S. Rao',
     studentCoordinatorName: 'Priya Verma',
     membershipStatus: 'open',
@@ -35,7 +37,8 @@ export const DEFAULT_DSU_CLUBS = [
     slug: 'dsu-design-guild',
     category: 'Cultural',
     campus: 'Harohalli Main Campus',
-    description: 'Student designers, UI/UX researchers, visual artists, and digital animators from the School of Design.',
+    description:
+      'Student designers, UI/UX researchers, visual artists, and digital animators from the School of Design.',
     facultyAdvisorName: 'Prof. Ananya Sen',
     studentCoordinatorName: 'Aditi Joshi',
     membershipStatus: 'open',
@@ -47,7 +50,8 @@ export const DEFAULT_DSU_CLUBS = [
     slug: 'dsu-cultural-forum',
     category: 'Cultural',
     campus: 'Harohalli Main Campus',
-    description: 'Fosters performing arts, western and classical music, theatrical drama, and annual university fests.',
+    description:
+      'Fosters performing arts, western and classical music, theatrical drama, and annual university fests.',
     facultyAdvisorName: 'Dr. Meenakshi Sundaram',
     studentCoordinatorName: 'Karthik N.',
     membershipStatus: 'open',
@@ -59,7 +63,8 @@ export const DEFAULT_DSU_CLUBS = [
     slug: 'dsu-sports-council',
     category: 'Sports',
     campus: 'Harohalli Main Campus',
-    description: 'Coordinates varsity tournaments, inter-collegiate leagues, football, cricket, basketball, and fitness initiatives.',
+    description:
+      'Coordinates varsity tournaments, inter-collegiate leagues, football, cricket, basketball, and fitness initiatives.',
     facultyAdvisorName: 'Capt. Vijay Kumar',
     studentCoordinatorName: 'Tanvi Patel',
     membershipStatus: 'open',
@@ -80,4 +85,3 @@ router.get(
 );
 
 export default router;
-

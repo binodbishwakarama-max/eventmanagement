@@ -105,4 +105,3 @@ const venueSchema = new Schema(
 venueSchema.index({ campus: 1, verificationStatus: 1, availabilityStatus: 1 });
 
 export const Venue = model('Venue', venueSchema);
-

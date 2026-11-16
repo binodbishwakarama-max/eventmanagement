@@ -8,13 +8,14 @@ export function DsuLogo({ variant = 'default', size = 'md', className = '' }) {
   const isWhite = variant === 'white';
   const [imgError, setImgError] = useState(false);
 
-  const sizeClasses = {
-    xs: 'h-6 max-h-6',
-    sm: 'h-8 max-h-8',
-    md: 'h-9 sm:h-10 max-h-10',
-    lg: 'h-11 sm:h-12 max-h-12',
-    xl: 'h-12 sm:h-14 max-h-14'
-  }[size] || 'h-9 sm:h-10 max-h-10';
+  const sizeClasses =
+    {
+      xs: 'h-6 max-h-6',
+      sm: 'h-8 max-h-8',
+      md: 'h-9 sm:h-10 max-h-10',
+      lg: 'h-11 sm:h-12 max-h-12',
+      xl: 'h-12 sm:h-14 max-h-14'
+    }[size] || 'h-9 sm:h-10 max-h-10';
 
   const logoSrc = isWhite ? '/dsu-logo-white.png' : '/dsu-logo.png';
 
@@ -37,10 +38,14 @@ export function DsuLogo({ variant = 'default', size = 'md', className = '' }) {
             DSU
           </div>
           <div className="flex flex-col leading-tight">
-            <span className={`font-bold text-sm tracking-tight ${isWhite ? 'text-white' : 'text-[#002B55]'}`}>
+            <span
+              className={`font-bold text-sm tracking-tight ${isWhite ? 'text-white' : 'text-[#002B55]'}`}
+            >
               Dayananda Sagar University
             </span>
-            <span className={`text-[10px] font-medium ${isWhite ? 'text-slate-300' : 'text-slate-500'}`}>
+            <span
+              className={`text-[10px] font-medium ${isWhite ? 'text-slate-300' : 'text-slate-500'}`}
+            >
               Campus Events Portal
             </span>
           </div>

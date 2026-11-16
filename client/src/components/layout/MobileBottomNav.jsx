@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Compass,
-  Calendar,
-  Ticket,
-  MapPin,
-  User,
-  ShieldCheck
-} from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Compass, Calendar, Ticket, MapPin, User, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { apiClient } from '../../api/client';
 import { CampusMapModal } from '../CampusMapModal';
@@ -23,7 +16,6 @@ import { CampusMapModal } from '../CampusMapModal';
 export function MobileBottomNav() {
   const { user } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [mapOpen, setMapOpen] = useState(false);
   const [activePassCount, setActivePassCount] = useState(0);
 
@@ -87,8 +79,12 @@ export function MobileBottomNav() {
               }`
             }
           >
-            <div className={`p-1 rounded-xl transition-colors ${isEventsActive ? 'bg-[#002B55]/10' : ''}`}>
-              <Compass className={`w-5 h-5 transition-transform ${isEventsActive ? 'scale-110 text-[#002B55]' : ''}`} />
+            <div
+              className={`p-1 rounded-xl transition-colors ${isEventsActive ? 'bg-[#002B55]/10' : ''}`}
+            >
+              <Compass
+                className={`w-5 h-5 transition-transform ${isEventsActive ? 'scale-110 text-[#002B55]' : ''}`}
+              />
             </div>
             <span className="text-[10px] tracking-tight leading-none">Discover</span>
           </NavLink>
@@ -114,8 +110,12 @@ export function MobileBottomNav() {
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
-            <div className={`p-1 rounded-xl relative transition-colors ${isDashboardActive ? 'bg-[#002B55]/10' : ''}`}>
-              <Ticket className={`w-5 h-5 transition-transform ${isDashboardActive ? 'scale-110 text-[#002B55]' : ''}`} />
+            <div
+              className={`p-1 rounded-xl relative transition-colors ${isDashboardActive ? 'bg-[#002B55]/10' : ''}`}
+            >
+              <Ticket
+                className={`w-5 h-5 transition-transform ${isDashboardActive ? 'scale-110 text-[#002B55]' : ''}`}
+              />
               {activePassCount > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#D9A521] text-[#00142A] text-[9px] font-black flex items-center justify-center shadow-xs">
                   {activePassCount}
@@ -135,8 +135,12 @@ export function MobileBottomNav() {
                   : 'text-slate-400 hover:text-slate-600'
               }`}
             >
-              <div className={`p-1 rounded-xl transition-colors ${isAdminActive ? 'bg-[#002B55]/10' : ''}`}>
-                <ShieldCheck className={`w-5 h-5 transition-transform ${isAdminActive ? 'scale-110 text-[#002B55]' : ''}`} />
+              <div
+                className={`p-1 rounded-xl transition-colors ${isAdminActive ? 'bg-[#002B55]/10' : ''}`}
+              >
+                <ShieldCheck
+                  className={`w-5 h-5 transition-transform ${isAdminActive ? 'scale-110 text-[#002B55]' : ''}`}
+                />
               </div>
               <span className="text-[10px] tracking-tight leading-none">Console</span>
             </NavLink>
@@ -148,7 +152,9 @@ export function MobileBottomNav() {
               <div className="p-1 rounded-xl">
                 <Calendar className="w-5 h-5 text-slate-500" />
               </div>
-              <span className="text-[10px] tracking-tight leading-none text-slate-500">Schedule</span>
+              <span className="text-[10px] tracking-tight leading-none text-slate-500">
+                Schedule
+              </span>
             </NavLink>
           )}
 

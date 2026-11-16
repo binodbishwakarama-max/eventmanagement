@@ -28,7 +28,7 @@ A production-grade, full-stack campus event management and digital admission sys
 
 - **Frontend (`client/`)**: React 18, Vite, React Router 6, Tailwind CSS, Zod schema validation, accessible design tokens & primitives (`<Button>`, `<Input>`, `<Select>`, `<Card>`, `<Modal>`, `<Skeleton>`, `<EmptyState>`, `<ErrorState>`).
 - **Backend (`server/`)**: Express REST API, Mongoose 8 (MongoDB), JWT authentication with token invalidation, bcrypt password hashing (work factor 12), Helmet HTTP security headers, CORS origin verification, express-rate-limit.
-- **Security & Integrity**: 
+- **Security & Integrity**:
   - Institutional USN validation matching DSU format (`^1DS\d{2}[A-Z]{2,3}\d{3}$`).
   - Academic identity review queue: self-submitted student accounts undergo administrative verification before granting active pass issuance.
   - Cryptographically hashed QR admission passes with single-use check-in enforcement (Rule R9 prevents duplicate entry).
@@ -62,25 +62,25 @@ npm run dev
 
 ### Server (`server/.env`)
 
-| Variable | Description | Default / Example |
-| :--- | :--- | :--- |
-| `PORT` | API server listen port | `5001` |
-| `NODE_ENV` | Runtime environment (`development`, `production`, `test`) | `development` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/dsu_events` |
-| `JWT_SECRET` | 256-bit cryptographic key for session tokens | `64-char hex string` |
-| `JWT_EXPIRES_IN` | Token lifespan | `1d` |
-| `CLIENT_ORIGIN` | Allowed web origin for CORS | `http://localhost:5173` |
-| `ADMIN_EMAIL` | Official administrator email address | `admin@dsu.edu.in` |
-| `ADMIN_PASSWORD` | Administrator initial password (min 12 chars) | `DSUAdmin2026!` |
-| `ALLOWED_EMAIL_DOMAINS` | Permitted institutional student email domains | `dsu.edu.in,example.test` |
-| `EMAIL_PROVIDER` | Transactional email provider (`mock`, `smtp`, `sendgrid`)| `mock` |
-| `STORAGE_PROVIDER` | Poster/file storage provider (`local`, `cloudinary`, `s3`) | `local` |
+| Variable                | Description                                                | Default / Example                      |
+| :---------------------- | :--------------------------------------------------------- | :------------------------------------- |
+| `PORT`                  | API server listen port                                     | `5001`                                 |
+| `NODE_ENV`              | Runtime environment (`development`, `production`, `test`)  | `development`                          |
+| `MONGODB_URI`           | MongoDB connection string                                  | `mongodb://127.0.0.1:27017/dsu_events` |
+| `JWT_SECRET`            | 256-bit cryptographic key for session tokens               | `64-char hex string`                   |
+| `JWT_EXPIRES_IN`        | Token lifespan                                             | `1d`                                   |
+| `CLIENT_ORIGIN`         | Allowed web origin for CORS                                | `http://localhost:5173`                |
+| `ADMIN_EMAIL`           | Official administrator email address                       | `admin@dsu.edu.in`                     |
+| `ADMIN_PASSWORD`        | Administrator initial password (min 12 chars)              | `DSUAdmin2026!`                        |
+| `ALLOWED_EMAIL_DOMAINS` | Permitted institutional student email domains              | `dsu.edu.in,example.test`              |
+| `EMAIL_PROVIDER`        | Transactional email provider (`mock`, `smtp`, `sendgrid`)  | `mock`                                 |
+| `STORAGE_PROVIDER`      | Poster/file storage provider (`local`, `cloudinary`, `s3`) | `local`                                |
 
 ### Client (`client/.env`)
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `VITE_API_URL` | Base API route endpoint | `/api` |
+| Variable         | Description                                                | Default |
+| :--------------- | :--------------------------------------------------------- | :------ |
+| `VITE_API_URL`   | Base API route endpoint                                    | `/api`  |
 | `VITE_DEMO_MODE` | Institutional operation mode (`false` for live university) | `false` |
 
 ---

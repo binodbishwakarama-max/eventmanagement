@@ -12,9 +12,27 @@ import {
 const router = Router();
 
 // Admin / Organizer routes
-router.get('/admin/list', authenticate, authorize('admin', 'organizer'), validate(adminEventQuerySchema, 'query'), eventsController.getAdminEvents);
-router.post('/', authenticate, authorize('admin', 'organizer'), validate(createEventSchema), eventsController.createEvent);
-router.put('/:id', authenticate, authorize('admin', 'organizer'), validate(updateEventSchema), eventsController.updateEvent);
+router.get(
+  '/admin/list',
+  authenticate,
+  authorize('admin', 'organizer'),
+  validate(adminEventQuerySchema, 'query'),
+  eventsController.getAdminEvents
+);
+router.post(
+  '/',
+  authenticate,
+  authorize('admin', 'organizer'),
+  validate(createEventSchema),
+  eventsController.createEvent
+);
+router.put(
+  '/:id',
+  authenticate,
+  authorize('admin', 'organizer'),
+  validate(updateEventSchema),
+  eventsController.updateEvent
+);
 router.delete('/:id', authenticate, authorize('admin', 'organizer'), eventsController.deleteEvent);
 
 // Public routes
@@ -22,4 +40,3 @@ router.get('/', validate(publicEventQuerySchema, 'query'), eventsController.getE
 router.get('/:id', optionalAuthenticate, eventsController.getEvent);
 
 export default router;
-

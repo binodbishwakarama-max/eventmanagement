@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import {
-  Ticket,
-  Shield,
-  ChevronDown,
-  LogOut,
-  Menu,
-  X,
-  MapPin,
-  Bell
-} from 'lucide-react';
+import { Ticket, Shield, ChevronDown, LogOut, Menu, X, MapPin, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../api/client';
 import { DsuLogo } from './DsuLogo';
@@ -132,9 +123,13 @@ export function Navbar() {
             <div className="flex items-center gap-2">
               <span className="font-semibold text-white">Dayananda Sagar University</span>
               <span className="text-slate-500 hidden sm:inline">•</span>
-              <span className="text-slate-300 hidden sm:inline">Harohalli Main Campus Events Portal</span>
+              <span className="text-slate-300 hidden sm:inline">
+                Harohalli Main Campus Events Portal
+              </span>
             </div>
-            <span className="text-slate-300 hidden sm:inline font-mono">Harohalli, Kanakapura Road • events@dsu.edu.in</span>
+            <span className="text-slate-300 hidden sm:inline font-mono">
+              Harohalli, Kanakapura Road • events@dsu.edu.in
+            </span>
           </div>
         </div>
 
@@ -195,7 +190,9 @@ export function Navbar() {
                           className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition block apple-press"
                         >
                           <p className="font-bold text-slate-900 text-xs">{category}</p>
-                          <p className="text-[11px] text-slate-500 font-medium mt-0.5">Explore university gatherings & symposiums</p>
+                          <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                            Explore university gatherings & symposiums
+                          </p>
                         </Link>
                       ))}
                     </div>
@@ -270,7 +267,9 @@ export function Navbar() {
                 {notificationsOpen && (
                   <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-3 text-xs z-50 apple-modal-spring">
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-                      <span className="font-bold text-[#002B55] text-xs uppercase tracking-wider">Campus Desk</span>
+                      <span className="font-bold text-[#002B55] text-xs uppercase tracking-wider">
+                        Campus Desk
+                      </span>
                       <span className="text-[10px] text-slate-500 font-mono">Official Notices</span>
                     </div>
                     <div className="space-y-2">
@@ -281,9 +280,13 @@ export function Navbar() {
                         >
                           <div className="flex items-start justify-between gap-2">
                             <p className="font-bold text-slate-800 text-xs">{n.title}</p>
-                            <span className="text-[10px] text-slate-400 shrink-0 font-mono">{n.time}</span>
+                            <span className="text-[10px] text-slate-400 shrink-0 font-mono">
+                              {n.time}
+                            </span>
                           </div>
-                          <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{n.desc}</p>
+                          <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                            {n.desc}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -316,7 +319,9 @@ export function Navbar() {
                     <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-2 text-xs z-50 apple-modal-spring">
                       <div className="p-3 border-b border-slate-100 bg-slate-50 rounded-lg mb-1">
                         <p className="font-bold text-slate-900 text-sm truncate">{user.name}</p>
-                        <p className="text-slate-500 text-[11px] font-mono truncate">{user.email}</p>
+                        <p className="text-slate-500 text-[11px] font-mono truncate">
+                          {user.email}
+                        </p>
                         <div className="flex items-center gap-1.5 mt-2">
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#002B55] text-white">
                             {user.role}
@@ -414,13 +419,17 @@ export function Navbar() {
         </nav>
 
         {/* University announcements ticker - desktop only */}
-        <div className="hidden md:flex bg-[#F8FAFC] border-t border-b border-[#E5E7EB] px-3 sm:px-4 py-2 overflow-hidden items-center text-xs group" title="Live University Notices">
+        <div
+          className="hidden md:flex bg-[#F8FAFC] border-t border-b border-[#E5E7EB] px-3 sm:px-4 py-2 overflow-hidden items-center text-xs group"
+          title="Live University Notices"
+        >
           <div className="flex items-center gap-1.5 shrink-0 bg-[#002B55] text-[#D9A521] px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase mr-2.5 sm:mr-3">
             <span>CAMPUS NOTICE</span>
           </div>
 
           <p className="text-slate-700 text-xs font-medium truncate sm:whitespace-normal">
-            Registrations are open for university technical symposia, national hackathons, and varsity championships.
+            Registrations are open for university technical symposia, national hackathons, and
+            varsity championships.
           </p>
         </div>
 

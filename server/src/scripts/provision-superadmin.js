@@ -1,4 +1,3 @@
-import readline from 'node:readline';
 import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 import { User } from '../models/User.js';
@@ -21,7 +20,9 @@ export async function bootstrapSuperAdmin(options = {}) {
   if (!targetEmail) {
     console.error('\n❌ [Security Error] Target email is required.');
     console.error('Usage: npm run admin:bootstrap -- --email=operator@dsu.edu.in');
-    console.error('Or:    node server/src/scripts/provision-superadmin.js --email=operator@dsu.edu.in\n');
+    console.error(
+      'Or:    node server/src/scripts/provision-superadmin.js --email=operator@dsu.edu.in\n'
+    );
     process.exit(1);
   }
 
@@ -41,7 +42,9 @@ export async function bootstrapSuperAdmin(options = {}) {
     // 1. One-Time Guard: Check for existing Super Administrator
     const existingSuperAdmin = await User.findOne({ role: 'super_admin' });
     if (existingSuperAdmin && existingSuperAdmin.email !== targetEmail && !args.force) {
-      console.error(`\n⚠️  [Security Warning] An active Super Administrator already exists: ${existingSuperAdmin.email}`);
+      console.error(
+        `\n⚠️  [Security Warning] An active Super Administrator already exists: ${existingSuperAdmin.email}`
+      );
       console.error('To assign an additional super administrator, pass --force explicitly.');
       console.error('Operation aborted to prevent unauthorized privilege takeover.\n');
       process.exit(1);
@@ -53,7 +56,9 @@ export async function bootstrapSuperAdmin(options = {}) {
     if (!targetUser) {
       console.warn(`\n[Notice] No existing account found for ${targetEmail}.`);
       console.log('For zero-trust security, the user should first sign in via Google SSO.');
-      console.log('Creating initial verified administrative shell account for Google SSO linking...');
+      console.log(
+        'Creating initial verified administrative shell account for Google SSO linking...'
+      );
 
       targetUser = await User.create({
         name: args.name || 'University Super Administrator',
@@ -69,7 +74,9 @@ export async function bootstrapSuperAdmin(options = {}) {
       });
 
       console.log(`✅ [Success] Shell account provisioned with SUPER_ADMIN role.`);
-      console.log(`When ${targetEmail} signs in with Google, it will automatically link with root privileges.`);
+      console.log(
+        `When ${targetEmail} signs in with Google, it will automatically link with root privileges.`
+      );
     } else {
       const priorRole = targetUser.role;
       targetUser.role = 'super_admin';
@@ -80,7 +87,9 @@ export async function bootstrapSuperAdmin(options = {}) {
       targetUser.tokenVersion = (targetUser.tokenVersion || 1) + 1; // Invalidate all prior lower-privileged sessions
       await targetUser.save();
 
-      console.log(`✅ [Success] Account ${targetEmail} promoted from [${priorRole}] to [SUPER_ADMIN].`);
+      console.log(
+        `✅ [Success] Account ${targetEmail} promoted from [${priorRole}] to [SUPER_ADMIN].`
+      );
       console.log(`[Security] Token version incremented: all prior active sessions invalidated.`);
     }
 

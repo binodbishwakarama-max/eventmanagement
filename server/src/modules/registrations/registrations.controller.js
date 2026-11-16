@@ -24,7 +24,12 @@ export const getEventRegistrations = asyncHandler(async (req, res) => {
 
 export const updateAttendance = asyncHandler(async (req, res) => {
   const { attended } = req.body;
-  const result = await regService.updateAttendance(req.params.id, req.params.registrationId, attended, req.user);
+  const result = await regService.updateAttendance(
+    req.params.id,
+    req.params.registrationId,
+    attended,
+    req.user
+  );
   return ok(res, result, 'Attendance updated');
 });
 
@@ -33,4 +38,3 @@ export const verifyPass = asyncHandler(async (req, res) => {
   const result = await regService.verifyAndCheckInPass(req.params.id, ticketCode, req.user);
   return ok(res, result, 'Pass verified and attendance marked');
 });
-

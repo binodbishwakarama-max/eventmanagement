@@ -85,4 +85,3 @@ const clubSchema = new Schema(
 clubSchema.index({ campus: 1, verificationStatus: 1, isActive: 1 });
 
 export const Club = model('Club', clubSchema);
-

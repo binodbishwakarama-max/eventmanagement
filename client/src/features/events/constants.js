@@ -1,11 +1,4 @@
-export const EVENT_CATEGORIES = [
-  'Technical',
-  'Cultural',
-  'Sports',
-  'Workshop',
-  'Seminar',
-  'Other'
-];
+export const EVENT_CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Workshop', 'Seminar', 'Other'];
 
 export const DEFAULT_VENUE_PRESETS = [
   { name: 'Sir M. Visvesvaraya Auditorium', capacity: 850 },
@@ -25,4 +18,3 @@ export const formatDateTimeForInput = (isoDate) => {
     date.getHours()
   )}:${pad(date.getMinutes())}`;
 };
-

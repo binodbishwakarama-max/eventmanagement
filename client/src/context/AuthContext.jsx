@@ -59,7 +59,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('dsu_user', JSON.stringify(receivedUser));
     setToken(receivedToken);
     setUser(receivedUser);
-    toast.success(isNew ? `Welcome to DSU Events, ${receivedUser.name}!` : `Welcome back, ${receivedUser.name}!`);
+    toast.success(
+      isNew ? `Welcome to DSU Events, ${receivedUser.name}!` : `Welcome back, ${receivedUser.name}!`
+    );
     return { user: receivedUser, isNew };
   };
 
@@ -105,11 +107,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isBootstrapping, login, register, loginWithGoogle, logout, logoutAll, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isBootstrapping,
+        login,
+        register,
+        loginWithGoogle,
+        logout,
+        logoutAll,
+        refreshUser
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-

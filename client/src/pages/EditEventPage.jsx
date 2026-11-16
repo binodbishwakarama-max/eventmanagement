@@ -30,7 +30,9 @@ export function EditEventPage() {
   const handleSubmit = async (formData) => {
     // Rule R6: Capacity cannot drop below existing registrations count
     if (event && Number(formData.capacity) < event.registeredCount) {
-      toast.error(`Capacity cannot be lower than current registered students (${event.registeredCount})`);
+      toast.error(
+        `Capacity cannot be lower than current registered students (${event.registeredCount})`
+      );
       return;
     }
 
@@ -105,7 +107,8 @@ export function EditEventPage() {
               Edit Event Specifications
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Update institutional schedule, capacity quota ({event.registeredCount || 0} registered), or publication status.
+              Update institutional schedule, capacity quota ({event.registeredCount || 0}{' '}
+              registered), or publication status.
             </p>
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-950">

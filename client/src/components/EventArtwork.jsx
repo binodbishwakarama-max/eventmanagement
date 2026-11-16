@@ -175,7 +175,9 @@ export function EventArtwork({
           loading={featured ? 'eager' : 'lazy'}
         />
       ) : (
-        <div className={`w-full h-full flex flex-col items-center justify-center p-6 text-white ${fallback.bg}`}>
+        <div
+          className={`w-full h-full flex flex-col items-center justify-center p-6 text-white ${fallback.bg}`}
+        >
           <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 mb-2">
             <FallbackIcon className="w-6 h-6 text-white" />
           </div>

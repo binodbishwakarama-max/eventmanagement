@@ -70,16 +70,19 @@ export async function registerForEvent(eventId, studentId) {
     }
 
     // Asynchronously dispatch pass confirmation email to student
-    User.findById(studentId).select('name email').then((student) => {
-      if (student?.email) {
-        sendRegistrationConfirmationEmail({
-          to: student.email,
-          studentName: student.name,
-          event,
-          ticketCode: registration.ticketCode
-        }).catch((err) => console.error('[Email Error] Confirmation email failed:', err.message));
-      }
-    }).catch(() => {});
+    User.findById(studentId)
+      .select('name email')
+      .then((student) => {
+        if (student?.email) {
+          sendRegistrationConfirmationEmail({
+            to: student.email,
+            studentName: student.name,
+            event,
+            ticketCode: registration.ticketCode
+          }).catch((err) => console.error('[Email Error] Confirmation email failed:', err.message));
+        }
+      })
+      .catch(() => {});
 
     eventsCache.clear();
     return registration;
@@ -215,7 +218,9 @@ export async function verifyAndCheckInPass(eventId, ticketCode, user) {
   }
 
   if (registration.attended) {
-    const timeStr = registration.attendedAt ? new Date(registration.attendedAt).toLocaleTimeString('en-IN') : 'earlier';
+    const timeStr = registration.attendedAt
+      ? new Date(registration.attendedAt).toLocaleTimeString('en-IN')
+      : 'earlier';
     throw ApiError.conflict(`Duplicate scan: pass already checked in at ${timeStr}`);
   }
 
@@ -229,7 +234,9 @@ export async function verifyAndCheckInPass(eventId, ticketCode, user) {
 
   if (!updatedReg) {
     const current = await Registration.findById(registration._id);
-    const timeStr = current?.attendedAt ? new Date(current.attendedAt).toLocaleTimeString('en-IN') : 'earlier';
+    const timeStr = current?.attendedAt
+      ? new Date(current.attendedAt).toLocaleTimeString('en-IN')
+      : 'earlier';
     throw ApiError.conflict(`Duplicate scan: pass already checked in at ${timeStr}`);
   }
 

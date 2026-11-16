@@ -9,8 +9,7 @@ const VARIANTS = {
     'bg-transparent hover:bg-slate-100 text-slate-700 hover:text-slate-900 focus-visible:ring-slate-300',
   destructive:
     'bg-rose-600 hover:bg-rose-700 text-white shadow-xs focus-visible:ring-rose-600 active:scale-[0.98]',
-  gold:
-    'bg-[#D9A521] hover:bg-[#C2921A] text-slate-950 font-bold shadow-xs focus-visible:ring-[#D9A521] active:scale-[0.98]'
+  gold: 'bg-[#D9A521] hover:bg-[#C2921A] text-slate-950 font-bold shadow-xs focus-visible:ring-[#D9A521] active:scale-[0.98]'
 };
 
 const SIZES = {
@@ -51,4 +50,3 @@ export function Button({
     </button>
   );
 }
-

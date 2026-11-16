@@ -43,7 +43,9 @@ export async function verifyGoogleIdToken(idToken) {
   }
 
   if (!env.GOOGLE_CLIENT_ID) {
-    throw ApiError.internal('Google OAuth is not configured on this server. GOOGLE_CLIENT_ID is missing.');
+    throw ApiError.internal(
+      'Google OAuth is not configured on this server. GOOGLE_CLIENT_ID is missing.'
+    );
   }
 
   const client = getClient();
@@ -103,4 +105,3 @@ export async function exchangeGoogleAuthCode(code) {
   const { tokens } = await client.getToken(code);
   return verifyGoogleIdToken(tokens.id_token);
 }
-

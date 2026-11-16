@@ -68,4 +68,3 @@ export async function fetchClubs() {
     throw AppApiError.fromAxiosError(err);
   }
 }
-

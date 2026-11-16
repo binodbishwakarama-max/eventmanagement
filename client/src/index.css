@@ -49,28 +49,7 @@
 
 /* Responsive High-DPI Campus Watermark */
 .dsu-campus-watermark {
-  background-image: url('/dsu-campus-hero-desktop.jpg');
-  background-image: -webkit-image-set(
-    url('/dsu-campus-hero-tablet.webp') 1x,
-    url('/dsu-campus-hero-desktop.webp') 2x
-  );
-  background-image: image-set(
-    url('/dsu-campus-hero-tablet.webp') 1x,
-    url('/dsu-campus-hero-desktop.webp') 2x
-  );
-}
-
-/* Responsive Login/Auth Backdrop */
-.dsu-auth-backdrop {
-  background-image: url('/dsu-campus-hero-desktop.jpg');
-  background-image: -webkit-image-set(
-    url('/dsu-campus-hero-mobile-2x.webp') 1x,
-    url('/dsu-campus-hero-desktop.webp') 2x
-  );
-  background-image: image-set(
-    url('/dsu-campus-hero-mobile-2x.webp') 1x,
-    url('/dsu-campus-hero-desktop.webp') 2x
-  );
+  background-image: url('/dsu-campus-hero-desktop.webp');
 }
 
 /* Glassmorphism Navigation */

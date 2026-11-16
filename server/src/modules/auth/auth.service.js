@@ -32,12 +32,26 @@ export async function registerUser(data) {
   }
 
   // Institutional domain check in production (permits university and common public emails)
-  if (env.NODE_ENV === 'production' && env.ALLOWED_EMAIL_DOMAINS && env.ALLOWED_EMAIL_DOMAINS !== '*') {
+  if (
+    env.NODE_ENV === 'production' &&
+    env.ALLOWED_EMAIL_DOMAINS &&
+    env.ALLOWED_EMAIL_DOMAINS !== '*'
+  ) {
     const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
     const domain = data.email.toLowerCase().split('@')[1];
-    const isPublicEmail = ['gmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'hotmail.com', 'proton.me', 'example.test'].includes(domain);
+    const isPublicEmail = [
+      'gmail.com',
+      'outlook.com',
+      'yahoo.com',
+      'icloud.com',
+      'hotmail.com',
+      'proton.me',
+      'example.test'
+    ].includes(domain);
     if (!allowed.includes(domain) && !isPublicEmail) {
-      throw ApiError.badRequest(`Registration requires a valid university (@${allowed.join(', @')}) or personal email address`);
+      throw ApiError.badRequest(
+        `Registration requires a valid university (@${allowed.join(', @')}) or personal email address`
+      );
     }
   }
 
@@ -97,9 +111,19 @@ export async function googleLoginOrRegister({ credential, code, usn }) {
   if (env.ALLOWED_EMAIL_DOMAINS && env.ALLOWED_EMAIL_DOMAINS !== '*') {
     const allowed = env.ALLOWED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase());
     const domain = normalizedEmail.split('@')[1];
-    const isPublicEmail = ['gmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'hotmail.com', 'proton.me', 'example.test'].includes(domain);
+    const isPublicEmail = [
+      'gmail.com',
+      'outlook.com',
+      'yahoo.com',
+      'icloud.com',
+      'hotmail.com',
+      'proton.me',
+      'example.test'
+    ].includes(domain);
     if (!allowed.includes(domain) && !isPublicEmail) {
-      throw ApiError.forbidden(`Access restricted to institutional (@${allowed.join(', @')}) or personal Google accounts`);
+      throw ApiError.forbidden(
+        `Access restricted to institutional (@${allowed.join(', @')}) or personal Google accounts`
+      );
     }
   }
 
@@ -122,7 +146,9 @@ export async function googleLoginOrRegister({ credential, code, usn }) {
   if (!user) {
     // Auto-detect USN and department from institutional email pattern
     const parsedIdentity = parseDsuIdentity(normalizedEmail);
-    const detectedUsn = (usn || parsedIdentity?.usn || normalizedEmail.split('@')[0]).toUpperCase().trim();
+    const detectedUsn = (usn || parsedIdentity?.usn || normalizedEmail.split('@')[0])
+      .toUpperCase()
+      .trim();
     const detectedDepartment = parsedIdentity?.department || 'School of Engineering & Technology';
 
     user = await User.create({
@@ -147,7 +173,9 @@ export async function googleLoginOrRegister({ credential, code, usn }) {
   } else {
     // Check if account has been suspended or deactivated
     if (user.accountStatus === 'suspended') {
-      throw ApiError.forbidden('Your account has been suspended by the university administrator. Please contact registrar support.');
+      throw ApiError.forbidden(
+        'Your account has been suspended by the university administrator. Please contact registrar support.'
+      );
     }
     if (user.accountStatus === 'deactivated') {
       // Reactivate on login
@@ -169,7 +197,9 @@ export async function forgotPassword(email) {
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) {
     // Return vague success response to prevent email enumeration
-    return { message: 'If an account exists with this email, password reset instructions have been issued.' };
+    return {
+      message: 'If an account exists with this email, password reset instructions have been issued.'
+    };
   }
 
   // 1. Generate 32-byte cryptographic random token

@@ -29,7 +29,9 @@ export const authenticate = asyncHandler(async (req, res, next) => {
     }
     // Session Revocation & Suspension Validation
     if (decoded.v && user.tokenVersion && decoded.v !== user.tokenVersion) {
-      throw ApiError.unauthorized('Session has been revoked across devices or password was changed. Please sign in again.');
+      throw ApiError.unauthorized(
+        'Session has been revoked across devices or password was changed. Please sign in again.'
+      );
     }
     if (user.accountStatus === 'suspended') {
       throw ApiError.forbidden('Your account has been suspended by the university administrator.');
@@ -80,4 +82,3 @@ export const authorize = (...roles) => {
     next();
   };
 };
-

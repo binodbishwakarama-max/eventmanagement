@@ -14,27 +14,17 @@ export function Card({ children, className = '', hover = false, ...props }) {
 }
 
 export function CardHeader({ children, className = '' }) {
-  return (
-    <div className={`p-6 pb-4 border-b border-slate-100/80 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`p-6 pb-4 border-b border-slate-100/80 ${className}`}>{children}</div>;
 }
 
 export function CardTitle({ children, className = '' }) {
   return (
-    <h3 className={`text-base font-bold text-slate-900 tracking-tight ${className}`}>
-      {children}
-    </h3>
+    <h3 className={`text-base font-bold text-slate-900 tracking-tight ${className}`}>{children}</h3>
   );
 }
 
 export function CardDescription({ children, className = '' }) {
-  return (
-    <p className={`text-xs text-slate-500 mt-1 leading-relaxed ${className}`}>
-      {children}
-    </p>
-  );
+  return <p className={`text-xs text-slate-500 mt-1 leading-relaxed ${className}`}>{children}</p>;
 }
 
 export function CardContent({ children, className = '' }) {
@@ -50,4 +40,3 @@ export function CardFooter({ children, className = '' }) {
     </div>
   );
 }
-

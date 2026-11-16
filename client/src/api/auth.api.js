@@ -45,4 +45,3 @@ export async function resetPasswordWithToken(token, newPassword) {
     throw AppApiError.fromAxiosError(err);
   }
 }
-

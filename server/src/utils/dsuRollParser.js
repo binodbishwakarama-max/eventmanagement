@@ -4,28 +4,138 @@
  */
 
 const BRANCH_MAP = {
-  cs: { name: 'Computer Science & Engineering', short: 'CSE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  cse: { name: 'Computer Science & Engineering', short: 'CSE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  aiml: { name: 'Artificial Intelligence & Machine Learning', short: 'AI & ML', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ai: { name: 'Artificial Intelligence & Machine Learning', short: 'AI & ML', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ds: { name: 'Data Science & Big Data Analytics', short: 'Data Science', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  cnds: { name: 'Computer Networks & Data Science', short: 'CNDS', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  cy: { name: 'Cyber Security & Forensic Computing', short: 'Cyber Security', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  cscy: { name: 'Cyber Security & Forensic Computing', short: 'Cyber Security', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  is: { name: 'Information Science & Technology', short: 'ISE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ise: { name: 'Information Science & Technology', short: 'ISE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ec: { name: 'Electronics & Communication Engineering', short: 'ECE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ece: { name: 'Electronics & Communication Engineering', short: 'ECE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ee: { name: 'Electrical & Electronics Engineering', short: 'EEE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  eee: { name: 'Electrical & Electronics Engineering', short: 'EEE', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  ae: { name: 'Aerospace Engineering', short: 'Aerospace', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  me: { name: 'Mechanical Engineering', short: 'Mechanical', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  bt: { name: 'Biotechnology & Bioinformatics', short: 'Biotech', degree: 'B.Tech', school: 'School of Basic & Applied Sciences' },
-  cv: { name: 'Civil Engineering', short: 'Civil', degree: 'B.Tech', school: 'School of Engineering & Technology' },
-  des: { name: 'User Experience & Interaction Design', short: 'B.Des', degree: 'B.Des', school: 'School of Design' },
-  bba: { name: 'Bachelor of Business Administration', short: 'BBA', degree: 'BBA', school: 'School of Commerce & Management Studies' },
-  mba: { name: 'Master of Business Administration', short: 'MBA', degree: 'MBA', school: 'School of Commerce & Management Studies' },
-  phar: { name: 'Pharmaceutical Sciences', short: 'Pharmacy', degree: 'B.Pharm', school: 'College of Pharmaceutical Sciences' },
+  cs: {
+    name: 'Computer Science & Engineering',
+    short: 'CSE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  cse: {
+    name: 'Computer Science & Engineering',
+    short: 'CSE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  aiml: {
+    name: 'Artificial Intelligence & Machine Learning',
+    short: 'AI & ML',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ai: {
+    name: 'Artificial Intelligence & Machine Learning',
+    short: 'AI & ML',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ds: {
+    name: 'Data Science & Big Data Analytics',
+    short: 'Data Science',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  cnds: {
+    name: 'Computer Networks & Data Science',
+    short: 'CNDS',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  cy: {
+    name: 'Cyber Security & Forensic Computing',
+    short: 'Cyber Security',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  cscy: {
+    name: 'Cyber Security & Forensic Computing',
+    short: 'Cyber Security',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  is: {
+    name: 'Information Science & Technology',
+    short: 'ISE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ise: {
+    name: 'Information Science & Technology',
+    short: 'ISE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ec: {
+    name: 'Electronics & Communication Engineering',
+    short: 'ECE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ece: {
+    name: 'Electronics & Communication Engineering',
+    short: 'ECE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ee: {
+    name: 'Electrical & Electronics Engineering',
+    short: 'EEE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  eee: {
+    name: 'Electrical & Electronics Engineering',
+    short: 'EEE',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  ae: {
+    name: 'Aerospace Engineering',
+    short: 'Aerospace',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  me: {
+    name: 'Mechanical Engineering',
+    short: 'Mechanical',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  bt: {
+    name: 'Biotechnology & Bioinformatics',
+    short: 'Biotech',
+    degree: 'B.Tech',
+    school: 'School of Basic & Applied Sciences'
+  },
+  cv: {
+    name: 'Civil Engineering',
+    short: 'Civil',
+    degree: 'B.Tech',
+    school: 'School of Engineering & Technology'
+  },
+  des: {
+    name: 'User Experience & Interaction Design',
+    short: 'B.Des',
+    degree: 'B.Des',
+    school: 'School of Design'
+  },
+  bba: {
+    name: 'Bachelor of Business Administration',
+    short: 'BBA',
+    degree: 'BBA',
+    school: 'School of Commerce & Management Studies'
+  },
+  mba: {
+    name: 'Master of Business Administration',
+    short: 'MBA',
+    degree: 'MBA',
+    school: 'School of Commerce & Management Studies'
+  },
+  phar: {
+    name: 'Pharmaceutical Sciences',
+    short: 'Pharmacy',
+    degree: 'B.Pharm',
+    school: 'College of Pharmaceutical Sciences'
+  },
   law: { name: 'School of Law', short: 'Law', degree: 'Law', school: 'School of Law' }
 };
 
@@ -77,4 +187,3 @@ export function parseDsuIdentity(input = '') {
 
   return null;
 }
-

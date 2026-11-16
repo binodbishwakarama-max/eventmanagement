@@ -57,7 +57,10 @@ class CdpSession {
       height,
       deviceScaleFactor,
       mobile,
-      screenOrientation: width > height ? { angle: 90, type: 'landscapePrimary' } : { angle: 0, type: 'portraitPrimary' }
+      screenOrientation:
+        width > height
+          ? { angle: 90, type: 'landscapePrimary' }
+          : { angle: 0, type: 'portraitPrimary' }
     });
   }
 
@@ -108,17 +111,94 @@ class CdpSession {
 }
 
 const VIEWPORTS = [
-  { name: '1-small-phone', label: 'Small Smartphone', width: 320, height: 640, dpr: 2, mobile: true },
-  { name: '2-iphone-standard', label: 'Standard iPhone', width: 390, height: 844, dpr: 3, mobile: true },
-  { name: '3-large-phone', label: 'Large Smartphone (Pro Max)', width: 430, height: 932, dpr: 3, mobile: true },
-  { name: '4-phone-landscape', label: 'Smartphone Landscape', width: 844, height: 390, dpr: 3, mobile: true },
-  { name: '5-tablet-portrait', label: 'Small/Standard Tablet Portrait', width: 768, height: 1024, dpr: 2, mobile: true },
-  { name: '6-tablet-landscape', label: 'Tablet Landscape', width: 1024, height: 768, dpr: 2, mobile: false },
-  { name: '7-laptop-1280', label: 'Standard Laptop (1280)', width: 1280, height: 800, dpr: 1, mobile: false },
-  { name: '8-desktop-1440', label: 'Desktop Monitor (1440)', width: 1440, height: 900, dpr: 1, mobile: false },
-  { name: '9-fhd-1920', label: 'Full HD Monitor (1080p)', width: 1920, height: 1080, dpr: 1, mobile: false },
-  { name: '10-qhd-2560', label: 'QHD / 2K Monitor (2560)', width: 2560, height: 1440, dpr: 1, mobile: false },
-  { name: '11-ultrawide-3440', label: 'Ultra-wide 21:9 Monitor (3440)', width: 3440, height: 1440, dpr: 1, mobile: false }
+  {
+    name: '1-small-phone',
+    label: 'Small Smartphone',
+    width: 320,
+    height: 640,
+    dpr: 2,
+    mobile: true
+  },
+  {
+    name: '2-iphone-standard',
+    label: 'Standard iPhone',
+    width: 390,
+    height: 844,
+    dpr: 3,
+    mobile: true
+  },
+  {
+    name: '3-large-phone',
+    label: 'Large Smartphone (Pro Max)',
+    width: 430,
+    height: 932,
+    dpr: 3,
+    mobile: true
+  },
+  {
+    name: '4-phone-landscape',
+    label: 'Smartphone Landscape',
+    width: 844,
+    height: 390,
+    dpr: 3,
+    mobile: true
+  },
+  {
+    name: '5-tablet-portrait',
+    label: 'Small/Standard Tablet Portrait',
+    width: 768,
+    height: 1024,
+    dpr: 2,
+    mobile: true
+  },
+  {
+    name: '6-tablet-landscape',
+    label: 'Tablet Landscape',
+    width: 1024,
+    height: 768,
+    dpr: 2,
+    mobile: false
+  },
+  {
+    name: '7-laptop-1280',
+    label: 'Standard Laptop (1280)',
+    width: 1280,
+    height: 800,
+    dpr: 1,
+    mobile: false
+  },
+  {
+    name: '8-desktop-1440',
+    label: 'Desktop Monitor (1440)',
+    width: 1440,
+    height: 900,
+    dpr: 1,
+    mobile: false
+  },
+  {
+    name: '9-fhd-1920',
+    label: 'Full HD Monitor (1080p)',
+    width: 1920,
+    height: 1080,
+    dpr: 1,
+    mobile: false
+  },
+  {
+    name: '10-qhd-2560',
+    label: 'QHD / 2K Monitor (2560)',
+    width: 2560,
+    height: 1440,
+    dpr: 1,
+    mobile: false
+  },
+  {
+    name: '11-ultrawide-3440',
+    label: 'Ultra-wide 21:9 Monitor (3440)',
+    width: 3440,
+    height: 1440,
+    dpr: 1,
+    mobile: false
+  }
 ];
 
 async function runResponsiveAudit() {
@@ -160,7 +240,9 @@ async function runResponsiveAudit() {
   const auditResults = [];
 
   for (const vp of VIEWPORTS) {
-    console.log(`\n▶ TESTING VIEWPORT: ${vp.label} (${vp.width}x${vp.height}, DPR=${vp.dpr}, Mobile=${vp.mobile})`);
+    console.log(
+      `\n▶ TESTING VIEWPORT: ${vp.label} (${vp.width}x${vp.height}, DPR=${vp.dpr}, Mobile=${vp.mobile})`
+    );
     await session.setViewport({
       width: vp.width,
       height: vp.height,
@@ -231,12 +313,20 @@ async function runResponsiveAudit() {
     const passedNoScroll = !overflowMetrics.hasHorizontalScroll;
     const isImageSharp = imageMetrics?.isSharp ?? true;
 
-    console.log(`  Horizontal Scroll: ${passedNoScroll ? '✔ None (Clean)' : '❌ OVERFLOW DETECTED'}`);
+    console.log(
+      `  Horizontal Scroll: ${passedNoScroll ? '✔ None (Clean)' : '❌ OVERFLOW DETECTED'}`
+    );
     console.log(`  Hero Image Source: ${imageMetrics?.currentSrc?.split('/').pop() || 'N/A'}`);
-    console.log(`  Hero Image Res: Intrinsic ${imageMetrics?.naturalWidth}x${imageMetrics?.naturalHeight} vs Rendered ${imageMetrics?.clientWidth}x${imageMetrics?.clientHeight}`);
-    console.log(`  Image Sharpness: ${isImageSharp ? '✔ 100% Crisp / No pixelation' : '⚠ Upscaling'}`);
+    console.log(
+      `  Hero Image Res: Intrinsic ${imageMetrics?.naturalWidth}x${imageMetrics?.naturalHeight} vs Rendered ${imageMetrics?.clientWidth}x${imageMetrics?.clientHeight}`
+    );
+    console.log(
+      `  Image Sharpness: ${isImageSharp ? '✔ 100% Crisp / No pixelation' : '⚠ Upscaling'}`
+    );
     console.log(`  Headline: "${textMetrics.headlineText}" (${textMetrics.headlineFontSize})`);
-    console.log(`  Saved Screenshot: ${path.basename(screenshotPath)} (${(size / 1024).toFixed(1)} KB)`);
+    console.log(
+      `  Saved Screenshot: ${path.basename(screenshotPath)} (${(size / 1024).toFixed(1)} KB)`
+    );
 
     auditResults.push({
       viewport: vp,
@@ -252,10 +342,14 @@ async function runResponsiveAudit() {
   console.log('\n--- TESTING ADMIN CONSOLE RESPONSIVENESS ---');
   await session.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, mobile: true });
   await session.navigate(`${BASE_URL}/admin`);
-  const adminMobileScroll = await session.evaluate('document.documentElement.scrollWidth <= window.innerWidth');
+  const adminMobileScroll = await session.evaluate(
+    'document.documentElement.scrollWidth <= window.innerWidth'
+  );
   const adminMobileScreenshot = path.join(screenshotsDir, 'admin-mobile-390.png');
   await session.captureScreenshot(adminMobileScreenshot);
-  console.log(`  Admin Mobile (390x844) No Horizontal Scroll: ${adminMobileScroll ? '✔ PASS' : '❌ FAIL'}`);
+  console.log(
+    `  Admin Mobile (390x844) No Horizontal Scroll: ${adminMobileScroll ? '✔ PASS' : '❌ FAIL'}`
+  );
 
   await session.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await session.navigate(`${BASE_URL}/admin`);
@@ -306,7 +400,9 @@ async function runResponsiveAudit() {
       })
     `);
     console.log(`  Detail load status: ${detailLoaded}`);
-    const hasFloatingBar = await session.evaluate(`!!document.querySelector('[data-testid="floating-mobile-action-bar"]')`);
+    const hasFloatingBar = await session.evaluate(
+      `!!document.querySelector('[data-testid="floating-mobile-action-bar"]')`
+    );
     console.log(`  Floating Mobile Action Bar Present: ${hasFloatingBar ? '✔ PASS' : '❌ FAIL'}`);
     const detailScreenshot = path.join(screenshotsDir, 'event-detail-mobile-390.png');
     await session.captureScreenshot(detailScreenshot);
@@ -321,7 +417,9 @@ async function runResponsiveAudit() {
   let allPass = true;
   for (const r of auditResults) {
     const status = r.passed ? '✔ PASS' : '❌ FAIL';
-    console.log(`  ${status} | ${r.viewport.label.padEnd(35)} | ${r.viewport.width}x${r.viewport.height} | Src: ${r.image?.currentSrc?.split('/').pop()}`);
+    console.log(
+      `  ${status} | ${r.viewport.label.padEnd(35)} | ${r.viewport.width}x${r.viewport.height} | Src: ${r.image?.currentSrc?.split('/').pop()}`
+    );
     if (!r.passed) allPass = false;
   }
 

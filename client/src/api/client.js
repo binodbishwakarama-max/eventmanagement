@@ -26,7 +26,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const url = error.config?.url || '';
-    if (error.response?.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/register')) {
+    if (
+      error.response?.status === 401 &&
+      !url.includes('/auth/login') &&
+      !url.includes('/auth/register')
+    ) {
       localStorage.removeItem('dsu_token');
       localStorage.removeItem('dsu_user');
     }

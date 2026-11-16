@@ -5,16 +5,7 @@ import { apiClient } from '../api/client';
 import { DsuLogo } from '../components/DsuLogo';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { loginSchema, forgotPasswordSchema } from '../features/auth/schemas';
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  ShieldCheck,
-  X,
-  CheckCircle2,
-  AlertCircle
-} from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function LoginPage() {
@@ -25,7 +16,9 @@ export function LoginPage() {
   const [emailInput, setEmailInput] = useState(localStorage.getItem('dsu_remembered_email') || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(Boolean(localStorage.getItem('dsu_remembered_email')));
+  const [rememberMe, setRememberMe] = useState(
+    Boolean(localStorage.getItem('dsu_remembered_email'))
+  );
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
@@ -86,8 +79,7 @@ export function LoginPage() {
         localStorage.removeItem('dsu_remembered_email');
       }
       const returnTo = location.state?.from;
-      const fallback =
-        user.role === 'admin' || user.role === 'organizer' ? '/admin' : '/dashboard';
+      const fallback = user.role === 'admin' || user.role === 'organizer' ? '/admin' : '/dashboard';
       navigate(returnTo ? `${returnTo.pathname}${returnTo.search || ''}` : fallback, {
         replace: true
       });
@@ -141,15 +133,16 @@ export function LoginPage() {
             <h1 className="text-2xl font-bold tracking-tight text-[#002B55]">
               Sign in to Campus Events
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Dayananda Sagar University • Main Campus
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Dayananda Sagar University • Main Campus</p>
           </div>
 
           {/* Institutional Credentials Form */}
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label
+                htmlFor="login-email"
+                className="block text-xs font-semibold text-slate-700 mb-1.5"
+              >
                 Email or Roll Number
               </label>
               <div className="relative">
@@ -180,7 +173,10 @@ export function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label
+                htmlFor="login-password"
+                className="block text-xs font-semibold text-slate-700 mb-1.5"
+              >
                 Password
               </label>
               <div className="relative">
@@ -194,7 +190,8 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: null }));
+                    if (fieldErrors.password)
+                      setFieldErrors((prev) => ({ ...prev, password: null }));
                   }}
                   placeholder="Enter your password"
                   className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55] transition ${
@@ -296,10 +293,7 @@ export function LoginPage() {
           <div className="mt-6 pt-4 border-t border-slate-100 text-center">
             <p className="text-xs text-slate-500">
               Don't have an account?{' '}
-              <Link
-                to="/register"
-                className="font-semibold text-[#002B55] hover:underline"
-              >
+              <Link to="/register" className="font-semibold text-[#002B55] hover:underline">
                 Register
               </Link>
             </p>
@@ -343,9 +337,7 @@ export function LoginPage() {
                     placeholder="student@dsu.edu.in"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#002B55]/20 focus:border-[#002B55]"
                   />
-                  {forgotError && (
-                    <p className="text-[11px] text-rose-600 mt-1">{forgotError}</p>
-                  )}
+                  {forgotError && <p className="text-[11px] text-rose-600 mt-1">{forgotError}</p>}
                 </div>
                 <button
                   type="submit"
@@ -362,7 +354,8 @@ export function LoginPage() {
                 </div>
                 <p className="text-xs font-bold text-slate-900">Reset instructions dispatched!</p>
                 <p className="text-[11px] text-slate-500">
-                  Follow the instructions sent to your institutional email to complete password recovery.
+                  Follow the instructions sent to your institutional email to complete password
+                  recovery.
                 </p>
                 <button
                   type="button"

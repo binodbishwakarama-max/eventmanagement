@@ -42,9 +42,7 @@ app.use(compression());
 // Priority 7: Request Correlation ID Middleware
 app.use((req, res, next) => {
   const correlationId =
-    req.headers['x-correlation-id'] ||
-    req.headers['x-request-id'] ||
-    crypto.randomUUID();
+    req.headers['x-correlation-id'] || req.headers['x-request-id'] || crypto.randomUUID();
   req.correlationId = correlationId;
   res.setHeader('X-Correlation-Id', correlationId);
 
@@ -108,7 +106,8 @@ const corsOptionsDelegate = (req, callback) => {
   if (
     configuredOrigins.includes(reqOrigin) ||
     configuredOrigins.includes('*') ||
-    (env.NODE_ENV !== 'production' && (reqOrigin.includes('localhost') || reqOrigin.includes('127.0.0.1')))
+    (env.NODE_ENV !== 'production' &&
+      (reqOrigin.includes('localhost') || reqOrigin.includes('127.0.0.1')))
   ) {
     return callback(null, { ...baseCorsOptions, origin: true });
   }
@@ -124,7 +123,13 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://accounts.google.com', 'https://www.youtube.com', 'https://s.ytimg.com'],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'https://accounts.google.com',
+          'https://www.youtube.com',
+          'https://s.ytimg.com'
+        ],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
         imgSrc: [
@@ -195,7 +200,10 @@ const authLimiter = rateLimit({
   max: 500, // Accommodate classroom / computer lab cohort batch logins
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: 'Too many authentication attempts, please try again in 15 minutes.' }
+  message: {
+    success: false,
+    message: 'Too many authentication attempts, please try again in 15 minutes.'
+  }
 });
 
 const registrationWriteLimiter = rateLimit({
@@ -205,7 +213,10 @@ const registrationWriteLimiter = rateLimit({
   legacyHeaders: false,
   keyGenerator: (req) => req.headers['authorization'] || req.ip,
   skip: (req) => req.method === 'OPTIONS' || env.NODE_ENV === 'test',
-  message: { success: false, message: 'High registration frequency detected. Please wait a moment before trying again.' }
+  message: {
+    success: false,
+    message: 'High registration frequency detected. Please wait a moment before trying again.'
+  }
 });
 
 const uploadLimiter = rateLimit({
@@ -213,7 +224,10 @@ const uploadLimiter = rateLimit({
   max: 30, // 30 poster uploads per 15 minutes
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: 'Upload rate limit reached. Please wait before uploading more posters.' }
+  message: {
+    success: false,
+    message: 'Upload rate limit reached. Please wait before uploading more posters.'
+  }
 });
 
 // Priority 7: Observability & Production Health Probes

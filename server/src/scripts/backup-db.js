@@ -16,9 +16,8 @@ export async function createDatabaseBackup(customUri = null) {
   const uri = customUri || env.MONGODB_URI;
   console.log(`[Backup Engine] Connecting to database for backup...`);
 
-  const conn = mongoose.connection.readyState === 1
-    ? mongoose.connection
-    : await mongoose.connect(uri);
+  const conn =
+    mongoose.connection.readyState === 1 ? mongoose.connection : await mongoose.connect(uri);
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupFolder = path.join(BACKUPS_DIR, `backup_${timestamp}`);
@@ -52,7 +51,9 @@ export async function createDatabaseBackup(customUri = null) {
       sha256: checksum
     };
 
-    console.log(`  ✔ [Exported] ${col.name}: ${docs.length} records (Checksum: ${checksum.slice(0, 8)}...)`);
+    console.log(
+      `  ✔ [Exported] ${col.name}: ${docs.length} records (Checksum: ${checksum.slice(0, 8)}...)`
+    );
   }
 
   const manifestPath = path.join(backupFolder, 'manifest.json');
@@ -72,4 +73,3 @@ if (process.argv[1]?.endsWith('backup-db.js')) {
       process.exit(1);
     });
 }
-

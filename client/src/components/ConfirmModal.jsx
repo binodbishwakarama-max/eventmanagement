@@ -57,11 +57,7 @@ export function ConfirmModal({
               isDanger ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'
             }`}
           >
-            {isDanger ? (
-              <AlertCircle className="w-6 h-6" />
-            ) : (
-              <AlertTriangle className="w-6 h-6" />
-            )}
+            {isDanger ? <AlertCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
           </div>
 
           <div className="min-w-0 flex-1">
@@ -109,4 +105,3 @@ export function ConfirmModal({
     </div>
   );
 }
-
